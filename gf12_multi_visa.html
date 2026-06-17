@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>マルチビザ タスク連動管理システム｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:760px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#533AB7;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#533AB7;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #F4F0FF}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select,.f textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#533AB7}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-purple{background:#F4F0FF;color:#533AB7}
+.badge-gray{background:#f0f0f0;color:#666}
+.alert-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:.75rem;line-height:1.7}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.alert-purple{background:#F4F0FF;border:1px solid #533AB7;color:#533AB7}
+.worker-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.worker-card.urgent{border-color:#E24B4A;background:#FFF5F5}
+.worker-card.warn{border-color:#EF9F27;background:#FFFBF0}
+.worker-card.ok{border-color:#1D9E75;background:#F0FFF8}
+.worker-header{display:flex;align-items:center;gap:8px;margin-bottom:.5rem;cursor:pointer}
+.worker-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.worker-detail.open{display:block}
+.task-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:12px}
+.task-item:last-child{border-bottom:none}
+.task-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.add-btn{width:100%;padding:10px;border:2px dashed #533AB7;border-radius:10px;background:none;color:#533AB7;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px 6px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:20px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.timeline-bar{height:24px;background:#f0f0f0;border-radius:6px;position:relative;overflow:hidden;margin-top:6px}
+.timeline-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;color:#fff;font-size:10px;font-weight:600}
+.cta-box{background:linear-gradient(135deg,#533AB7,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow マルチビザ タスク連動管理システム｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>🔗 マルチビザ タスク連動管理システム</h1>
+  <p>複数の外国人スタッフの在留資格更新を同時管理<br>関連タスクを自動連動でリストアップ</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('workers',this)">👥 対象者一覧</button>
+  <button class="tab" onclick="switchTab('timeline',this)">📅 更新タイムライン</button>
+  <button class="tab" onclick="switchTab('tasks',this)">✅ 連動タスク一覧</button>
+</div>
+
+<div id="tab-workers"><div id="workers-content"></div></div>
+<div id="tab-timeline" style="display:none"><div id="timeline-content"></div></div>
+<div id="tab-tasks" style="display:none"><div id="tasks-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版で一括管理</h3>
+  <p>本番版では複数顧問先の全スタッフを一括管理・<br>更新タスクの自動生成・期限アラート通知をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var workers = [];
+var expanded = {};
+
+var VISA_TYPES = ['特定技能1号','特定技能2号','技能実習1号','技能実習2号','技能実習3号','育成就労','技術・人文知識・国際業務','経営・管理','留学','家族滞在','永住者','その他'];
+
+var TASK_TEMPLATES = {
+  '特定技能1号':['在留期間更新許可申請書の準備','支援計画実施記録の整理','定期面談記録の確認','受入れ機関概況書の作成'],
+  '特定技能2号':['在留期間更新許可申請書の準備','受入れ機関概況書の作成'],
+  '技能実習1号':['技能実習計画の確認','監理団体への報告','技能検定受検の準備'],
+  '技能実習2号':['技能検定3級受検準備（3号移行の場合）','技能実習計画の確認','監理団体への報告'],
+  '技能実習3号':['技能実習計画の確認','監理団体への報告'],
+  '育成就労':['育成就労計画実施記録の整理','支援計画実施記録の整理','定期面談記録の確認'],
+  '技術・人文知識・国際業務':['在留期間更新許可申請書の準備','在職証明書の準備','業務内容の確認'],
+  '経営・管理':['在留期間更新許可申請書の準備','事業計画書・決算書の準備'],
+  '永住者':['在留カード更新の確認（期限7年）'],
+  '留学':['在学証明書の準備','資格外活動許可の確認'],
+  '家族滞在':['扶養者の在留状況確認']
+};
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['workers','timeline','tasks'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='workers') renderWorkers();
+  if(tab==='timeline') renderTimeline();
+  if(tab==='tasks') renderTasks();
+}
+
+function addWorker(){
+  workers.push({client:'',name:'',visa:'',expiry:'',memo:''});
+  renderWorkers();
+}
+function delWorker(i){if(!confirm('削除しますか？'))return;workers.splice(i,1);renderWorkers();}
+function upWorker(i,key,val){workers[i][key]=val;renderWorkers();}
+function toggleExpand(i){expanded[i]=!expanded[i];renderWorkers();}
+
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  try{var d=new Date(dateStr);return Math.ceil((d-new Date())/86400000);}catch(e){return null;}
+}
+
+function getStatus(w){
+  var days=daysUntil(w.expiry);
+  if(days===null) return 'gray';
+  if(days<0) return 'urgent';
+  if(days<=90) return 'urgent';
+  if(days<=180) return 'warn';
+  return 'ok';
+}
+
+function renderWorkers(){
+  var html='';
+  if(workers.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">対象者がまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    var urgentCount=workers.filter(function(w){return getStatus(w)==='urgent';}).length;
+    var warnCount=workers.filter(function(w){return getStatus(w)==='warn';}).length;
+    var okCount=workers.filter(function(w){return getStatus(w)==='ok';}).length;
+    html+='<div class="sec"><div class="summary-grid">';
+    html+='<div class="summary-card"><div class="summary-num" style="color:#533AB7">'+workers.length+'</div><div class="summary-label">対象者数</div></div>';
+    html+='<div class="summary-card" style="background:#FCEBEB;border-color:#E24B4A"><div class="summary-num" style="color:#A32D2D">'+urgentCount+'</div><div class="summary-label">90日以内</div></div>';
+    html+='<div class="summary-card" style="background:#FAEEDA;border-color:#EF9F27"><div class="summary-num" style="color:#854F0B">'+warnCount+'</div><div class="summary-label">180日以内</div></div>';
+    html+='<div class="summary-card" style="background:#E1F5EE;border-color:#1D9E75"><div class="summary-num" style="color:#0F6E56">'+okCount+'</div><div class="summary-label">余裕あり</div></div>';
+    html+='</div></div>';
+
+    workers.forEach(function(w,i){
+      var st=getStatus(w);
+      var isExp=expanded[i];
+      var days=daysUntil(w.expiry);
+      html+='<div class="worker-card '+(st==='gray'?'':st)+'">';
+      html+='<div class="worker-header" onclick="toggleExpand('+i+')">';
+      html+='<div style="flex:1">';
+      html+='<div style="font-size:13px;font-weight:700">'+(w.name||'（氏名未入力）')+'</div>';
+      html+='<div style="font-size:11px;color:#888">'+(w.client||'顧問先未入力')+' ／ '+(w.visa||'在留資格未選択')+'</div>';
+      html+='</div>';
+      if(days!==null){
+        var badgeCls=st==='urgent'?'badge-ng':st==='warn'?'badge-warn':'badge-ok';
+        html+='<span class="badge '+badgeCls+'">'+(days<0?Math.abs(days)+'日超過':'あと'+days+'日')+'</span>';
+      }
+      html+='<span style="font-size:12px;color:#aaa;margin-left:4px">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+      html+='<div class="worker-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r2">';
+      html+='<div class="f"><label>顧問先名</label><input type="text" value="'+escH(w.client)+'" placeholder="例：株式会社〇〇" oninput="upWorker('+i+',\'client\',this.value)"></div>';
+      html+='<div class="f"><label>氏名</label><input type="text" value="'+escH(w.name)+'" placeholder="例：Nguyen Van A" oninput="upWorker('+i+',\'name\',this.value)"></div>';
+      html+='<div class="f"><label>在留資格</label><select onchange="upWorker('+i+',\'visa\',this.value)"><option value="">選択</option>'+VISA_TYPES.map(function(v){return'<option '+(w.visa===v?'selected':'')+'>'+v+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>在留期限</label><input type="date" value="'+escH(w.expiry)+'" oninput="upWorker('+i+',\'expiry\',this.value)"></div>';
+      html+='</div>';
+      html+='<div class="f"><label>メモ</label><input type="text" value="'+escH(w.memo)+'" placeholder="備考など" oninput="upWorker('+i+',\'memo\',this.value)"></div>';
+      html+='<button class="del-btn" onclick="delWorker('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addWorker()">＋ 対象者を追加</button>';
+  document.getElementById('workers-content').innerHTML=html;
+}
+
+function renderTimeline(){
+  var html='<div class="sec"><div class="sec-title">📅 在留期限 更新タイムライン</div>';
+  if(workers.length===0){
+    html+='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">対象者一覧タブで対象者を登録するとタイムラインが表示されます</div>';
+  } else {
+    html+='<div class="alert-purple">在留期限が近い順に表示しています。期限の3か月前から更新手続きが可能です。</div>';
+    var sorted=workers.filter(function(w){return w.expiry;}).map(function(w){return {w:w,days:daysUntil(w.expiry)};}).sort(function(a,b){return a.days-b.days;});
+    sorted.forEach(function(item){
+      var w=item.w, days=item.days;
+      var pct=Math.max(2,Math.min(100,100-(days/365*100)));
+      var col=days<0?'#E24B4A':days<=90?'#E24B4A':days<=180?'#EF9F27':'#1D9E75';
+      html+='<div style="margin-bottom:.75rem">';
+      html+='<div style="font-size:12px;font-weight:600;color:#333">'+escH(w.name||'（氏名未入力）')+'　<span style="color:#888;font-weight:400">'+escH(w.client||'')+' ／ '+escH(w.visa||'')+'</span></div>';
+      html+='<div class="timeline-bar"><div class="timeline-fill" style="width:'+pct+'%;background:'+col+'">'+(days<0?Math.abs(days)+'日超過':days+'日')+'</div></div>';
+      html+='</div>';
+    });
+    if(sorted.length===0) html+='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">在留期限を入力すると表示されます</div>';
+  }
+  html+='</div>';
+  document.getElementById('timeline-content').innerHTML=html;
+}
+
+function renderTasks(){
+  var html='<div class="sec"><div class="sec-title">✅ 在留資格別 連動タスク一覧</div>';
+  var hasVisa=workers.filter(function(w){return w.visa;});
+  if(hasVisa.length===0){
+    html+='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">対象者一覧タブで在留資格を選択するとタスクが自動生成されます</div>';
+  } else {
+    html+='<div class="alert-purple">在留資格に応じて必要なタスクを自動でリストアップします。</div>';
+    hasVisa.forEach(function(w){
+      var tasks=TASK_TEMPLATES[w.visa]||['在留期間更新許可申請書の準備'];
+      var days=daysUntil(w.expiry);
+      html+='<div style="margin-bottom:.75rem;border:1px solid #eee;border-radius:10px;padding:.75rem">';
+      html+='<div style="font-size:13px;font-weight:700;color:#533AB7;margin-bottom:6px">'+escH(w.name||'（氏名未入力）')+'　<span style="font-size:11px;color:#888;font-weight:400">'+escH(w.visa)+(days!==null?'　期限まで'+(days<0?Math.abs(days)+'日超過':days+'日'):'')+'</span></div>';
+      tasks.forEach(function(t){
+        var dotCol=days!==null&&days<=90?'#E24B4A':days!==null&&days<=180?'#EF9F27':'#1D9E75';
+        html+='<div class="task-item"><div class="task-dot" style="background:'+dotCol+'"></div>'+t+'</div>';
+      });
+      html+='</div>';
+    });
+  }
+  html+='</div>';
+  document.getElementById('tasks-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderWorkers();
+</script>
+</body>
+</html>

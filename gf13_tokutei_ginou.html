@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>特定技能 支援計画書 作成ツール｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:720px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#0F6E56,#1D9E75);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#1D9E75;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#0F6E56;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E1F5EE}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select,.f textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#1D9E75}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-gray{background:#f0f0f0;color:#666}
+.alert-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:.75rem;line-height:1.7}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.alert-blue{background:#E6F1FB;border:1px solid #185FA5;color:#0C447C}
+.support-item{border:1.5px solid #eee;border-radius:10px;padding:.85rem;margin-bottom:.6rem}
+.support-item.done{border-color:#1D9E75;background:#F0FFF8}
+.support-header{display:flex;align-items:center;gap:8px;margin-bottom:.5rem;cursor:pointer}
+.support-num{width:24px;height:24px;border-radius:50%;background:#1D9E75;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.support-title{font-size:13px;font-weight:700;flex:1}
+.support-detail{display:none;margin-top:.5rem;padding-top:.5rem;border-top:1px solid #eee}
+.support-detail.open{display:block}
+.support-desc{font-size:11px;color:#666;line-height:1.6;margin-bottom:.5rem}
+.chk{width:22px;height:22px;border-radius:6px;border:1.5px solid #ddd;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff}
+.chk.done{background:#1D9E75;border-color:#1D9E75}
+.preview-box{background:#fafafa;border:1px solid #ddd;border-radius:10px;padding:1rem;font-size:12px;line-height:1.8;white-space:pre-wrap;font-family:monospace}
+.summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:12px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:24px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.progress-bar-bg{height:8px;background:#eee;border-radius:4px;margin-top:6px}
+.progress-bar-fill{height:100%;border-radius:4px;transition:width .4s;background:#1D9E75}
+.cta-box{background:linear-gradient(135deg,#0F6E56,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+.gen-btn{width:100%;padding:12px;border:none;border-radius:10px;background:#1D9E75;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:.5rem}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 特定技能 支援計画書 作成ツール｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>📝 特定技能 支援計画書 作成ツール</h1>
+  <p>1号特定技能外国人支援計画の10項目を<br>入力するだけで計画書を作成</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('basic',this)">📋 基本情報</button>
+  <button class="tab" onclick="switchTab('support',this)">✅ 支援10項目</button>
+  <button class="tab" onclick="switchTab('preview',this)">📄 計画書プレビュー</button>
+</div>
+
+<div id="tab-basic"><div id="basic-content"></div></div>
+<div id="tab-support" style="display:none"><div id="support-content"></div></div>
+<div id="tab-preview" style="display:none"><div id="preview-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版でPDF出力</h3>
+  <p>本番版では計画書のPDF出力・<br>複数名分のテンプレート管理・更新履歴管理をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var basic = {
+  company:'', representative:'', address:'',
+  worker_name:'', worker_nationality:'', field:'',
+  support_org:'', support_org_address:'', plan_date:''
+};
+
+var SUPPORT_ITEMS = [
+  {
+    id:'s1', title:'事前ガイダンスの提供',
+    desc:'雇用契約締結後、入国前または在留資格変更前に、労働条件・活動内容・入国手続き・上陸条件等について、本人が理解できる言語で実施します。',
+    detail:''
+  },
+  {
+    id:'s2', title:'出入国する際の送迎',
+    desc:'出入国港と事業所または住居との間の送迎を行います。',
+    detail:''
+  },
+  {
+    id:'s3', title:'住居確保・生活に必要な契約支援',
+    desc:'住居確保の支援（連帯保証人になる、社宅を提供する等）、銀行口座開設・携帯電話契約・電気ガス水道等の手続きを補助します。',
+    detail:''
+  },
+  {
+    id:'s4', title:'生活オリエンテーションの実施',
+    desc:'生活一般に関する事項（金融機関・医療機関・交通機関の利用方法、緊急時の対応等）について、本人が理解できる言語で8時間以上実施します。',
+    detail:''
+  },
+  {
+    id:'s5', title:'公的手続き等への同行',
+    desc:'必要に応じて、住居地・社会保障・税金等の手続きについて、書類作成の補助・行政機関への同行を行います。',
+    detail:''
+  },
+  {
+    id:'s6', title:'日本語学習の機会の提供',
+    desc:'日本語教室・日本語学習教材の情報提供、自主学習のための契約補助等を行います。',
+    detail:''
+  },
+  {
+    id:'s7', title:'相談・苦情への対応',
+    desc:'職場や生活上の問題について、本人が理解できる言語で相談・苦情に対応します。',
+    detail:''
+  },
+  {
+    id:'s8', title:'日本人との交流促進',
+    desc:'地域の祭り等の案内、自治会等の地域住民との交流の場の情報提供を行います。',
+    detail:''
+  },
+  {
+    id:'s9', title:'転職支援（人員整理等の場合）',
+    desc:'employer都合により雇用契約を解除する場合、転職先を探すための支援（求人情報の提供、職業紹介事業者の紹介等）を行います。',
+    detail:''
+  },
+  {
+    id:'s10', title:'定期的な面談・行政機関への通報',
+    desc:'支援責任者・支援担当者が3か月に1回以上、本人および監督者と面談を実施します。労働基準法等の違反を知った場合は、行政機関に通報します。',
+    detail:''
+  }
+];
+
+var checks = {};
+var expanded = {};
+
+var FIELDS = ['介護','ビルクリーニング','素形材・産業機械','電気電子情報','建設','造船・舶用','自動車整備','航空','宿泊','農業','漁業','飲食料品製造','外食業'];
+var NATIONALITIES = ['ベトナム','中国','フィリピン','インドネシア','ミャンマー','タイ','カンボジア','ネパール','スリランカ','その他'];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['basic','support','preview'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='basic') renderBasic();
+  if(tab==='support') renderSupport();
+  if(tab==='preview') renderPreview();
+}
+
+function upBasic(key,val){basic[key]=val;}
+
+function renderBasic() {
+  var html = '<div class="sec"><div class="sec-title">📋 基本情報入力</div>';
+  html += '<div class="alert-blue">特定技能1号外国人を雇用する際は「1号特定技能外国人支援計画」の作成が義務です。基本情報を入力してください。</div>';
+  html += '<div style="font-size:12px;font-weight:600;color:#0F6E56;margin-bottom:6px">🏢 受入企業情報</div>';
+  html += '<div class="r2">';
+  html += '<div class="f"><label>企業名</label><input type="text" value="'+escH(basic.company)+'" placeholder="例：株式会社〇〇" oninput="upBasic(\'company\',this.value)"></div>';
+  html += '<div class="f"><label>代表者名</label><input type="text" value="'+escH(basic.representative)+'" placeholder="代表取締役 〇〇" oninput="upBasic(\'representative\',this.value)"></div>';
+  html += '<div class="f" style="grid-column:1/-1"><label>住所</label><input type="text" value="'+escH(basic.address)+'" placeholder="事業所の住所" oninput="upBasic(\'address\',this.value)"></div>';
+  html += '</div>';
+
+  html += '<div style="font-size:12px;font-weight:600;color:#0F6E56;margin:.75rem 0 6px">👤 特定技能外国人情報</div>';
+  html += '<div class="r2">';
+  html += '<div class="f"><label>氏名</label><input type="text" value="'+escH(basic.worker_name)+'" placeholder="例：Nguyen Van A" oninput="upBasic(\'worker_name\',this.value)"></div>';
+  html += '<div class="f"><label>国籍</label><select onchange="upBasic(\'worker_nationality\',this.value)"><option value="">選択</option>'+NATIONALITIES.map(function(n){return'<option '+(basic.worker_nationality===n?'selected':'')+'>'+n+'</option>';}).join('')+'</select></div>';
+  html += '<div class="f" style="grid-column:1/-1"><label>特定産業分野</label><select onchange="upBasic(\'field\',this.value)"><option value="">選択</option>'+FIELDS.map(function(f){return'<option '+(basic.field===f?'selected':'')+'>'+f+'</option>';}).join('')+'</select></div>';
+  html += '</div>';
+
+  html += '<div style="font-size:12px;font-weight:600;color:#0F6E56;margin:.75rem 0 6px">🏛 登録支援機関情報（自社支援の場合は空欄）</div>';
+  html += '<div class="r2">';
+  html += '<div class="f"><label>登録支援機関名</label><input type="text" value="'+escH(basic.support_org)+'" placeholder="登録支援機関名（自社支援の場合は空欄）" oninput="upBasic(\'support_org\',this.value)"></div>';
+  html += '<div class="f"><label>計画作成日</label><input type="date" value="'+escH(basic.plan_date)+'" oninput="upBasic(\'plan_date\',this.value)"></div>';
+  html += '<div class="f" style="grid-column:1/-1"><label>登録支援機関 所在地</label><input type="text" value="'+escH(basic.support_org_address)+'" placeholder="登録支援機関の住所" oninput="upBasic(\'support_org_address\',this.value)"></div>';
+  html += '</div>';
+  html += '</div>';
+  document.getElementById('basic-content').innerHTML = html;
+}
+
+function toggleCheck(id){checks[id]=!checks[id];renderSupport();}
+function toggleExpand(id){expanded[id]=!expanded[id];renderSupport();}
+function upDetail(id,val){
+  var item = SUPPORT_ITEMS.find(function(s){return s.id===id;});
+  if(item) item.detail = val;
+}
+
+function renderSupport() {
+  var done = SUPPORT_ITEMS.filter(function(s){return checks[s.id];}).length;
+  var pct = Math.round(done/SUPPORT_ITEMS.length*100);
+
+  var html = '<div class="sec"><div class="sec-title">✅ 1号特定技能外国人支援 10項目<span style="font-size:11px;font-weight:400;color:#666">'+done+'/10完了</span></div>';
+  html += '<div class="progress-bar-bg"><div class="progress-bar-fill" style="width:'+pct+'%"></div></div>';
+  html += '<div class="alert-blue" style="margin:.75rem 0">各項目について実施内容を確認・記入し、チェックを入れてください。10項目すべての実施が義務です。</div>';
+
+  SUPPORT_ITEMS.forEach(function(item,idx){
+    var done = checks[item.id];
+    var isExp = expanded[item.id];
+    html += '<div class="support-item'+(done?' done':'')+'">';
+    html += '<div class="support-header" onclick="toggleExpand(\''+item.id+'\')">';
+    html += '<div class="support-num">'+(idx+1)+'</div>';
+    html += '<div class="support-title">'+item.title+'</div>';
+    html += '<div class="chk'+(done?' done':'')+'" onclick="event.stopPropagation();toggleCheck(\''+item.id+'\')">'+(done?'✓':'')+'</div>';
+    html += '<span style="font-size:12px;color:#aaa">'+(isExp?'▲':'▼')+'</span>';
+    html += '</div>';
+    html += '<div class="support-detail'+(isExp?' open':'')+'">';
+    html += '<div class="support-desc">'+item.desc+'</div>';
+    html += '<div class="f"><label>具体的な実施内容・備考</label><textarea rows="2" oninput="upDetail(\''+item.id+'\',this.value)">'+escH(item.detail)+'</textarea></div>';
+    html += '</div></div>';
+  });
+
+  if(pct===100){
+    html += '<div class="alert-ok" style="margin-top:.5rem">✓ 全10項目の実施内容を入力しました。計画書プレビュータブで確認してください。</div>';
+    html += '<button class="gen-btn" onclick="switchTab(\'preview\',document.querySelectorAll(\'.tab\')[2])">📄 計画書プレビューを見る →</button>';
+  }
+  html += '</div>';
+  document.getElementById('support-content').innerHTML = html;
+}
+
+function renderPreview() {
+  var done = SUPPORT_ITEMS.filter(function(s){return checks[s.id];}).length;
+  var html = '<div class="sec"><div class="sec-title">📄 1号特定技能外国人支援計画書（プレビュー）</div>';
+
+  if(done===0){
+    html += '<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">支援10項目タブで実施内容を入力するとプレビューが生成されます</div>';
+  } else {
+    var text = '【1号特定技能外国人支援計画書】\n\n';
+    text += '■ 受入機関情報\n';
+    text += '企業名：'+(basic.company||'（未入力）')+'\n';
+    text += '代表者：'+(basic.representative||'（未入力）')+'\n';
+    text += '所在地：'+(basic.address||'（未入力）')+'\n\n';
+    text += '■ 特定技能外国人情報\n';
+    text += '氏名：'+(basic.worker_name||'（未入力）')+'\n';
+    text += '国籍：'+(basic.worker_nationality||'（未入力）')+'\n';
+    text += '特定産業分野：'+(basic.field||'（未入力）')+'\n\n';
+    if(basic.support_org){
+      text += '■ 登録支援機関\n';
+      text += '機関名：'+basic.support_org+'\n';
+      text += '所在地：'+(basic.support_org_address||'')+'\n\n';
+    } else {
+      text += '■ 支援実施体制：自社支援\n\n';
+    }
+    text += '作成日：'+(basic.plan_date||'（未入力）')+'\n\n';
+    text += '■ 支援内容（全10項目）\n\n';
+    SUPPORT_ITEMS.forEach(function(item,idx){
+      text += (idx+1)+'. '+item.title+'\n';
+      text += '   '+item.desc+'\n';
+      if(item.detail) text += '   【実施内容】'+item.detail+'\n';
+      text += '\n';
+    });
+    html += '<div class="preview-box">'+escH(text)+'</div>';
+    html += '<button class="gen-btn" onclick="alert(\'本番版ではPDFファイルとしてダウンロードできます\')">📥 PDFでダウンロード（本番版機能）</button>';
+  }
+  html += '</div>';
+  document.getElementById('preview-content').innerHTML = html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderBasic();
+</script>
+</body>
+</html>

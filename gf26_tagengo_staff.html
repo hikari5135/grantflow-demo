@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>多言語スタッフ管理システム｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:760px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#0F6E56,#1D9E75);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#1D9E75;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#0F6E56;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E1F5EE}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select,.f textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#1D9E75}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-gray{background:#f0f0f0;color:#666}
+.alert-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:.75rem;line-height:1.7}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-blue{background:#E6F1FB;border:1px solid #185FA5;color:#0C447C}
+.staff-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.staff-header{display:flex;align-items:center;gap:8px;margin-bottom:.5rem;cursor:pointer}
+.staff-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.staff-detail.open{display:block}
+.add-btn{width:100%;padding:10px;border:2px dashed #1D9E75;border-radius:10px;background:none;color:#1D9E75;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px 6px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:20px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.lang-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px;background:#E1F5EE;color:#0F6E56}
+.msg-box{background:#f8f8f8;border-radius:10px;padding:1rem;margin-top:.5rem;font-size:13px;line-height:1.8;border:1px solid #eee}
+.cta-box{background:linear-gradient(135deg,#0F6E56,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 多言語スタッフ管理システム｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>🌏 多言語スタッフ管理システム</h1>
+  <p>外国人スタッフの情報を多言語で管理<br>連絡・通知を母国語で自動生成</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('staff',this)">👤 スタッフ一覧</button>
+  <button class="tab" onclick="switchTab('message',this)">💬 多言語メッセージ</button>
+  <button class="tab" onclick="switchTab('summary',this)">📊 国籍別サマリー</button>
+</div>
+
+<div id="tab-staff"><div id="staff-content"></div></div>
+<div id="tab-message" style="display:none"><div id="message-content"></div></div>
+<div id="tab-summary" style="display:none"><div id="summary-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版でさらに便利に</h3>
+  <p>本番版ではクラウド保存・多言語一括送信・<br>翻訳精度向上をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="https://forms.gle/xrgH2CtGaCL7LXHE6" target="_blank" class="cta-btn">📝 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var staff = [];
+var expanded = {};
+
+var NATIONALITIES = ['ベトナム','中国','フィリピン','インドネシア','ミャンマー','タイ','カンボジア','ネパール','その他'];
+var LANGS = ['ベトナム語','中国語','フィリピン語（タガログ語）','インドネシア語','ミャンマー語','タイ語','英語'];
+var VISA_TYPES = ['特定技能1号','技能実習','育成就労','技術・人文知識・国際業務','永住者','その他'];
+var JAPANESE_LEVELS = ['N1（高度）','N2（上級）','N3（中級）','N4（初級）','N5（入門）','なし'];
+
+var MESSAGES = {
+  'ベトナム語': {
+    greeting: 'Xin chào! Chúc bạn một ngày làm việc tốt lành.',
+    shift: 'Ca làm việc của bạn ngày mai: {shift}',
+    safety: 'Hãy chú ý an toàn trong công việc!',
+    holiday: 'Ngày mai là ngày nghỉ. Chúc bạn nghỉ ngơi vui vẻ!'
+  },
+  '中国語': {
+    greeting: '你好！祝您工作顺利！',
+    shift: '明天的工作班次：{shift}',
+    safety: '请注意工作安全！',
+    holiday: '明天是休息日。祝您休息愉快！'
+  },
+  'フィリピン語（タガログ語）': {
+    greeting: 'Magandang araw! Sana ay maayos ang iyong trabaho ngayon.',
+    shift: 'Ang iyong shift bukas: {shift}',
+    safety: 'Mag-ingat sa kaligtasan sa trabaho!',
+    holiday: 'Bukas ay holiday. Mag-pahinga nang maayos!'
+  },
+  'インドネシア語': {
+    greeting: 'Halo! Semoga hari kerja Anda menyenangkan.',
+    shift: 'Shift kerja Anda besok: {shift}',
+    safety: 'Perhatikan keselamatan kerja!',
+    holiday: 'Besok adalah hari libur. Selamat beristirahat!'
+  },
+  'ミャンマー語': {
+    greeting: 'မင်္ဂလာပါ! ကောင်းသောနေ့ရက်ဖြစ်ပါစေ။',
+    shift: 'မနက်ဖြန် အလုပ်ချိန်: {shift}',
+    safety: 'အလုပ်လုံခြုံရေးကို သတိထားပါ!',
+    holiday: 'မနက်ဖြန် ရုံးပိတ်ရက်ဖြစ်သည်။ နားနေပါ!'
+  },
+  'タイ語': {
+    greeting: 'สวัสดี! ขอให้ทำงานได้ดีนะครับ/ค่ะ',
+    shift: 'กะทำงานพรุ่งนี้: {shift}',
+    safety: 'โปรดระวังความปลอดภัยในการทำงาน!',
+    holiday: 'พรุ่งนี้เป็นวันหยุด ขอให้พักผ่อนให้เต็มที่!'
+  },
+  '英語': {
+    greeting: 'Hello! Have a great working day!',
+    shift: 'Your shift tomorrow: {shift}',
+    safety: 'Please be careful about work safety!',
+    holiday: 'Tomorrow is a holiday. Enjoy your day off!'
+  }
+};
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['staff','message','summary'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='staff') renderStaff();
+  if(tab==='message') renderMessage();
+  if(tab==='summary') renderSummary();
+}
+
+function addStaff(){
+  staff.push({name:'',nameKana:'',nationality:'ベトナム',lang:'ベトナム語',visa:'特定技能1号',japanese:'N4（初級）',dept:'',phone:'',memo:''});
+  renderStaff();
+}
+function delStaff(i){if(!confirm('削除しますか？'))return;staff.splice(i,1);renderStaff();}
+function upStaff(i,key,val){staff[i][key]=val;}
+function toggleExpand(i){expanded[i]=!expanded[i];renderStaff();}
+
+function renderStaff(){
+  var html='';
+  if(staff.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">スタッフがまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    staff.forEach(function(s,i){
+      var isExp=expanded[i];
+      html+='<div class="staff-card">';
+      html+='<div class="staff-header" onclick="toggleExpand('+i+')">';
+      html+='<div style="flex:1">';
+      html+='<div style="font-size:13px;font-weight:700">'+(s.name||'（氏名未入力）')+'</div>';
+      html+='<div style="font-size:11px;color:#888">'+escH(s.nationality)+' ／ '+escH(s.visa)+' ／ 日本語：'+escH(s.japanese)+'</div>';
+      html+='</div>';
+      html+='<span class="lang-badge">'+escH(s.lang)+'</span>';
+      html+='<span style="font-size:12px;color:#aaa;margin-left:4px">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+      html+='<div class="staff-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r3">';
+      html+='<div class="f"><label>氏名</label><input type="text" value="'+escH(s.name)+'" placeholder="例：Nguyen Van A" oninput="upStaff('+i+',\'name\',this.value)"></div>';
+      html+='<div class="f"><label>氏名（カナ）</label><input type="text" value="'+escH(s.nameKana)+'" placeholder="ニュエン バン エー" oninput="upStaff('+i+',\'nameKana\',this.value)"></div>';
+      html+='<div class="f"><label>国籍</label><select onchange="upStaff('+i+',\'nationality\',this.value)">'+NATIONALITIES.map(function(n){return'<option '+(s.nationality===n?'selected':'')+'>'+n+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>使用言語</label><select onchange="upStaff('+i+',\'lang\',this.value)">'+LANGS.map(function(l){return'<option '+(s.lang===l?'selected':'')+'>'+l+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>在留資格</label><select onchange="upStaff('+i+',\'visa\',this.value)">'+VISA_TYPES.map(function(v){return'<option '+(s.visa===v?'selected':'')+'>'+v+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>日本語レベル</label><select onchange="upStaff('+i+',\'japanese\',this.value)">'+JAPANESE_LEVELS.map(function(j){return'<option '+(s.japanese===j?'selected':'')+'>'+j+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>部署</label><input type="text" value="'+escH(s.dept)+'" placeholder="部署名" oninput="upStaff('+i+',\'dept\',this.value)"></div>';
+      html+='<div class="f"><label>電話番号</label><input type="text" value="'+escH(s.phone)+'" placeholder="電話番号" oninput="upStaff('+i+',\'phone\',this.value)"></div>';
+      html+='<div class="f"><label>メモ</label><input type="text" value="'+escH(s.memo)+'" placeholder="備考など" oninput="upStaff('+i+',\'memo\',this.value)"></div>';
+      html+='</div>';
+      html+='<button class="del-btn" onclick="delStaff('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addStaff()">＋ スタッフを追加</button>';
+  document.getElementById('staff-content').innerHTML=html;
+}
+
+function renderMessage(){
+  var html='<div class="sec"><div class="sec-title">💬 多言語メッセージ生成</div>';
+  html+='<div class="alert-blue">スタッフの使用言語に合わせたメッセージを自動生成します。</div>';
+  html+='<div class="r2">';
+  html+='<div class="f"><label>対象スタッフ</label><select id="msg-staff" onchange="updateMessage()"><option value="">選択してください</option>';
+  staff.forEach(function(s,i){
+    html+='<option value="'+i+'">'+escH(s.name||'（氏名未入力）')+'（'+escH(s.lang)+'）</option>';
+  });
+  html+='</select></div>';
+  html+='<div class="f"><label>メッセージ種別</label><select id="msg-type" onchange="updateMessage()"><option value="greeting">挨拶・おつかれさま</option><option value="shift">シフト連絡</option><option value="safety">安全注意</option><option value="holiday">休日のお知らせ</option></select></div>';
+  html+='</div>';
+  html+='<div class="f" id="shift-input" style="display:none"><label>シフト内容</label><input type="text" id="shift-text" placeholder="例：8:00〜17:00" oninput="updateMessage()"></div>';
+  html+='<div id="msg-result"></div>';
+  if(staff.length===0){
+    html+='<div class="alert-warn">スタッフ一覧タブでスタッフを登録するとメッセージを生成できます。</div>';
+  }
+  html+='</div>';
+  document.getElementById('message-content').innerHTML=html;
+}
+
+function updateMessage(){
+  var staffIdx=document.getElementById('msg-staff')?document.getElementById('msg-staff').value:'';
+  var msgType=document.getElementById('msg-type')?document.getElementById('msg-type').value:'greeting';
+  var shiftInput=document.getElementById('shift-input');
+  var resultEl=document.getElementById('msg-result');
+  if(shiftInput) shiftInput.style.display=msgType==='shift'?'block':'none';
+  if(!staffIdx||staffIdx===''){if(resultEl)resultEl.innerHTML='';return;}
+  var s=staff[parseInt(staffIdx)];
+  if(!s){if(resultEl)resultEl.innerHTML='';return;}
+  var lang=s.lang;
+  var msgs=MESSAGES[lang]||MESSAGES['英語'];
+  var msg=msgs[msgType]||'';
+  if(msgType==='shift'){
+    var shiftText=document.getElementById('shift-text')?document.getElementById('shift-text').value:'';
+    msg=msg.replace('{shift}',shiftText||'（シフト内容を入力してください）');
+  }
+  if(resultEl){
+    resultEl.innerHTML='<div style="font-size:12px;font-weight:600;color:#0F6E56;margin-bottom:6px">'+escH(s.name||'スタッフ')+'さんへの'+escH(lang)+'メッセージ</div><div class="msg-box">'+escH(msg)+'</div><button style="margin-top:.5rem;padding:6px 14px;border:1.5px solid #1D9E75;border-radius:8px;background:#E1F5EE;color:#0F6E56;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit" onclick="copyMessage(\''+escH(msg).replace(/'/g,"\\'")+'\')" >📋 コピー</button>';
+  }
+}
+
+function copyMessage(msg){
+  navigator.clipboard.writeText(msg).then(function(){alert('コピーしました！');}).catch(function(){alert('コピーできませんでした。手動でコピーしてください。');});
+}
+
+function renderSummary(){
+  var html='<div class="sec"><div class="sec-title">📊 国籍別・言語別サマリー</div>';
+  if(staff.length===0){
+    html+='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">スタッフを登録するとサマリーが表示されます</div>';
+  } else {
+    var byNation={};
+    var byLang={};
+    var byVisa={};
+    var byJapanese={};
+    staff.forEach(function(s){
+      byNation[s.nationality]=(byNation[s.nationality]||0)+1;
+      byLang[s.lang]=(byLang[s.lang]||0)+1;
+      byVisa[s.visa]=(byVisa[s.visa]||0)+1;
+      byJapanese[s.japanese]=(byJapanese[s.japanese]||0)+1;
+    });
+
+    html+='<div style="font-size:12px;font-weight:600;color:#333;margin-bottom:8px">🌏 国籍別</div>';
+    Object.keys(byNation).forEach(function(k){
+      html+='<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:13px"><span>'+escH(k)+'</span><span style="font-weight:600">'+byNation[k]+'名</span></div>';
+    });
+
+    html+='<div style="font-size:12px;font-weight:600;color:#333;margin:1rem 0 8px">💬 使用言語別</div>';
+    Object.keys(byLang).forEach(function(k){
+      html+='<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:13px"><span>'+escH(k)+'</span><span style="font-weight:600">'+byLang[k]+'名</span></div>';
+    });
+
+    html+='<div style="font-size:12px;font-weight:600;color:#333;margin:1rem 0 8px">📝 日本語レベル別</div>';
+    Object.keys(byJapanese).forEach(function(k){
+      html+='<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:13px"><span>'+escH(k)+'</span><span style="font-weight:600">'+byJapanese[k]+'名</span></div>';
+    });
+  }
+  html+='</div>';
+  document.getElementById('summary-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderStaff();
+</script>
+</body>
+</html>

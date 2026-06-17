@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>飲食宿泊業 衛生管理・シフト管理システム｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:760px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#C25E0F,#E8882A);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#C25E0F;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#8B3D06;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #FEF3E8}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus{border-color:#C25E0F}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.alert-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:.75rem;line-height:1.7}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-orange{background:#FEF3E8;border:1px solid #C25E0F;color:#8B3D06}
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.check-item:last-child{border-bottom:none}
+.chk{width:22px;height:22px;border-radius:6px;border:1.5px solid #ddd;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;margin-top:1px}
+.chk.done{background:#C25E0F;border-color:#C25E0F}
+.chk-body{flex:1}
+.chk-title{font-size:13px;font-weight:500;color:#333}
+.chk-title.done{color:#C25E0F;text-decoration:line-through}
+.chk-desc{font-size:11px;color:#666;margin-top:2px}
+.staff-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.staff-header{display:flex;align-items:center;gap:8px;margin-bottom:.5rem;cursor:pointer}
+.staff-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.staff-detail.open{display:block}
+.shift-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.shift-table{width:100%;border-collapse:collapse;font-size:11px}
+.shift-table th{background:#C25E0F;color:#fff;padding:6px 4px;text-align:center;white-space:nowrap}
+.shift-table td{padding:4px;border:1px solid #eee;text-align:center}
+.shift-table select{font-size:10px;padding:2px;border:none;width:100%;font-family:inherit;background:transparent}
+.add-btn{width:100%;padding:10px;border:2px dashed #C25E0F;border-radius:10px;background:none;color:#C25E0F;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.progress-bar-bg{height:8px;background:#eee;border-radius:4px;margin-top:4px}
+.progress-bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.cta-box{background:linear-gradient(135deg,#8B3D06,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 飲食宿泊業 衛生管理・シフト管理システム｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>🍽️ 飲食宿泊業 衛生管理・シフト管理システム</h1>
+  <p>衛生管理チェックリストとシフト管理を一元化<br>外国人スタッフの多い飲食・宿泊業向け</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('hygiene',this)">🧼 衛生管理チェック</button>
+  <button class="tab" onclick="switchTab('shift',this)">📅 シフト管理</button>
+  <button class="tab" onclick="switchTab('staff',this)">👤 スタッフ管理</button>
+</div>
+
+<div id="tab-hygiene"><div id="hygiene-content"></div></div>
+<div id="tab-shift" style="display:none"><div id="shift-content"></div></div>
+<div id="tab-staff" style="display:none"><div id="staff-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版でさらに効率化</h3>
+  <p>本番版ではクラウド保存・複数店舗の一括管理・<br>衛生チェック記録のレポート出力をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="https://forms.gle/xrgH2CtGaCL7LXHE6" target="_blank" class="cta-btn">📝 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var hygieneChecks = {};
+var staff = [];
+var staffExpanded = {};
+
+var HYGIENE_CATEGORIES = [
+  {name:'開店前チェック', items:[
+    {id:'h1', title:'手洗い設備（石鹸・ペーパータオル）の確認', desc:''},
+    {id:'h2', title:'調理器具・食器の洗浄・消毒確認', desc:''},
+    {id:'h3', title:'冷蔵・冷凍庫の温度確認', desc:'冷蔵：10度以下、冷凍：-15度以下'},
+    {id:'h4', title:'食材の鮮度・賞味期限確認', desc:''},
+    {id:'h5', title:'スタッフの健康状態確認', desc:'発熱・下痢・嘔吐等の有無'}
+  ]},
+  {name:'調理中チェック', items:[
+    {id:'h6', title:'加熱調理の中心温度確認（75度以上・1分以上）', desc:''},
+    {id:'h7', title:'手洗いの徹底（調理前・生食品取扱後等）', desc:''},
+    {id:'h8', title:'交差汚染防止（生食品と加熱食品の分離）', desc:''},
+    {id:'h9', title:'調理器具の使い回し防止', desc:''}
+  ]},
+  {name:'閉店後チェック', items:[
+    {id:'h10', title:'調理器具・食器の洗浄・消毒', desc:''},
+    {id:'h11', title:'厨房・フロアの清掃', desc:''},
+    {id:'h12', title:'生ゴミの処理・ゴミ箱の消毒', desc:''},
+    {id:'h13', title:'冷蔵・冷凍庫内の整理整頓', desc:''},
+    {id:'h14', title:'害虫・害獣の痕跡確認', desc:''}
+  ]}
+];
+
+var DAYS = ['月','火','水','木','金','土','日'];
+var SHIFTS = ['早番(7:00-15:00)','中番(10:00-18:00)','遅番(15:00-23:00)','夜勤(22:00-7:00)','休み','未定'];
+var NATIONALITIES = ['日本','ベトナム','中国','フィリピン','インドネシア','ミャンマー','タイ','その他'];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['hygiene','shift','staff'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='hygiene') renderHygiene();
+  if(tab==='shift') renderShift();
+  if(tab==='staff') renderStaff();
+}
+
+function toggleCheck(id){hygieneChecks[id]=!hygieneChecks[id];renderHygiene();}
+
+function renderHygiene(){
+  var allItems=[];
+  HYGIENE_CATEGORIES.forEach(function(cat){allItems=allItems.concat(cat.items);});
+  var done=allItems.filter(function(i){return hygieneChecks[i.id];}).length;
+  var pct=Math.round(done/allItems.length*100);
+  var col=pct===100?'#1D9E75':pct>50?'#C25E0F':'#E24B4A';
+
+  var html='<div class="sec"><div class="sec-title">🧼 本日の衛生管理チェック</div>';
+  html+='<div class="f"><label>チェック日</label><input type="date" value="'+new Date().toISOString().substr(0,10)+'"></div>';
+  html+='<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="font-weight:600">完了率</span><span style="font-weight:700;color:'+col+'">'+done+'/'+allItems.length+'（'+pct+'%）</span></div>';
+  html+='<div class="progress-bar-bg"><div class="progress-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div>';
+
+  HYGIENE_CATEGORIES.forEach(function(cat){
+    var catDone=cat.items.filter(function(i){return hygieneChecks[i.id];}).length;
+    html+='<div style="font-size:12px;font-weight:700;color:#8B3D06;margin:.75rem 0 4px">'+cat.name+' ('+catDone+'/'+cat.items.length+')</div>';
+    cat.items.forEach(function(item){
+      var d=hygieneChecks[item.id];
+      html+='<div class="check-item"><div class="chk'+(d?' done':'')+'" onclick="toggleCheck(\''+item.id+'\')">'+(d?'✓':'')+'</div>';
+      html+='<div class="chk-body"><div class="chk-title'+(d?' done':'')+'">'+item.title+'</div>';
+      if(item.desc) html+='<div class="chk-desc">'+item.desc+'</div>';
+      html+='</div></div>';
+    });
+  });
+
+  if(pct===100){
+    html+='<div class="alert-ok" style="margin-top:.75rem">✓ 本日の衛生管理チェックが完了しました。</div>';
+  }
+  html+='</div>';
+  document.getElementById('hygiene-content').innerHTML=html;
+}
+
+function addStaff(){
+  var s={name:'',nationality:'日本',role:'',shifts:{}};
+  DAYS.forEach(function(d){s.shifts[d]='';});
+  staff.push(s);
+  renderStaff();
+}
+function delStaff(i){if(!confirm('削除しますか？'))return;staff.splice(i,1);renderStaff();}
+function upStaff(i,key,val){staff[i][key]=val;}
+function upShift(i,day,val){staff[i].shifts[day]=val;}
+function toggleStaff(i){staffExpanded[i]=!staffExpanded[i];renderStaff();}
+
+function renderStaff(){
+  var html='';
+  if(staff.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">スタッフがまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    staff.forEach(function(s,i){
+      var isExp=staffExpanded[i];
+      html+='<div class="staff-card">';
+      html+='<div class="staff-header" onclick="toggleStaff('+i+')">';
+      html+='<div style="flex:1"><div style="font-size:13px;font-weight:700">'+(s.name||'（氏名未入力）')+'</div>';
+      html+='<div style="font-size:11px;color:#888">'+escH(s.nationality)+' ／ '+escH(s.role||'役職未入力')+'</div></div>';
+      html+='<span style="font-size:12px;color:#aaa">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+      html+='<div class="staff-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r3">';
+      html+='<div class="f"><label>氏名</label><input type="text" value="'+escH(s.name)+'" placeholder="氏名" oninput="upStaff('+i+',\'name\',this.value)"></div>';
+      html+='<div class="f"><label>国籍</label><select onchange="upStaff('+i+',\'nationality\',this.value)">'+NATIONALITIES.map(function(n){return'<option '+(s.nationality===n?'selected':'')+'>'+n+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>役職・担当</label><input type="text" value="'+escH(s.role)+'" placeholder="例：ホール担当" oninput="upStaff('+i+',\'role\',this.value)"></div>';
+      html+='</div>';
+      html+='<button class="del-btn" onclick="delStaff('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addStaff()">＋ スタッフを追加</button>';
+  document.getElementById('staff-content').innerHTML=html;
+}
+
+function renderShift(){
+  var html='<div class="sec"><div class="sec-title">📅 週間シフト表</div>';
+  if(staff.length===0){
+    html+='<div class="alert-orange">スタッフ管理タブでスタッフを登録するとシフト表が表示されます</div>';
+  } else {
+    html+='<div class="shift-wrap"><table class="shift-table"><tr><th>氏名</th>';
+    DAYS.forEach(function(d){html+='<th>'+d+'</th>';});
+    html+='</tr>';
+    staff.forEach(function(s,i){
+      html+='<tr><td style="font-weight:600;text-align:left;white-space:nowrap;padding:4px 8px">'+escH(s.name||'未入力')+'</td>';
+      DAYS.forEach(function(day){
+        html+='<td><select onchange="upShift('+i+',\''+day+'\',this.value)">';
+        html+='<option value="">-</option>';
+        SHIFTS.forEach(function(sh){
+          html+='<option '+(s.shifts[day]===sh?'selected':'')+'>'+sh+'</option>';
+        });
+        html+='</select></td>';
+      });
+      html+='</tr>';
+    });
+    html+='</table></div>';
+  }
+  html+='</div>';
+  document.getElementById('shift-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderHygiene();
+</script>
+</body>
+</html>

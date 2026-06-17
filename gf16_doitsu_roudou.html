@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>同一労働同一賃金 チェックツール｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:720px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#185FA5,#378ADD);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#185FA5;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#0C447C;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E6F1FB}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus{border-color:#185FA5}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-gray{background:#f0f0f0;color:#666}
+.alert-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:.75rem;line-height:1.7}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.alert-blue{background:#E6F1FB;border:1px solid #185FA5;color:#0C447C}
+.compare-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.compare-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.compare-row:last-child{border-bottom:none}
+.compare-label{font-size:12px;color:#666;width:100px;flex-shrink:0}
+.compare-reg{flex:1;text-align:center;font-size:13px;font-weight:600;padding:6px;background:#E6F1FB;border-radius:6px}
+.compare-nonreg{flex:1;text-align:center;font-size:13px;font-weight:600;padding:6px;background:#FAEEDA;border-radius:6px}
+.compare-diff{width:60px;text-align:center;font-size:12px;font-weight:700}
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.check-item:last-child{border-bottom:none}
+.chk{width:22px;height:22px;border-radius:6px;border:1.5px solid #ddd;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;margin-top:1px}
+.chk.done{background:#185FA5;border-color:#185FA5}
+.chk-body{flex:1}
+.chk-title{font-size:13px;font-weight:500;color:#333}
+.chk-title.done{color:#185FA5;text-decoration:line-through;text-decoration-color:#185FA5}
+.chk-desc{font-size:11px;color:#666;margin-top:2px}
+.result-box{border-radius:12px;padding:1.25rem;margin-bottom:1rem;text-align:center}
+.result-box.ok{background:#E1F5EE;border:1.5px solid #1D9E75}
+.result-box.warn{background:#FAEEDA;border:1.5px solid #EF9F27}
+.result-box.ng{background:#FCEBEB;border:1.5px solid #E24B4A}
+.result-big{font-size:24px;font-weight:700}
+.result-label{font-size:13px;font-weight:600;margin-top:4px}
+.allowance-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:.75rem}
+.allowance-table th{background:#185FA5;color:#fff;padding:8px 10px;text-align:left}
+.allowance-table td{padding:7px 10px;border-bottom:1px solid #eee}
+.allowance-table tr:nth-child(even) td{background:#fafafa}
+.add-btn{width:100%;padding:10px;border:2px dashed #185FA5;border-radius:10px;background:none;color:#185FA5;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.cta-box{background:linear-gradient(135deg,#0C447C,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 同一労働同一賃金 チェックツール｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>⚖️ 同一労働同一賃金 チェックツール</h1>
+  <p>正社員とパート・契約社員の待遇差を点検<br>不合理な差は法令違反になる可能性があります</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('compare',this)">⚖️ 待遇比較</button>
+  <button class="tab" onclick="switchTab('checklist',this)">✅ 点検チェックリスト</button>
+  <button class="tab" onclick="switchTab('allowance',this)">📋 手当別チェック項目</button>
+</div>
+
+<div id="tab-compare"><div id="compare-content"></div></div>
+<div id="tab-checklist" style="display:none"><div id="checklist-content"></div></div>
+<div id="tab-allowance" style="display:none"><div id="allowance-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版でさらに詳しく点検</h3>
+  <p>本番版では複数の雇用形態の一括比較・<br>点検結果のレポート出力をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var compareData = {
+  base_reg:'', base_nonreg:'',
+  bonus_reg:'', bonus_nonreg:'',
+  commute_reg:'', commute_nonreg:'',
+  family_reg:'', family_nonreg:'',
+  housing_reg:'', housing_nonreg:'',
+  retirement_reg:'', retirement_nonreg:'',
+  paid_leave_reg:'', paid_leave_nonreg:'',
+  training_reg:'', training_nonreg:'',
+  cafeteria_reg:'', cafeteria_nonreg:''
+};
+
+var ITEMS = [
+  {key:'base',label:'基本給',unit:'円'},
+  {key:'bonus',label:'ボーナス（年間）',unit:'円'},
+  {key:'commute',label:'通勤手当',unit:'円'},
+  {key:'family',label:'家族手当',unit:'円'},
+  {key:'housing',label:'住宅手当',unit:'円'},
+  {key:'retirement',label:'退職金',unit:'円'},
+  {key:'paid_leave',label:'特別休暇（慶弔休暇等）',unit:'日'},
+  {key:'training',label:'教育訓練',unit:'有無'},
+  {key:'cafeteria',label:'食堂・休憩室利用',unit:'有無'}
+];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['compare','checklist','allowance'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='compare') renderCompare();
+  if(tab==='checklist') renderChecklist();
+  if(tab==='allowance') renderAllowance();
+}
+
+function upCompare(key,val){
+  compareData[key]=val;
+  updateCompareResult();
+}
+
+function renderCompare() {
+  var html = '<div class="sec"><div class="sec-title">⚖️ 正社員 vs パート・契約社員 待遇比較</div>';
+  html += '<div class="alert-blue">「不合理な待遇差」は禁止されています（パートタイム・有期雇用労働法第8条・第9条）。各項目を入力して比較してください。</div>';
+  ITEMS.forEach(function(item){
+    html += '<div style="margin-bottom:.75rem">';
+    html += '<div style="font-size:12px;font-weight:600;color:#333;margin-bottom:4px">'+item.label+'</div>';
+    html += '<div class="r2">';
+    if(item.unit==='有無'){
+      html += '<div class="f"><label>正社員</label><select onchange="upCompare(\''+item.key+'_reg\',this.value)"><option value="">選択</option><option '+(compareData[item.key+'_reg']==='あり'?'selected':'')+'>あり</option><option '+(compareData[item.key+'_reg']==='なし'?'selected':'')+'>なし</option></select></div>';
+      html += '<div class="f"><label>パート・契約社員</label><select onchange="upCompare(\''+item.key+'_nonreg\',this.value)"><option value="">選択</option><option '+(compareData[item.key+'_nonreg']==='あり'?'selected':'')+'>あり</option><option '+(compareData[item.key+'_nonreg']==='なし'?'selected':'')+'>なし</option></select></div>';
+    } else {
+      html += '<div class="f"><label>正社員（'+item.unit+'）</label><input type="number" value="'+compareData[item.key+'_reg']+'" placeholder="0" oninput="upCompare(\''+item.key+'_reg\',this.value)"></div>';
+      html += '<div class="f"><label>パート・契約社員（'+item.unit+'）</label><input type="number" value="'+compareData[item.key+'_nonreg']+'" placeholder="0" oninput="upCompare(\''+item.key+'_nonreg\',this.value)"></div>';
+    }
+    html += '</div></div>';
+  });
+  html += '<div id="compare-result"></div>';
+  html += '</div>';
+  document.getElementById('compare-content').innerHTML = html;
+  updateCompareResult();
+}
+
+function updateCompareResult() {
+  var el = document.getElementById('compare-result');
+  if(!el) return;
+  var issues = [];
+  var checked = 0;
+
+  ITEMS.forEach(function(item){
+    var reg = compareData[item.key+'_reg'];
+    var nonreg = compareData[item.key+'_nonreg'];
+    if(!reg && !nonreg) return;
+    checked++;
+
+    if(item.unit==='有無'){
+      if(reg==='あり' && nonreg==='なし'){
+        issues.push({item:item.label, text:'正社員のみ「'+item.label+'」が利用可能。職務内容が同じ場合は不合理な差とされる可能性があります。'});
+      }
+    } else {
+      var r = parseFloat(reg)||0;
+      var n = parseFloat(nonreg)||0;
+      if(r>0 && n===0 && item.key!=='base'){
+        issues.push({item:item.label, text:'パート・契約社員に「'+item.label+'」が支給されていません。手当の目的・趣旨が雇用形態に関係ない場合は不合理な差となる可能性があります。'});
+      } else if(r>0 && n>0 && item.key==='base'){
+        var diff = ((r-n)/r*100);
+        if(diff>30){
+          issues.push({item:item.label, text:'正社員と'+diff.toFixed(0)+'%の差があります。職務内容・責任の程度・配置変更の範囲等を考慮し、差が合理的かを点検してください。'});
+        }
+      }
+    }
+  });
+
+  if(checked===0){
+    el.innerHTML = '<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">項目を入力すると点検結果が表示されます</div>';
+    return;
+  }
+
+  var status = issues.length===0?'ok':issues.length<=2?'warn':'ng';
+  var label = issues.length===0?'特に大きな問題は見つかりませんでした':'要点検項目が'+issues.length+'件あります';
+  var col = status==='ok'?'#0F6E56':status==='warn'?'#854F0B':'#A32D2D';
+
+  var html = '<div class="result-box '+status+'">';
+  html += '<div class="result-big" style="color:'+col+'">'+issues.length+'件</div>';
+  html += '<div class="result-label" style="color:'+col+'">'+label+'</div>';
+  html += '</div>';
+
+  if(issues.length>0){
+    issues.forEach(function(iss){
+      html += '<div class="alert-box alert-warn">🟡 <strong>'+iss.item+'</strong>：'+iss.text+'</div>';
+    });
+  } else {
+    html += '<div class="alert-box alert-ok">✓ 入力された項目について、明らかな不合理差は検出されませんでした。ただし職務内容・人材活用の仕組みの違いなど、個別事情も踏まえてご確認ください。</div>';
+  }
+
+  html += '<div class="alert-blue" style="margin-top:.5rem">⚠ この点検結果は参考情報です。最終判断は職務内容・責任の程度・人材活用の仕組み等を踏まえ、担当社労士にご確認ください。</div>';
+
+  el.innerHTML = html;
+}
+
+var checks = {};
+var CHECKLIST = [
+  {id:'cl1',title:'基本給の決定基準を確認した',desc:'正社員とパート・契約社員で基本給の決定基準（経験・能力・業績等）が同じ場合、同一の基準を適用しているか'},
+  {id:'cl2',title:'役職手当・職務手当の支給基準を確認した',desc:'役職・職務の内容に応じて支給している場合、同一の役職・職務であれば同一の手当を支給しているか'},
+  {id:'cl3',title:'通勤手当の支給状況を確認した',desc:'通勤手当は雇用形態に関わらず同一の支給が原則'},
+  {id:'cl4',title:'家族手当・住宅手当の支給状況を確認した',desc:'手当の趣旨が雇用形態に関係ない場合、不支給は不合理とされる可能性がある'},
+  {id:'cl5',title:'賞与（ボーナス）の支給基準を確認した',desc:'会社の業績等への貢献に応じて支給する場合、貢献に応じた支給が必要'},
+  {id:'cl6',title:'退職金の支給状況を確認した',desc:'長期雇用を前提とした制度の場合、勤続年数等に応じた取扱いの差は一定の合理性が認められる場合がある'},
+  {id:'cl7',title:'法定外の有給休暇・休暇制度を確認した',desc:'慶弔休暇等は雇用形態に関わらず同一の付与が原則'},
+  {id:'cl8',title:'教育訓練の実施状況を確認した',desc:'現在の職務に必要な能力を付与するための教育訓練は同一の実施が原則'},
+  {id:'cl9',title:'福利厚生施設の利用状況を確認した',desc:'食堂・休憩室・更衣室の利用は雇用形態に関わらず同一の利用が原則'},
+  {id:'cl10',title:'労働者への説明体制を整備した',desc:'パート・契約社員から待遇差の理由を求められた場合、説明する義務がある'}
+];
+
+function toggleCheck(id){checks[id]=!checks[id];renderChecklist();}
+
+function renderChecklist(){
+  var done=CHECKLIST.filter(function(c){return checks[c.id];}).length;
+  var pct=Math.round(done/CHECKLIST.length*100);
+  var html='<div class="sec"><div class="sec-title">✅ 点検チェックリスト<span style="font-size:11px;font-weight:400;color:#666">'+done+'/'+CHECKLIST.length+'完了</span></div>';
+  html+='<div style="height:6px;background:#eee;border-radius:3px;margin-bottom:1rem"><div style="height:100%;width:'+pct+'%;background:#185FA5;border-radius:3px;transition:width .4s"></div></div>';
+  CHECKLIST.forEach(function(c){
+    var done=checks[c.id];
+    html+='<div class="check-item"><div class="chk'+(done?' done':'')+'" onclick="toggleCheck(\''+c.id+'\')">'+(done?'✓':'')+'</div><div class="chk-body"><div class="chk-title'+(done?' done':'')+'">'+c.title+'</div><div class="chk-desc">'+c.desc+'</div></div></div>';
+  });
+  if(pct===100){
+    html+='<div class="alert-ok" style="margin-top:.75rem">✓ 全項目の点検が完了しました。不合理な差が見つかった場合は是正計画を立てましょう。</div>';
+  }
+  html+='</div>';
+  document.getElementById('checklist-content').innerHTML=html;
+}
+
+function renderAllowance(){
+  var html='<div class="sec"><div class="sec-title">📋 手当別 チェックポイント</div>';
+  html+='<table class="allowance-table">';
+  html+='<tr><th>手当・制度</th><th>チェックポイント</th></tr>';
+  html+='<tr><td>基本給</td><td>能力・経験・業績・勤続年数等に応じて支給する場合、同一の基準を適用</td></tr>';
+  html+='<tr><td>役職手当</td><td>役職の内容・責任に応じて同一の手当を支給</td></tr>';
+  html+='<tr><td>通勤手当</td><td>原則、雇用形態に関わらず同一支給が必要</td></tr>';
+  html+='<tr><td>精皆勤手当</td><td>業務内容が同一なら同一支給が必要</td></tr>';
+  html+='<tr><td>時間外手当の割増率</td><td>正社員と同率の割増率が必要</td></tr>';
+  html+='<tr><td>食事手当</td><td>勤務時間内に食事時間がある場合は同一支給が必要</td></tr>';
+  html+='<tr><td>単身赴任手当</td><td>同一の要件を満たす場合は同一支給が必要</td></tr>';
+  html+='<tr><td>地域手当</td><td>同一地域で働く場合は同一支給が必要</td></tr>';
+  html+='<tr><td>賞与</td><td>会社業績等への貢献に応じた支給が必要</td></tr>';
+  html+='<tr><td>退職金</td><td>長期雇用前提の制度の場合、一定の取扱い差は合理性が認められうる</td></tr>';
+  html+='<tr><td>法定外休暇</td><td>勤続期間が同一であれば同一の付与が必要</td></tr>';
+  html+='<tr><td>安全管理に関する措置・給付</td><td>業務内容が同一の場合は同一の措置が必要</td></tr>';
+  html+='</table>';
+  html+='<div class="alert-ng">🔴 違反した場合：労働者から損害賠償請求を受ける可能性があります。また都道府県労働局からの行政指導の対象となる場合があります。</div>';
+  html+='</div>';
+  document.getElementById('allowance-content').innerHTML=html;
+}
+
+renderCompare();
+</script>
+</body>
+</html>

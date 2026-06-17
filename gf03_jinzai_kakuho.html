@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>人材確保等支援助成金 管理システム｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:720px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#1D4E89,#2E86C1);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#2E86C1;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#1D4E89;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #D6EAF8}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select,.f textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#2E86C1}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#D6EAF8;color:#1D4E89}
+.badge-gray{background:#f0f0f0;color:#666}
+.alert-box{border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:.5rem;line-height:1.6}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.alert-blue{background:#D6EAF8;border:1px solid #2E86C1;color:#1D4E89}
+.course-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem;cursor:pointer;transition:all .15s}
+.course-card:hover{border-color:#2E86C1;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.course-card.selected{border-color:#2E86C1;background:#EBF5FB}
+.course-name{font-size:13px;font-weight:700;color:#1D4E89;margin-bottom:4px}
+.course-amount{font-size:14px;font-weight:700;color:#533AB7;margin-bottom:4px}
+.course-desc{font-size:11px;color:#666;line-height:1.6}
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.check-item:last-child{border-bottom:none}
+.chk{width:22px;height:22px;border-radius:6px;border:1.5px solid #ddd;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;margin-top:1px}
+.chk.done{background:#2E86C1;border-color:#2E86C1}
+.chk-body{flex:1}
+.chk-title{font-size:13px;font-weight:500;color:#333}
+.chk-title.done{color:#2E86C1;text-decoration:line-through;text-decoration-color:#2E86C1}
+.chk-desc{font-size:11px;color:#666;margin-top:2px}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:22px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.calc-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:13px}
+.calc-row:last-child{border-bottom:none}
+.calc-row.total{font-weight:700;font-size:14px;padding-top:8px}
+.add-btn{width:100%;padding:10px;border:2px dashed #2E86C1;border-radius:10px;background:none;color:#2E86C1;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.case-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.case-card.applying{border-color:#2E86C1;background:#EBF5FB}
+.case-card.approved{border-color:#1D9E75;background:#F0FFF8}
+.case-card.completed{border-color:#533AB7;background:#F4F0FF}
+.case-header{display:flex;align-items:center;gap:8px;margin-bottom:.5rem;cursor:pointer}
+.case-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.case-detail.open{display:block}
+.cta-box{background:linear-gradient(135deg,#1D4E89,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 人材確保等支援助成金 管理システム｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>💼 人材確保等支援助成金 管理システム</h1>
+  <p>コース選択・要件チェック・申請管理を一元化</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('courses',this)">📋 コース選択</button>
+  <button class="tab" onclick="switchTab('checklist',this)">✅ 要件チェック</button>
+  <button class="tab" onclick="switchTab('cases',this)">📁 申請管理</button>
+</div>
+
+<div id="tab-courses"><div id="courses-content"></div></div>
+<div id="tab-checklist" style="display:none"><div id="checklist-content"></div></div>
+<div id="tab-cases" style="display:none"><div id="cases-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版で複数案件を管理</h3>
+  <p>本番版ではクラウド保存・複数顧問先の一括管理・<br>申請期限アラート通知をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var selectedCourse = null;
+var checks = {};
+var cases = [];
+var caseExpanded = {};
+
+var COURSES = [
+  {
+    id:'foreign_env',
+    name:'外国人労働者就労環境整備助成コース',
+    amount:'最大57万円',
+    desc:'外国人労働者の就労環境を整備した事業主に支給。多言語化・相談窓口設置・職場環境改善などが対象です。',
+    target:'外国人労働者を雇用している事業主',
+    period:'整備完了後6か月以内に申請'
+  },
+  {
+    id:'jirei',
+    name:'事業主団体助成コース',
+    amount:'経費の2/3（上限500万円）',
+    desc:'事業主団体が会員企業の人材確保・定着のための支援を行った場合に支給されます。',
+    target:'事業主団体（事業協同組合等）',
+    period:'支援完了後2か月以内に申請'
+  },
+  {
+    id:'career',
+    name:'雇用管理制度助成コース',
+    amount:'最大130万円',
+    desc:'離職率低下のための雇用管理制度（評価・処遇制度等）を整備・導入した場合に支給されます。',
+    target:'雇用保険適用事業所',
+    period:'制度導入後1年以内に申請'
+  },
+  {
+    id:'startup',
+    name:'若年・女性建設労働者就労促進コース',
+    amount:'最大60万円',
+    desc:'建設業において若年者・女性の就労環境を整備した場合に支給されます。',
+    target:'建設業の事業主',
+    period:'整備完了後6か月以内に申請'
+  },
+  {
+    id:'retain',
+    name:'作業員宿舎等設置助成コース',
+    amount:'最大750万円',
+    desc:'建設業・造船業において作業員宿舎・作業員施設を設置した場合に支給されます。',
+    target:'建設業・造船業の事業主',
+    period:'設置完了後2か月以内に申請'
+  }
+];
+
+var CHECKS_BY_COURSE = {
+  foreign_env:[
+    {id:'f1',title:'外国人労働者を現に雇用している',desc:'雇用保険の適用事業所であること'},
+    {id:'f2',title:'就労環境整備計画書を作成・提出した',desc:'労働局への計画書提出が必要'},
+    {id:'f3',title:'就業規則等に相談窓口を明記した',desc:'外国人労働者が相談できる窓口の設置'},
+    {id:'f4',title:'多言語対応の資料を整備した',desc:'雇用契約書・就業規則等の母国語翻訳'},
+    {id:'f5',title:'職場環境改善の措置を実施した',desc:'計画書に記載した措置を実施'},
+    {id:'f6',title:'雇用管理改善を6か月以上継続した',desc:'整備後6か月間の継続が要件'},
+    {id:'f7',title:'不正受給がない',desc:'過去5年間に不正受給がないこと'},
+    {id:'f8',title:'支給申請書類を準備した',desc:'様式・添付書類の確認が必要'}
+  ],
+  career:[
+    {id:'c1',title:'雇用保険適用事業所である',desc:'雇用保険の適用を受けていること'},
+    {id:'c2',title:'雇用管理制度整備計画書を提出した',desc:'労働局への計画書提出が必要'},
+    {id:'c3',title:'評価・処遇制度を新たに導入した',desc:'賃金制度・評価制度等の整備'},
+    {id:'c4',title:'制度を1年以上継続して運用した',desc:'継続運用の実績が必要'},
+    {id:'c5',title:'離職率が低下または目標を達成した',desc:'計画期間中の離職率比較'},
+    {id:'c6',title:'不正受給がない',desc:'過去5年間に不正受給がないこと'},
+    {id:'c7',title:'支給申請書類を準備した',desc:'様式・添付書類の確認'}
+  ]
+};
+
+var DEFAULT_CHECKS = [
+  {id:'d1',title:'事業主の要件を確認した',desc:'雇用保険適用・労働保険料滞納なし'},
+  {id:'d2',title:'対象コースの要件を確認した',desc:'選択したコースの詳細要件を確認'},
+  {id:'d3',title:'計画書を労働局に提出した',desc:'申請前に必ず計画書の提出が必要'},
+  {id:'d4',title:'計画に基づく措置を実施した',desc:'計画書の内容を実施すること'},
+  {id:'d5',title:'必要書類を準備した',desc:'支給申請に必要な書類を揃える'},
+  {id:'d6',title:'申請期限を確認した',desc:'措置実施後の申請期限を確認'},
+  {id:'d7',title:'不正受給歴がない',desc:'過去5年間に不正受給がないこと'}
+];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['courses','checklist','cases'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='courses') renderCourses();
+  if(tab==='checklist') renderChecklist();
+  if(tab==='cases') renderCases();
+}
+
+function selectCourse(id) {
+  selectedCourse = selectedCourse===id ? null : id;
+  renderCourses();
+}
+
+function renderCourses() {
+  var html = '<div class="sec"><div class="sec-title">📋 対象コースを選択してください</div>';
+  html += '<div class="alert-blue" style="margin-bottom:1rem">人材確保等支援助成金には複数のコースがあります。該当するコースを選択して要件チェックに進んでください。</div>';
+  COURSES.forEach(function(c){
+    var sel = selectedCourse===c.id;
+    html += '<div class="course-card'+(sel?' selected':'')+'" onclick="selectCourse(\''+c.id+'\')"><div class="course-name">'+c.name+'</div><div class="course-amount">'+c.amount+'</div><div class="course-desc">'+c.desc+'</div><div style="margin-top:6px;font-size:11px;color:#888">対象：'+c.target+'　申請期限：'+c.period+'</div></div>';
+  });
+  if(selectedCourse){
+    html += '<button onclick="switchTab(\'checklist\',document.querySelectorAll(\'.tab\')[1])" style="width:100%;padding:12px;border:none;border-radius:10px;background:#2E86C1;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:.5rem">✅ 要件チェックへ進む →</button>';
+  }
+  html += '</div>';
+  document.getElementById('courses-content').innerHTML = html;
+}
+
+function toggleCheck(id){checks[id]=!checks[id];renderChecklist();}
+
+function renderChecklist() {
+  var checkItems = selectedCourse && CHECKS_BY_COURSE[selectedCourse] ? CHECKS_BY_COURSE[selectedCourse] : DEFAULT_CHECKS;
+  var done = checkItems.filter(function(c){return checks[c.id];}).length;
+  var pct = Math.round(done/checkItems.length*100);
+  var col = pct>=80?'#2E86C1':pct>=50?'#EF9F27':'#E24B4A';
+
+  var html = '<div class="sec"><div class="sec-title">✅ 申請要件チェックリスト'+(selectedCourse?' — '+COURSES.find(function(c){return c.id===selectedCourse;}).name:'')+'</div>';
+  html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">';
+  html += '<div style="flex:1;height:6px;background:#eee;border-radius:3px"><div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:3px;transition:width .4s"></div></div>';
+  html += '<span style="font-size:12px;font-weight:600;color:'+col+'">'+done+'/'+checkItems.length+'完了（'+pct+'%）</span>';
+  html += '</div>';
+
+  if(!selectedCourse){
+    html += '<div class="alert-warn">コース選択タブでコースを選択すると、そのコースに特化したチェックリストが表示されます。</div>';
+  }
+
+  checkItems.forEach(function(item){
+    var d = checks[item.id];
+    html += '<div class="check-item"><div class="chk'+(d?' done':'')+'" onclick="toggleCheck(\''+item.id+'\')">'+( d?'✓':'')+'</div><div class="chk-body"><div class="chk-title'+(d?' done':'')+'">'+item.title+'</div><div class="chk-desc">'+item.desc+'</div></div></div>';
+  });
+
+  if(pct===100){
+    html += '<div class="alert-ok" style="margin-top:.75rem">✓ すべての要件をクリアしました！申請管理タブで案件を登録しましょう。</div>';
+    html += '<button onclick="switchTab(\'cases\',document.querySelectorAll(\'.tab\')[2])" style="width:100%;padding:10px;border:none;border-radius:8px;background:#1D9E75;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:.5rem">📁 申請管理へ進む →</button>';
+  }
+  html += '</div>';
+  document.getElementById('checklist-content').innerHTML = html;
+}
+
+function addCase(){
+  cases.push({company:'',course:selectedCourse||'',planDate:'',applyDate:'',amount:'',status:'planning',memo:''});
+  renderCases();
+}
+function delCase(i){if(!confirm('削除しますか？'))return;cases.splice(i,1);renderCases();}
+function upCase(i,key,val){cases[i][key]=val;}
+function toggleCase(i){caseExpanded[i]=!caseExpanded[i];renderCases();}
+
+var STATUS_LABELS = {planning:'計画中',applying:'申請中',approved:'支給決定',completed:'受給完了',rejected:'不支給'};
+var STATUS_BADGE = {planning:'badge-gray',applying:'badge-blue',approved:'badge-ok',completed:'badge-ok',rejected:'badge-ng'};
+var CARD_CLS = {planning:'',applying:'applying',approved:'approved',completed:'completed',rejected:''};
+
+function renderCases(){
+  var html='';
+  if(cases.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">申請案件がまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    var totals = {planning:0,applying:0,approved:0,completed:0};
+    cases.forEach(function(c){if(totals[c.status]!==undefined)totals[c.status]++;});
+    html+='<div class="sec"><div class="summary-grid">';
+    html+='<div class="summary-card"><div class="summary-num" style="color:#2E86C1">'+cases.length+'</div><div class="summary-label">総案件数</div></div>';
+    html+='<div class="summary-card" style="background:#E1F5EE;border-color:#1D9E75"><div class="summary-num" style="color:#0F6E56">'+(totals.approved+totals.completed)+'</div><div class="summary-label">支給決定済</div></div>';
+    html+='<div class="summary-card" style="background:#D6EAF8;border-color:#2E86C1"><div class="summary-num" style="color:#1D4E89">'+totals.applying+'</div><div class="summary-label">申請中</div></div>';
+    html+='</div></div>';
+    cases.forEach(function(c,i){
+      var isExp=caseExpanded[i];
+      html+='<div class="case-card '+(CARD_CLS[c.status]||'')+'">';
+      html+='<div class="case-header" onclick="toggleCase('+i+')">';
+      html+='<div style="flex:1"><div style="font-size:13px;font-weight:700">'+(c.company||'（会社名未入力）')+'</div>';
+      html+='<div style="font-size:11px;color:#888">'+(c.course||'コース未選択')+(c.planDate?' ／ 計画届：'+c.planDate:'')+'</div></div>';
+      html+='<span class="badge '+(STATUS_BADGE[c.status]||'badge-gray')+'">'+(STATUS_LABELS[c.status]||c.status)+'</span>';
+      if(c.amount) html+='<span style="font-size:12px;font-weight:700;color:#533AB7;margin-left:6px">'+c.amount+'円</span>';
+      html+='<span style="font-size:12px;color:#aaa;margin-left:4px">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+      html+='<div class="case-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r2" style="margin-bottom:.75rem">';
+      html+='<div class="f"><label>会社名・顧問先名</label><input type="text" value="'+escH(c.company)+'" placeholder="例：株式会社〇〇" oninput="upCase('+i+',\'company\',this.value)"></div>';
+      html+='<div class="f"><label>コース</label><select onchange="upCase('+i+',\'course\',this.value)"><option value="">選択</option>'+COURSES.map(function(co){return'<option '+(c.course===co.id?'selected':'')+' value="'+co.id+'">'+co.name+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>計画届提出日</label><input type="date" value="'+escH(c.planDate)+'" oninput="upCase('+i+',\'planDate\',this.value)"></div>';
+      html+='<div class="f"><label>支給申請日</label><input type="date" value="'+escH(c.applyDate)+'" oninput="upCase('+i+',\'applyDate\',this.value)"></div>';
+      html+='<div class="f"><label>申請金額（円）</label><input type="number" value="'+escH(c.amount)+'" placeholder="例：570000" oninput="upCase('+i+',\'amount\',this.value)"></div>';
+      html+='<div class="f"><label>ステータス</label><select onchange="upCase('+i+',\'status\',this.value);renderCases()"><option value="planning" '+(c.status==='planning'?'selected':'')+'>計画中</option><option value="applying" '+(c.status==='applying'?'selected':'')+'>申請中</option><option value="approved" '+(c.status==='approved'?'selected':'')+'>支給決定</option><option value="completed" '+(c.status==='completed'?'selected':'')+'>受給完了</option><option value="rejected" '+(c.status==='rejected'?'selected':'')+'>不支給</option></select></div>';
+      html+='</div>';
+      html+='<div class="f"><label>メモ・備考</label><input type="text" value="'+escH(c.memo)+'" placeholder="備考など" oninput="upCase('+i+',\'memo\',this.value)"></div>';
+      html+='<button class="del-btn" onclick="delCase('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addCase()">＋ 申請案件を追加</button>';
+  document.getElementById('cases-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderCourses();
+</script>
+</body>
+</html>

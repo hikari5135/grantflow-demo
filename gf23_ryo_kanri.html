@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>寮宿舎管理システム｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:760px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#2C5F8A,#3A7FBF);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#2C5F8A;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#2C5F8A;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E8F1F8}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select,.f textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#2C5F8A}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#E8F1F8;color:#2C5F8A}
+.badge-gray{background:#f0f0f0;color:#666}
+.alert-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:.75rem;line-height:1.7}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.alert-blue{background:#E8F1F8;border:1px solid #2C5F8A;color:#1A3D5C}
+.room-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.room-card.full{border-color:#E24B4A;background:#FFF5F5}
+.room-card.available{border-color:#1D9E75;background:#F0FFF8}
+.room-card.partial{border-color:#EF9F27;background:#FFFBF0}
+.room-header{display:flex;align-items:center;gap:8px;margin-bottom:.5rem;cursor:pointer}
+.room-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.room-detail.open{display:block}
+.resident-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:12px}
+.resident-item:last-child{border-bottom:none}
+.add-btn{width:100%;padding:10px;border:2px dashed #2C5F8A;border-radius:10px;background:none;color:#2C5F8A;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px 6px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:20px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.progress-bar-bg{height:10px;background:#eee;border-radius:5px;margin-top:4px}
+.progress-bar-fill{height:100%;border-radius:5px;transition:width .4s}
+.cta-box{background:linear-gradient(135deg,#2C5F8A,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 寮宿舎管理システム｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>🏠 寮宿舎管理システム</h1>
+  <p>外国人労働者の寮・宿舎の入居状況を一元管理<br>部屋割り・家賃・設備管理・入退去記録を効率化</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('rooms',this)">🏠 部屋一覧</button>
+  <button class="tab" onclick="switchTab('residents',this)">👤 入居者管理</button>
+  <button class="tab" onclick="switchTab('summary',this)">📊 稼働サマリー</button>
+</div>
+
+<div id="tab-rooms"><div id="rooms-content"></div></div>
+<div id="tab-residents" style="display:none"><div id="residents-content"></div></div>
+<div id="tab-summary" style="display:none"><div id="summary-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版で複数施設を一括管理</h3>
+  <p>本番版では複数施設の一括管理・<br>家賃自動計算・入退去通知・設備点検記録をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="https://forms.gle/xrgH2CtGaCL7LXHE6" target="_blank" class="cta-btn">📝 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var rooms = [];
+var residents = [];
+var roomExpanded = {};
+
+var ROOM_TYPES = ['個室','2人部屋','3人部屋','4人部屋','その他'];
+var FACILITY_TYPES = ['Wi-Fi','エアコン','洗濯機','冷蔵庫','電子レンジ','駐車場','駐輪場'];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['rooms','residents','summary'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='rooms') renderRooms();
+  if(tab==='residents') renderResidents();
+  if(tab==='summary') renderSummary();
+}
+
+function addRoom(){
+  rooms.push({name:'',type:'個室',capacity:1,rent:0,floor:'',facilities:'',memo:''});
+  renderRooms();
+}
+function delRoom(i){if(!confirm('削除しますか？'))return;rooms.splice(i,1);renderRooms();}
+function upRoom(i,key,val){rooms[i][key]=val;renderRooms();}
+function toggleRoom(i){roomExpanded[i]=!roomExpanded[i];renderRooms();}
+
+function getResidentsInRoom(roomName){
+  return residents.filter(function(r){return r.room===roomName && r.status==='入居中';});
+}
+
+function getRoomStatus(room){
+  var current=getResidentsInRoom(room.name).length;
+  var cap=parseInt(room.capacity)||1;
+  if(current===0) return 'available';
+  if(current>=cap) return 'full';
+  return 'partial';
+}
+
+function renderRooms(){
+  var html='';
+  if(rooms.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">部屋がまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    rooms.forEach(function(room,i){
+      var st=getRoomStatus(room);
+      var current=getResidentsInRoom(room.name).length;
+      var cap=parseInt(room.capacity)||1;
+      var isExp=roomExpanded[i];
+      var pct=Math.min(100,Math.round(current/cap*100));
+      var statusLabel=st==='full'?'満室':st==='available'?'空室':'入居中';
+      var badgeCls=st==='full'?'badge-ng':st==='available'?'badge-ok':'badge-warn';
+
+      html+='<div class="room-card '+st+'">';
+      html+='<div class="room-header" onclick="toggleRoom('+i+')">';
+      html+='<div style="flex:1">';
+      html+='<div style="font-size:13px;font-weight:700">'+(room.name||'（部屋名未入力）')+'　<span style="font-size:11px;color:#888">'+room.type+'</span></div>';
+      html+='<div style="font-size:11px;color:#888">定員'+cap+'名　現在'+current+'名　'+(room.rent?'家賃'+parseInt(room.rent).toLocaleString()+'円':'')+'</div>';
+      html+='</div>';
+      html+='<span class="badge '+badgeCls+'">'+statusLabel+'</span>';
+      html+='<span style="font-size:12px;color:#aaa;margin-left:4px">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+
+      html+='<div style="margin:6px 0 2px"><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:'+pct+'%;background:'+(st==='full'?'#E24B4A':st==='available'?'#1D9E75':'#EF9F27')+'"></div></div></div>';
+
+      html+='<div class="room-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r3">';
+      html+='<div class="f"><label>部屋名・号室</label><input type="text" value="'+escH(room.name)+'" placeholder="例：101号室" oninput="upRoom('+i+',\'name\',this.value)"></div>';
+      html+='<div class="f"><label>部屋タイプ</label><select onchange="upRoom('+i+',\'type\',this.value)">'+ROOM_TYPES.map(function(t){return'<option '+(room.type===t?'selected':'')+'>'+t+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>定員（名）</label><input type="number" value="'+room.capacity+'" min="1" oninput="upRoom('+i+',\'capacity\',this.value)"></div>';
+      html+='<div class="f"><label>家賃（円/月）</label><input type="number" value="'+room.rent+'" placeholder="0" oninput="upRoom('+i+',\'rent\',this.value)"></div>';
+      html+='<div class="f"><label>階数・棟</label><input type="text" value="'+escH(room.floor)+'" placeholder="例：1階" oninput="upRoom('+i+',\'floor\',this.value)"></div>';
+      html+='<div class="f"><label>設備</label><input type="text" value="'+escH(room.facilities)+'" placeholder="例：Wi-Fi・エアコン" oninput="upRoom('+i+',\'facilities\',this.value)"></div>';
+      html+='<div class="f" style="grid-column:1/-1"><label>メモ</label><input type="text" value="'+escH(room.memo)+'" placeholder="備考など" oninput="upRoom('+i+',\'memo\',this.value)"></div>';
+      html+='</div>';
+
+      var roomResidents=getResidentsInRoom(room.name);
+      if(roomResidents.length>0){
+        html+='<div style="font-size:11px;font-weight:600;color:#2C5F8A;margin-bottom:4px">現在の入居者</div>';
+        roomResidents.forEach(function(r){
+          html+='<div class="resident-item">👤 '+escH(r.name||'（氏名未入力）')+'　'+escH(r.nationality||'')+'　'+escH(r.visa||'')+'</div>';
+        });
+      }
+
+      html+='<button class="del-btn" style="margin-top:.5rem" onclick="delRoom('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addRoom()">＋ 部屋を追加</button>';
+  document.getElementById('rooms-content').innerHTML=html;
+}
+
+var residentExpanded = {};
+function addResident(){
+  residents.push({name:'',nationality:'',visa:'',room:'',move_in:'',move_out:'',rent_share:0,status:'入居中',memo:''});
+  renderResidents();
+}
+function delResident(i){if(!confirm('削除しますか？'))return;residents.splice(i,1);renderResidents();}
+function upResident(i,key,val){residents[i][key]=val;renderResidents();}
+function toggleResident(i){residentExpanded[i]=!residentExpanded[i];renderResidents();}
+
+var NATIONALITIES = ['ベトナム','中国','フィリピン','インドネシア','ミャンマー','タイ','その他'];
+var VISA_TYPES = ['特定技能1号','技能実習','育成就労','技術・人文知識・国際業務','その他'];
+var STATUS_TYPES = ['入居中','退去済','入居予定'];
+
+function renderResidents(){
+  var html='';
+  if(residents.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">入居者がまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    residents.forEach(function(r,i){
+      var isExp=residentExpanded[i];
+      var badgeCls=r.status==='入居中'?'badge-blue':r.status==='退去済'?'badge-gray':'badge-warn';
+      html+='<div class="room-card">';
+      html+='<div class="room-header" onclick="toggleResident('+i+')">';
+      html+='<div style="flex:1">';
+      html+='<div style="font-size:13px;font-weight:700">'+(r.name||'（氏名未入力）')+'</div>';
+      html+='<div style="font-size:11px;color:#888">'+(r.room||'部屋未割当')+' ／ '+(r.nationality||'国籍未選択')+' ／ '+(r.visa||'在留資格未選択')+'</div>';
+      html+='</div>';
+      html+='<span class="badge '+badgeCls+'">'+r.status+'</span>';
+      html+='<span style="font-size:12px;color:#aaa;margin-left:4px">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+      html+='<div class="room-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r3">';
+      html+='<div class="f"><label>氏名</label><input type="text" value="'+escH(r.name)+'" placeholder="氏名" oninput="upResident('+i+',\'name\',this.value)"></div>';
+      html+='<div class="f"><label>国籍</label><select onchange="upResident('+i+',\'nationality\',this.value)"><option value="">選択</option>'+NATIONALITIES.map(function(n){return'<option '+(r.nationality===n?'selected':'')+'>'+n+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>在留資格</label><select onchange="upResident('+i+',\'visa\',this.value)"><option value="">選択</option>'+VISA_TYPES.map(function(v){return'<option '+(r.visa===v?'selected':'')+'>'+v+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>割当部屋</label><select onchange="upResident('+i+',\'room\',this.value)"><option value="">選択</option>'+rooms.map(function(rm){return'<option '+(r.room===rm.name?'selected':'')+'>'+escH(rm.name)+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>入居日</label><input type="date" value="'+escH(r.move_in)+'" oninput="upResident('+i+',\'move_in\',this.value)"></div>';
+      html+='<div class="f"><label>退去日（予定）</label><input type="date" value="'+escH(r.move_out)+'" oninput="upResident('+i+',\'move_out\',this.value)"></div>';
+      html+='<div class="f"><label>家賃負担額（円）</label><input type="number" value="'+r.rent_share+'" oninput="upResident('+i+',\'rent_share\',this.value)"></div>';
+      html+='<div class="f"><label>ステータス</label><select onchange="upResident('+i+',\'status\',this.value)">'+STATUS_TYPES.map(function(s){return'<option '+(r.status===s?'selected':'')+'>'+s+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>メモ</label><input type="text" value="'+escH(r.memo)+'" placeholder="備考など" oninput="upResident('+i+',\'memo\',this.value)"></div>';
+      html+='</div>';
+      html+='<button class="del-btn" onclick="delResident('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addResident()">＋ 入居者を追加</button>';
+  document.getElementById('residents-content').innerHTML=html;
+}
+
+function renderSummary(){
+  var totalRooms=rooms.length;
+  var totalCapacity=rooms.reduce(function(a,r){return a+(parseInt(r.capacity)||1);},0);
+  var currentResidents=residents.filter(function(r){return r.status==='入居中';}).length;
+  var emptyRooms=rooms.filter(function(r){return getRoomStatus(r)==='available';}).length;
+  var occupancyRate=totalCapacity>0?Math.round(currentResidents/totalCapacity*100):0;
+  var totalRent=residents.filter(function(r){return r.status==='入居中';}).reduce(function(a,r){return a+(parseFloat(r.rent_share)||0);},0);
+
+  var html='<div class="sec"><div class="sec-title">📊 稼働サマリー</div>';
+  html+='<div class="summary-grid">';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#2C5F8A">'+totalRooms+'</div><div class="summary-label">総部屋数</div></div>';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#0F6E56">'+currentResidents+'</div><div class="summary-label">入居者数</div></div>';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#854F0B">'+emptyRooms+'</div><div class="summary-label">空室数</div></div>';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#2C5F8A">'+occupancyRate+'%</div><div class="summary-label">稼働率</div></div>';
+  html+='</div>';
+
+  html+='<div style="margin-bottom:1rem">';
+  html+='<div style="font-size:12px;font-weight:600;color:#333;margin-bottom:4px">稼働率</div>';
+  html+='<div class="progress-bar-bg"><div class="progress-bar-fill" style="width:'+occupancyRate+'%;background:'+(occupancyRate>=90?'#E24B4A':occupancyRate>=70?'#EF9F27':'#1D9E75')+'"></div></div>';
+  html+='</div>';
+
+  if(totalRent>0){
+    html+='<div style="background:#E8F1F8;border-radius:8px;padding:10px 14px;margin-bottom:.75rem;display:flex;justify-content:space-between;align-items:center">';
+    html+='<span style="font-size:12px;font-weight:600;color:#2C5F8A">月間家賃収入合計</span>';
+    html+='<span style="font-size:16px;font-weight:700;color:#2C5F8A">'+totalRent.toLocaleString()+'円</span>';
+    html+='</div>';
+  }
+
+  if(totalRooms===0){
+    html+='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">部屋一覧タブで部屋を登録するとサマリーが表示されます</div>';
+  }
+  html+='</div>';
+  document.getElementById('summary-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderRooms();
+</script>
+</body>
+</html>

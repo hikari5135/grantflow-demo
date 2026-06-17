@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>育成就労制度 移行チェックシステム｜GrantFlow</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:700px;width:100%}
+.topbar{background:linear-gradient(135deg,#185FA5,#378ADD);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.info-box{background:#E6F1FB;border:1px solid #378ADD;border-radius:10px;padding:10px 14px;margin-bottom:1rem;font-size:12px;color:#0C447C;line-height:1.7}
+.info-box strong{font-weight:700}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:12px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;transition:all .2s;font-family:inherit}
+.tab.on{background:#185FA5;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#185FA5;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E6F1FB;display:flex;align-items:center;gap:8px}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0}
+.check-item:last-child{border-bottom:none}
+.check-box{width:24px;height:24px;border-radius:6px;border:2px solid #ddd;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s;margin-top:1px}
+.check-box.done{background:#185FA5;border-color:#185FA5;color:#fff}
+.check-box.warn{background:#EF9F27;border-color:#EF9F27;color:#fff}
+.check-box.ng{background:#E24B4A;border-color:#E24B4A;color:#fff}
+.check-body{flex:1}
+.check-title{font-size:13px;font-weight:600;color:#333;margin-bottom:3px}
+.check-title.done{color:#185FA5;text-decoration:line-through;text-decoration-color:#185FA5}
+.check-desc{font-size:11px;color:#666;line-height:1.6}
+.check-date{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
+.check-date label{font-size:11px;color:#888}
+.check-date input{font-size:12px;padding:3px 8px;border:1px solid #ddd;border-radius:6px;width:160px}
+.status-btns{display:flex;gap:4px;margin-top:6px}
+.st-btn{padding:3px 10px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #ddd;background:#f7f7f7;color:#666;font-family:inherit}
+.st-btn.on-done{background:#E6F1FB;border-color:#185FA5;color:#185FA5}
+.st-btn.on-warn{background:#FAEEDA;border-color:#EF9F27;color:#854F0B}
+.st-btn.on-ng{background:#FCEBEB;border-color:#E24B4A;color:#A32D2D}
+.progress-card{background:#fff;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.prog-label{font-size:12px;font-weight:600;color:#333;width:120px;flex-shrink:0}
+.prog-bar-bg{flex:1;height:8px;background:#eee;border-radius:4px}
+.prog-bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.prog-pct{font-size:12px;font-weight:700;width:36px;text-align:right;flex-shrink:0}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:24px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.alert-box{border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:.5rem}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.worker-card{border:1.5px solid #eee;border-radius:10px;padding:1rem;margin-bottom:.75rem;transition:all .15s}
+.worker-card.ok{border-color:#1D9E75;background:#F0FFF8}
+.worker-card.warn{border-color:#EF9F27;background:#FFFBF0}
+.worker-card.ng{border-color:#E24B4A;background:#FFF5F5}
+.worker-header{display:flex;align-items:center;gap:8px;margin-bottom:.75rem;cursor:pointer}
+.worker-name{font-size:13px;font-weight:700;flex:1}
+.worker-badge{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-gray{background:#f0f0f0;color:#666}
+.worker-body{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.wf{margin-bottom:.5rem}
+.wf label{font-size:11px;color:#666;display:block;margin-bottom:2px}
+.wf input,.wf select{width:100%;font-size:12px;padding:5px 8px;border:1px solid #ddd;border-radius:6px;outline:none}
+.wf input:focus,.wf select:focus{border-color:#185FA5}
+.add-btn{width:100%;padding:10px;border:2px dashed #185FA5;border-radius:10px;background:none;color:#185FA5;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.add-btn:hover{background:#E6F1FB}
+.del-btn{padding:4px 10px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.cta-box{background:linear-gradient(135deg,#185FA5,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="topbar">
+  <h1>🔄 育成就労制度 移行チェックシステム</h1>
+  <p>技能実習制度から育成就労制度への移行手続きを<br>漏れなく管理するためのシステムです</p>
+</div>
+
+<div class="info-box">
+  <strong>📋 育成就労制度とは</strong><br>
+  2024年に技能実習制度が廃止され、2027年までに新しい「育成就労制度」に移行します。
+  受け入れ企業・監理団体・登録支援機関は早急な対応が必要です。
+  このシステムで移行手続きの進捗を管理しましょう。
+</div>
+
+<div class="tabs" id="tabs">
+  <button class="tab on" onclick="switchTab('checklist',this)">📋 手続きチェック</button>
+  <button class="tab" onclick="switchTab('workers',this)">👤 対象者管理</button>
+  <button class="tab" onclick="switchTab('progress',this)">📊 進捗サマリー</button>
+</div>
+
+<div id="tab-checklist">
+<div id="checklist-content"></div>
+</div>
+
+<div id="tab-workers" style="display:none">
+<div id="workers-content"></div>
+</div>
+
+<div id="tab-progress" style="display:none">
+<div id="progress-content"></div>
+</div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版で複数事業所を管理</h3>
+  <p>本番版ではクラウド保存・複数事業所の一括管理・<br>アラート通知機能をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var CHECKS = [
+  {
+    cat:'法人・契約関係',
+    items:[
+      {id:'c1',title:'育成就労制度への移行方針を決定した',desc:'経営陣・担当者で移行方針を確認・決定する'},
+      {id:'c2',title:'監理団体との契約内容を確認した',desc:'現行の技能実習監理団体との契約が育成就労制度に対応しているか確認'},
+      {id:'c3',title:'監理団体と育成就労対応の協議を行った',desc:'監理団体が育成就労制度の認定を取得予定かどうかを確認'},
+      {id:'c4',title:'送出機関との契約内容を確認した',desc:'送出国の送出機関との契約が育成就労制度に対応しているか確認'}
+    ]
+  },
+  {
+    cat:'就業規則・社内整備',
+    items:[
+      {id:'c5',title:'就業規則に育成就労に関する規定を追加した',desc:'育成就労計画・技能習得目標・指導体制などを就業規則に明記'},
+      {id:'c6',title:'育成就労計画書を作成した',desc:'対象者ごとの技能習得目標・期間・指導内容を記載した計画書の作成'},
+      {id:'c7',title:'技能評価基準を確認した',desc:'対象職種の技能評価基準（試験）を確認し、習得目標を設定'}
+    ]
+  },
+  {
+    cat:'対象者への対応',
+    items:[
+      {id:'c8',title:'技能実習生に育成就労制度を説明した',desc:'現在の技能実習生に制度変更の内容・影響・今後の予定を多言語で説明'},
+      {id:'c9',title:'対象者の移行意向を確認した',desc:'育成就労制度への移行を希望するか、帰国するかの意向を確認'},
+      {id:'c10',title:'移行希望者の在留資格手続きを確認した',desc:'育成就労ビザへの切り替え手続きの流れと必要書類を確認'}
+    ]
+  },
+  {
+    cat:'書類・申請関係',
+    items:[
+      {id:'c11',title:'育成就労計画の認定申請書類を準備した',desc:'外国人技能育成機構（JITCO等）への申請書類の準備'},
+      {id:'c12',title:'受け入れ報告書の様式変更を確認した',desc:'新制度に対応した定期報告書の様式・提出先を確認'},
+      {id:'c13',title:'支援計画書を作成した',desc:'登録支援機関が作成する支援計画書の内容を新制度に対応させる'}
+    ]
+  },
+  {
+    cat:'移行後の管理体制',
+    items:[
+      {id:'c14',title:'転籍・職場変更の対応方針を決めた',desc:'育成就労では一定条件で転籍が可能になるため、対応方針を明確にする'},
+      {id:'c15',title:'相談窓口を設置・案内した',desc:'育成就労労働者からの相談を受け付ける窓口を設置し、多言語で案内'},
+      {id:'c16',title:'定期面談の実施計画を立てた',desc:'3か月に1回以上の定期面談の実施計画を立て、記録様式を準備'}
+    ]
+  }
+];
+
+var statuses = {};
+var dates = {};
+var workers = [];
+var activeTab = 'checklist';
+
+function switchTab(tab, el) {
+  activeTab = tab;
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  document.getElementById('tab-checklist').style.display = tab==='checklist'?'':'none';
+  document.getElementById('tab-workers').style.display = tab==='workers'?'':'none';
+  document.getElementById('tab-progress').style.display = tab==='progress'?'':'none';
+  if(tab==='checklist') renderChecklist();
+  if(tab==='workers') renderWorkers();
+  if(tab==='progress') renderProgress();
+}
+
+function setStatus(id, st) {
+  statuses[id] = statuses[id]===st ? null : st;
+  renderChecklist();
+}
+
+function setDate(id, val) {
+  dates[id] = val;
+}
+
+function renderChecklist() {
+  var html = '';
+  var totalDone = 0, totalItems = 0;
+  CHECKS.forEach(function(cat) {
+    var catDone = cat.items.filter(function(item){return statuses[item.id]==='done';}).length;
+    totalDone += catDone;
+    totalItems += cat.items.length;
+    html += '<div class="sec">';
+    html += '<div class="sec-title">📁 '+cat.cat+'　<span style="font-size:11px;font-weight:400;color:#666">'+catDone+'/'+cat.items.length+'完了</span></div>';
+    cat.items.forEach(function(item) {
+      var st = statuses[item.id] || 'none';
+      var boxCls = st==='done'?'done':st==='warn'?'warn':st==='ng'?'ng':'';
+      var boxTxt = st==='done'?'✓':st==='warn'?'!':st==='ng'?'✗':'';
+      html += '<div class="check-item">';
+      html += '<div class="check-box '+boxCls+'">'+boxTxt+'</div>';
+      html += '<div class="check-body">';
+      html += '<div class="check-title'+(st==='done'?' done':'')+'">'+item.title+'</div>';
+      html += '<div class="check-desc">'+item.desc+'</div>';
+      html += '<div class="status-btns">';
+      html += '<button class="st-btn'+(st==='done'?' on-done':'')+'" onclick="setStatus(\''+item.id+'\',\'done\')">✓ 完了</button>';
+      html += '<button class="st-btn'+(st==='warn'?' on-warn':'')+'" onclick="setStatus(\''+item.id+'\',\'warn\')">! 対応中</button>';
+      html += '<button class="st-btn'+(st==='ng'?' on-ng':'')+'" onclick="setStatus(\''+item.id+'\',\'ng\')">✗ 未対応</button>';
+      html += '</div>';
+      html += '<div class="check-date"><label>対応日：</label><input type="text" value="'+(dates[item.id]||'')+'" placeholder="令和X年X月X日" oninput="setDate(\''+item.id+'\',this.value)"></div>';
+      html += '</div></div>';
+    });
+    html += '</div>';
+  });
+  document.getElementById('checklist-content').innerHTML = html;
+}
+
+function addWorker() {
+  workers.push({name:'',nationality:'',period:'',status:'active',memo:''});
+  renderWorkers();
+}
+
+function delWorker(i) {
+  if(!confirm('削除しますか？')) return;
+  workers.splice(i,1);
+  renderWorkers();
+}
+
+function updateWorker(i, key, val) {
+  workers[i][key] = val;
+}
+
+function getWorkerStatus(w) {
+  if(!w.name) return 'gray';
+  if(w.status==='migrated') return 'ok';
+  if(w.status==='active') return 'warn';
+  return 'ng';
+}
+
+function renderWorkers() {
+  var html = '';
+  if(workers.length === 0) {
+    html += '<div class="sec"><div style="text-align:center;padding:1.5rem;color:#aaa;font-size:13px">対象者がまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    workers.forEach(function(w, i) {
+      var wst = getWorkerStatus(w);
+      var badgeLabel = wst==='ok'?'移行完了':wst==='warn'?'手続き中':wst==='ng'?'未対応':'未入力';
+      html += '<div class="worker-card '+wst+'">';
+      html += '<div class="worker-header">';
+      html += '<div class="worker-name">'+(w.name||'（氏名未入力）')+'</div>';
+      html += '<span class="worker-badge badge-'+wst+'">'+badgeLabel+'</span>';
+      html += '<button class="del-btn" onclick="delWorker('+i+')">削除</button>';
+      html += '</div>';
+      html += '<div class="worker-body">';
+      html += '<div class="wf"><label>氏名</label><input type="text" value="'+escH(w.name)+'" placeholder="例：Nguyen Van A" oninput="updateWorker('+i+',\'name\',this.value)"></div>';
+      html += '<div class="wf"><label>国籍</label><select onchange="updateWorker('+i+',\'nationality\',this.value)"><option value="">選択</option><option '+(w.nationality==='vietnam'?'selected':'')+' value="vietnam">ベトナム</option><option '+(w.nationality==='china'?'selected':'')+' value="china">中国</option><option '+(w.nationality==='indonesia'?'selected':'')+' value="indonesia">インドネシア</option><option '+(w.nationality==='myanmar'?'selected':'')+' value="myanmar">ミャンマー</option><option '+(w.nationality==='other'?'selected':'')+' value="other">その他</option></select></div>';
+      html += '<div class="wf"><label>在留期限</label><input type="text" value="'+escH(w.period)+'" placeholder="例：令和8年3月31日" oninput="updateWorker('+i+',\'period\',this.value)"></div>';
+      html += '<div class="wf"><label>移行状況</label><select onchange="updateWorker('+i+',\'status\',this.value)"><option '+(w.status==='active'?'selected':'')+' value="active">技能実習中</option><option '+(w.status==='applying'?'selected':'')+' value="applying">育成就労申請中</option><option '+(w.status==='migrated'?'selected':'')+' value="migrated">育成就労移行完了</option><option '+(w.status==='return'?'selected':'')+' value="return">帰国予定</option></select></div>';
+      html += '<div class="wf" style="grid-column:1/-1"><label>メモ</label><input type="text" value="'+escH(w.memo)+'" placeholder="備考・注意事項など" oninput="updateWorker('+i+',\'memo\',this.value)"></div>';
+      html += '</div></div>';
+    });
+  }
+  html += '<button class="add-btn" onclick="addWorker()">＋ 対象者を追加</button>';
+  document.getElementById('workers-content').innerHTML = html;
+}
+
+function renderProgress() {
+  var totalItems = 0, doneItems = 0, warnItems = 0, ngItems = 0;
+  CHECKS.forEach(function(cat){
+    cat.items.forEach(function(item){
+      totalItems++;
+      var st = statuses[item.id];
+      if(st==='done') doneItems++;
+      else if(st==='warn') warnItems++;
+      else if(st==='ng') ngItems++;
+    });
+  });
+  var donePct = Math.round(doneItems/totalItems*100);
+  var warnPct = Math.round(warnItems/totalItems*100);
+  var ngPct = Math.round(ngItems/totalItems*100);
+
+  var totalWorkers = workers.length;
+  var migratedWorkers = workers.filter(function(w){return w.status==='migrated';}).length;
+  var applyingWorkers = workers.filter(function(w){return w.status==='applying';}).length;
+
+  var overall = donePct>=80?'移行準備 良好':donePct>=50?'移行準備 進行中':'移行準備 要対応';
+  var overallCol = donePct>=80?'#0F6E56':donePct>=50?'#854F0B':'#A32D2D';
+  var overallBg = donePct>=80?'#E1F5EE':donePct>=50?'#FAEEDA':'#FCEBEB';
+  var overallBd = donePct>=80?'#1D9E75':donePct>=50?'#EF9F27':'#E24B4A';
+
+  var html = '';
+  html += '<div class="sec">';
+  html += '<div style="background:'+overallBg+';border:1.5px solid '+overallBd+';border-radius:10px;padding:1rem;text-align:center;margin-bottom:1rem">';
+  html += '<div style="font-size:18px;font-weight:700;color:'+overallCol+'">'+overall+'</div>';
+  html += '<div style="font-size:28px;font-weight:700;color:'+overallCol+';margin:.25rem 0">'+donePct+'%</div>';
+  html += '<div style="font-size:11px;color:'+overallCol+'">手続き完了率</div>';
+  html += '</div>';
+
+  html += '<div class="summary-grid">';
+  html += '<div class="summary-card" style="background:#E1F5EE;border-color:#1D9E75"><div class="summary-num" style="color:#0F6E56">'+doneItems+'</div><div class="summary-label">完了</div></div>';
+  html += '<div class="summary-card" style="background:#FAEEDA;border-color:#EF9F27"><div class="summary-num" style="color:#854F0B">'+warnItems+'</div><div class="summary-label">対応中</div></div>';
+  html += '<div class="summary-card" style="background:#FCEBEB;border-color:#E24B4A"><div class="summary-num" style="color:#A32D2D">'+ngItems+'</div><div class="summary-label">未対応</div></div>';
+  html += '</div>';
+
+  html += '<div class="progress-card" style="margin-bottom:0">';
+  CHECKS.forEach(function(cat){
+    var catDone = cat.items.filter(function(item){return statuses[item.id]==='done';}).length;
+    var catPct = Math.round(catDone/cat.items.length*100);
+    var catCol = catPct>=80?'#1D9E75':catPct>=50?'#EF9F27':'#E24B4A';
+    html += '<div class="prog-row">';
+    html += '<div class="prog-label" style="font-size:11px">'+cat.cat+'</div>';
+    html += '<div class="prog-bar-bg"><div class="prog-bar-fill" style="width:'+catPct+'%;background:'+catCol+'"></div></div>';
+    html += '<div class="prog-pct" style="color:'+catCol+'">'+catPct+'%</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '</div>';
+
+  html += '<div class="sec">';
+  html += '<div class="sec-title">👤 対象者状況</div>';
+  if(totalWorkers===0){
+    html += '<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">対象者タブから対象者を登録してください</div>';
+  } else {
+    html += '<div class="summary-grid">';
+    html += '<div class="summary-card"><div class="summary-num" style="color:#185FA5">'+totalWorkers+'</div><div class="summary-label">登録者数</div></div>';
+    html += '<div class="summary-card" style="background:#E1F5EE;border-color:#1D9E75"><div class="summary-num" style="color:#0F6E56">'+migratedWorkers+'</div><div class="summary-label">移行完了</div></div>';
+    html += '<div class="summary-card" style="background:#FAEEDA;border-color:#EF9F27"><div class="summary-num" style="color:#854F0B">'+applyingWorkers+'</div><div class="summary-label">申請中</div></div>';
+    html += '</div>';
+  }
+  html += '</div>';
+
+  if(ngItems > 0) {
+    html += '<div class="alert-box alert-ng">🔴 未対応の手続きが'+ngItems+'件あります。早急に対応してください。</div>';
+  }
+  if(warnItems > 0) {
+    html += '<div class="alert-box alert-warn">🟡 対応中の手続きが'+warnItems+'件あります。進捗を確認してください。</div>';
+  }
+  if(donePct>=80) {
+    html += '<div class="alert-box alert-ok">✓ 移行準備が順調に進んでいます。残りの手続きも完了させましょう。</div>';
+  }
+
+  document.getElementById('progress-content').innerHTML = html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+renderChecklist();
+renderWorkers();
+</script>
+</body>
+</html>

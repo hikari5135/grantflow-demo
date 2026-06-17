@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>監理団体・登録支援機関 連絡管理ツール｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:720px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#0F6E56,#1D9E75);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#1D9E75;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#0F6E56;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E1F5EE}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select,.f textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#1D9E75}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.contact-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.contact-card.important{border-color:#E24B4A;background:#FFF5F5}
+.contact-card.normal{border-color:#1D9E75;background:#F0FFF8}
+.contact-card.pending{border-color:#EF9F27;background:#FFFBF0}
+.contact-header{display:flex;align-items:center;gap:8px;margin-bottom:.5rem;cursor:pointer}
+.contact-title{font-size:13px;font-weight:700;flex:1}
+.contact-meta{font-size:11px;color:#888}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-gray{background:#f0f0f0;color:#666}
+.contact-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.contact-detail.open{display:block}
+.add-btn{width:100%;padding:10px;border:2px dashed #1D9E75;border-radius:10px;background:none;color:#1D9E75;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:22px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.alert-box{border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:.5rem;line-height:1.6}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.org-card{border:1.5px solid #eee;border-radius:10px;padding:.75rem;margin-bottom:.5rem;cursor:pointer;transition:all .15s}
+.org-card:hover{border-color:#1D9E75;background:#f0fff8}
+.org-card.selected{border-color:#1D9E75;background:#E1F5EE}
+.cta-box{background:linear-gradient(135deg,#0F6E56,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 監理団体・登録支援機関 連絡管理ツール｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>📞 監理団体・登録支援機関 連絡管理ツール</h1>
+  <p>連絡・報告・書類提出の記録を一元管理します</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('contacts',this)">📝 連絡記録</button>
+  <button class="tab" onclick="switchTab('orgs',this)">🏢 団体管理</button>
+  <button class="tab" onclick="switchTab('summary',this)">📊 サマリー</button>
+</div>
+
+<div id="tab-contacts"><div id="contacts-content"></div></div>
+<div id="tab-orgs" style="display:none"><div id="orgs-content"></div></div>
+<div id="tab-summary" style="display:none"><div id="summary-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版でさらに効率化</h3>
+  <p>本番版ではクラウド保存・複数担当者での共有・<br>期限アラートメール通知をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var contacts = [];
+var orgs = [];
+var expanded = {};
+
+var CONTACT_TYPES = ['定期報告','面談実施','書類提出','電話連絡','メール連絡','緊急連絡','その他'];
+var CONTACT_STATUS = ['完了','対応中','未対応','要フォロー'];
+var ORG_TYPES = ['監理団体','登録支援機関','送出機関','行政機関','その他'];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['contacts','orgs','summary'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='contacts') renderContacts();
+  if(tab==='orgs') renderOrgs();
+  if(tab==='summary') renderSummary();
+}
+
+function addContact() {
+  contacts.push({
+    date:'', org:'', type:'定期報告', status:'完了',
+    content:'', nextAction:'', nextDate:'', staff:'', important:false
+  });
+  renderContacts();
+}
+
+function delContact(i){if(!confirm('削除しますか？'))return;contacts.splice(i,1);renderContacts();}
+function upContact(i,key,val){contacts[i][key]=val;}
+function toggleExpand(i){expanded[i]=!expanded[i];renderContacts();}
+function toggleImportant(i){contacts[i].important=!contacts[i].important;renderContacts();}
+
+function getCardCls(c){
+  if(c.important) return 'important';
+  if(c.status==='対応中'||c.status==='要フォロー') return 'pending';
+  return 'normal';
+}
+
+function getBadgeCls(status){
+  if(status==='完了') return 'badge-ok';
+  if(status==='対応中') return 'badge-warn';
+  if(status==='未対応') return 'badge-ng';
+  return 'badge-blue';
+}
+
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  try{
+    var d=new Date(dateStr);
+    return Math.ceil((d-new Date())/86400000);
+  }catch(e){return null;}
+}
+
+function renderContacts(){
+  var html='';
+  if(contacts.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">連絡記録がまだありません。<br>下の「追加」ボタンから記録してください。</div></div>';
+  } else {
+    var sorted = contacts.slice().map(function(c,i){return {c:c,i:i};}).sort(function(a,b){
+      if(a.c.important&&!b.c.important) return -1;
+      if(!a.c.important&&b.c.important) return 1;
+      return 0;
+    });
+    sorted.forEach(function(item){
+      var c=item.c, i=item.i;
+      var isExp=expanded[i];
+      var days=daysUntil(c.nextDate);
+      html+='<div class="contact-card '+getCardCls(c)+'">';
+      html+='<div class="contact-header" onclick="toggleExpand('+i+')">';
+      html+='<div style="flex:1">';
+      html+='<div class="contact-title">'+(c.org||'（団体名未入力）')+'　<span class="badge badge-blue">'+(c.type||'種別未選択')+'</span></div>';
+      html+='<div class="contact-meta">'+(c.date||'日付未入力')+(c.staff?' ／ 担当：'+c.staff:'')+'</div>';
+      html+='</div>';
+      html+='<span class="badge '+getBadgeCls(c.status)+'">'+c.status+'</span>';
+      if(c.important) html+='<span style="font-size:14px;margin-left:4px">⭐</span>';
+      html+='<span style="font-size:12px;color:#aaa;margin-left:4px">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+      html+='<div class="contact-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r3" style="margin-bottom:.75rem">';
+      html+='<div class="f"><label>連絡日</label><input type="date" value="'+escH(c.date)+'" oninput="upContact('+i+',\'date\',this.value)"></div>';
+      html+='<div class="f"><label>団体名</label><input type="text" value="'+escH(c.org)+'" placeholder="例：〇〇監理団体" oninput="upContact('+i+',\'org\',this.value)"></div>';
+      html+='<div class="f"><label>連絡種別</label><select onchange="upContact('+i+',\'type\',this.value)">'+CONTACT_TYPES.map(function(t){return'<option '+(c.type===t?'selected':'')+'>'+t+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>担当者</label><input type="text" value="'+escH(c.staff)+'" placeholder="担当者名" oninput="upContact('+i+',\'staff\',this.value)"></div>';
+      html+='<div class="f"><label>ステータス</label><select onchange="upContact('+i+',\'status\',this.value);renderContacts()">'+CONTACT_STATUS.map(function(s){return'<option '+(c.status===s?'selected':'')+'>'+s+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>次回対応期限</label><input type="date" value="'+escH(c.nextDate)+'" oninput="upContact('+i+',\'nextDate\',this.value)"></div>';
+      html+='</div>';
+      html+='<div class="f"><label>連絡内容・報告事項</label><textarea rows="3" oninput="upContact('+i+',\'content\',this.value)">'+escH(c.content)+'</textarea></div>';
+      html+='<div class="f"><label>次のアクション</label><input type="text" value="'+escH(c.nextAction)+'" placeholder="例：来月の定期報告書を提出する" oninput="upContact('+i+',\'nextAction\',this.value)"></div>';
+      if(days!==null&&days<=7&&c.status!=='完了'){
+        html+='<div class="alert-box '+(days<0?'alert-ng':'alert-warn')+'" style="margin-bottom:.5rem">'+(days<0?'🔴 次回対応期限が'+Math.abs(days)+'日超過しています':'🟡 次回対応期限まであと'+days+'日')+'</div>';
+      }
+      html+='<div style="display:flex;gap:8px;margin-top:.25rem">';
+      html+='<button onclick="toggleImportant('+i+')" style="padding:4px 10px;border:1px solid #EF9F27;border-radius:5px;background:'+(c.important?'#FAEEDA':'#fff')+';color:#854F0B;font-size:11px;cursor:pointer">'+(c.important?'⭐ 重要':'☆ 重要')+'</button>';
+      html+='<button class="del-btn" onclick="delContact('+i+')">🗑 削除</button>';
+      html+='</div>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addContact()">＋ 連絡記録を追加</button>';
+  document.getElementById('contacts-content').innerHTML=html;
+}
+
+function addOrg(){
+  orgs.push({name:'',type:'監理団体',contact:'',phone:'',email:'',memo:''});
+  renderOrgs();
+}
+function delOrg(i){if(!confirm('削除しますか？'))return;orgs.splice(i,1);renderOrgs();}
+function upOrg(i,key,val){orgs[i][key]=val;}
+
+function renderOrgs(){
+  var html='';
+  if(orgs.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">団体がまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    orgs.forEach(function(o,i){
+      html+='<div class="sec" style="margin-bottom:.75rem">';
+      html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">';
+      html+='<div style="font-size:13px;font-weight:700;flex:1">'+(o.name||'（団体名未入力）')+'</div>';
+      html+='<span class="badge badge-blue">'+(o.type||'種別未選択')+'</span>';
+      html+='<button class="del-btn" onclick="delOrg('+i+')">削除</button>';
+      html+='</div>';
+      html+='<div class="r2">';
+      html+='<div class="f"><label>団体名</label><input type="text" value="'+escH(o.name)+'" placeholder="例：〇〇監理組合" oninput="upOrg('+i+',\'name\',this.value)"></div>';
+      html+='<div class="f"><label>種別</label><select onchange="upOrg('+i+',\'type\',this.value)">'+ORG_TYPES.map(function(t){return'<option '+(o.type===t?'selected':'')+'>'+t+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>担当者名</label><input type="text" value="'+escH(o.contact)+'" placeholder="担当者名" oninput="upOrg('+i+',\'contact\',this.value)"></div>';
+      html+='<div class="f"><label>電話番号</label><input type="text" value="'+escH(o.phone)+'" placeholder="03-XXXX-XXXX" oninput="upOrg('+i+',\'phone\',this.value)"></div>';
+      html+='<div class="f" style="grid-column:1/-1"><label>メールアドレス</label><input type="text" value="'+escH(o.email)+'" placeholder="example@example.com" oninput="upOrg('+i+',\'email\',this.value)"></div>';
+      html+='<div class="f" style="grid-column:1/-1"><label>メモ</label><input type="text" value="'+escH(o.memo)+'" placeholder="備考など" oninput="upOrg('+i+',\'memo\',this.value)"></div>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addOrg()">＋ 団体を追加</button>';
+  document.getElementById('orgs-content').innerHTML=html;
+}
+
+function renderSummary(){
+  var total=contacts.length;
+  var done=contacts.filter(function(c){return c.status==='完了';}).length;
+  var pending=contacts.filter(function(c){return c.status==='対応中'||c.status==='要フォロー';}).length;
+  var important=contacts.filter(function(c){return c.important;}).length;
+  var overdue=contacts.filter(function(c){
+    var days=daysUntil(c.nextDate);
+    return days!==null&&days<0&&c.status!=='完了';
+  });
+  var soon=contacts.filter(function(c){
+    var days=daysUntil(c.nextDate);
+    return days!==null&&days>=0&&days<=7&&c.status!=='完了';
+  });
+
+  var html='<div class="sec"><div class="sec-title">📊 連絡状況サマリー</div>';
+  html+='<div class="summary-grid">';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#185FA5">'+total+'</div><div class="summary-label">総連絡件数</div></div>';
+  html+='<div class="summary-card" style="background:#E1F5EE;border-color:#1D9E75"><div class="summary-num" style="color:#0F6E56">'+done+'</div><div class="summary-label">完了</div></div>';
+  html+='<div class="summary-card" style="background:#FAEEDA;border-color:#EF9F27"><div class="summary-num" style="color:#854F0B">'+pending+'</div><div class="summary-label">対応中</div></div>';
+  html+='</div>';
+
+  if(overdue.length>0){
+    html+='<div style="font-size:12px;font-weight:600;color:#A32D2D;margin-bottom:6px">🔴 対応期限超過</div>';
+    overdue.forEach(function(c){
+      var days=daysUntil(c.nextDate);
+      html+='<div class="alert-box alert-ng">'+escH(c.org)+'（'+c.type+'）：'+Math.abs(days)+'日超過</div>';
+    });
+  }
+  if(soon.length>0){
+    html+='<div style="font-size:12px;font-weight:600;color:#854F0B;margin:8px 0 6px">🟡 期限間近（7日以内）</div>';
+    soon.forEach(function(c){
+      var days=daysUntil(c.nextDate);
+      html+='<div class="alert-box alert-warn">'+escH(c.org)+'（'+c.type+'）：あと'+days+'日</div>';
+    });
+  }
+  if(important>0){
+    html+='<div style="font-size:12px;font-weight:600;color:#854F0B;margin:8px 0 6px">⭐ 重要連絡（'+important+'件）</div>';
+    contacts.filter(function(c){return c.important;}).forEach(function(c){
+      html+='<div class="alert-box alert-warn">'+escH(c.org)+'：'+escH(c.content.substring(0,30))+(c.content.length>30?'…':'')+'</div>';
+    });
+  }
+  if(total===0) html+='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">連絡記録を追加するとサマリーが表示されます</div>';
+  if(overdue.length===0&&soon.length===0&&total>0) html+='<div class="alert-box alert-ok">✓ 期限超過・期限間近の対応はありません</div>';
+  html+='</div>';
+  document.getElementById('summary-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderContacts();
+</script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>36協定 自動チェックツール｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:720px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#7B0D1E,#C0392B);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#C0392B;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#7B0D1E;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #FADBD8}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus{border-color:#C0392B}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-gray{background:#f0f0f0;color:#666}
+.alert-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:.75rem;line-height:1.7}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.alert-blue{background:#E6F1FB;border:1px solid #185FA5;color:#0C447C}
+.result-box{border-radius:12px;padding:1.25rem;margin-bottom:1rem;text-align:center}
+.result-box.ok{background:#E1F5EE;border:1.5px solid #1D9E75}
+.result-box.warn{background:#FAEEDA;border:1.5px solid #EF9F27}
+.result-box.ng{background:#FCEBEB;border:1.5px solid #E24B4A}
+.result-big{font-size:32px;font-weight:700}
+.result-label{font-size:13px;font-weight:600;margin-top:4px}
+.result-sub{font-size:11px;margin-top:4px;opacity:.8}
+.calc-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #eee;font-size:13px}
+.calc-row:last-child{border-bottom:none}
+.calc-row.total{font-weight:700;font-size:14px;padding-top:8px}
+.calc-row.over{color:#A32D2D;font-weight:600}
+.progress-bar-bg{height:10px;background:#eee;border-radius:5px;margin-top:4px}
+.progress-bar-fill{height:100%;border-radius:5px;transition:width .4s}
+.emp-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.emp-card.ok{border-color:#1D9E75;background:#F0FFF8}
+.emp-card.warn{border-color:#EF9F27;background:#FFFBF0}
+.emp-card.ng{border-color:#E24B4A;background:#FFF5F5}
+.emp-header{display:flex;align-items:center;gap:8px;margin-bottom:.5rem;cursor:pointer}
+.emp-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.emp-detail.open{display:block}
+.add-btn{width:100%;padding:10px;border:2px dashed #C0392B;border-radius:10px;background:none;color:#C0392B;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:22px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.limit-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:.75rem}
+.limit-table th{background:#7B0D1E;color:#fff;padding:8px 10px;text-align:left}
+.limit-table td{padding:7px 10px;border-bottom:1px solid #eee}
+.limit-table tr:last-child td{border-bottom:none}
+.limit-table tr:nth-child(even) td{background:#fafafa}
+.cta-box{background:linear-gradient(135deg,#7B0D1E,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 36協定 自動チェックツール｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>⏰ 36協定 自動チェックツール</h1>
+  <p>残業時間が36協定の上限を超えていないか自動チェック<br>2024年4月から建設・運輸・医療も上限規制が適用されました</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('check',this)">🔍 残業チェック</button>
+  <button class="tab" onclick="switchTab('employees',this)">👤 従業員管理</button>
+  <button class="tab" onclick="switchTab('limits',this)">📋 上限一覧</button>
+</div>
+
+<div id="tab-check"><div id="check-content"></div></div>
+<div id="tab-employees" style="display:none"><div id="employees-content"></div></div>
+<div id="tab-limits" style="display:none"><div id="limits-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版で全従業員を一括管理</h3>
+  <p>本番版では全従業員の残業時間を一括管理・<br>上限超過のアラートメール通知をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var employees = [];
+var expanded = {};
+
+var INDUSTRIES = ['一般','建設業','自動車運転','医療','研究開発'];
+var MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['check','employees','limits'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='check') renderCheck();
+  if(tab==='employees') renderEmployees();
+  if(tab==='limits') renderLimits();
+}
+
+function gv(id){var el=document.getElementById(id);return el?parseFloat(el.value||0):0;}
+
+function getLimits(industry, hasSpecial) {
+  var limits = {
+    monthly: hasSpecial ? 100 : 45,
+    annual: hasSpecial ? 720 : 360,
+    consecutive: 6,
+    monthly_special_count: 6
+  };
+  if(industry==='建設業') {
+    limits.monthly = hasSpecial ? 100 : 45;
+    limits.annual = hasSpecial ? 720 : 360;
+  } else if(industry==='自動車運転') {
+    limits.annual = hasSpecial ? 960 : 960;
+    limits.monthly = hasSpecial ? 100 : 45;
+  } else if(industry==='医療') {
+    limits.annual = hasSpecial ? 1860 : 960;
+  }
+  return limits;
+}
+
+function renderCheck() {
+  var html = '<div class="sec"><div class="sec-title">🔍 残業時間チェック</div>';
+  html += '<div class="alert-blue">2024年4月から建設業・自動車運転・医療にも上限規制が適用されました。違反した場合は6か月以下の懲役または30万円以下の罰金です。</div>';
+  html += '<div class="r2">';
+  html += '<div class="f"><label>従業員名</label><input type="text" id="c-name" placeholder="例：山田太郎"></div>';
+  html += '<div class="f"><label>業種</label><select id="c-industry"><option>一般</option><option>建設業</option><option>自動車運転</option><option>医療</option><option>研究開発</option></select></div>';
+  html += '</div>';
+  html += '<div class="f"><label>特別条項あり</label><select id="c-special"><option value="0">なし（月45時間・年360時間が上限）</option><option value="1">あり（月100時間未満・年720時間が上限）</option></select></div>';
+  html += '<div style="font-size:12px;font-weight:600;color:#7B0D1E;margin:.75rem 0 .5rem">📅 月別残業時間（時間）</div>';
+  html += '<div class="r3">';
+  for(var i=0;i<12;i++){
+    html += '<div class="f"><label>'+MONTHS[i]+'</label><input type="number" id="m'+i+'" placeholder="0" oninput="calcCheck()" min="0"></div>';
+  }
+  html += '</div>';
+  html += '<div id="check-result"></div>';
+  html += '</div>';
+  document.getElementById('check-content').innerHTML = html;
+}
+
+function calcCheck() {
+  var industry = document.getElementById('c-industry') ? document.getElementById('c-industry').value : '一般';
+  var hasSpecial = document.getElementById('c-special') ? parseInt(document.getElementById('c-special').value) : 0;
+  var limits = getLimits(industry, hasSpecial);
+  var months = [];
+  var annual = 0;
+  for(var i=0;i<12;i++){
+    var v = gv('m'+i);
+    months.push(v);
+    annual += v;
+  }
+  var maxMonth = Math.max.apply(null, months);
+  var overMonths = months.filter(function(m){return m > limits.monthly;});
+  var warnMonths = months.filter(function(m){return m > 45 && m <= limits.monthly;});
+
+  var status = 'ok';
+  var messages = [];
+
+  if(overMonths.length > 0) {
+    status = 'ng';
+    messages.push({type:'ng',text:'月'+limits.monthly+'時間超過が'+overMonths.length+'か月あります（上限違反）'});
+  }
+  if(annual > limits.annual) {
+    status = 'ng';
+    messages.push({type:'ng',text:'年間残業時間が'+annual+'時間で上限'+limits.annual+'時間を超えています（上限違反）'});
+  }
+  if(hasSpecial && overMonths.length === 0) {
+    var specialMonths = months.filter(function(m){return m > 45;});
+    if(specialMonths.length > 6) {
+      status = 'warn';
+      messages.push({type:'warn',text:'特別条項適用月が'+specialMonths.length+'か月（年6か月以内が上限）'});
+    }
+  }
+  if(warnMonths.length > 0 && status==='ok') {
+    status = 'warn';
+    messages.push({type:'warn',text:'月45時間超が'+warnMonths.length+'か月あります（特別条項が必要）'});
+  }
+
+  var annualPct = Math.min(100, Math.round(annual/limits.annual*100));
+  var annualCol = annualPct>=100?'#E24B4A':annualPct>=80?'#EF9F27':'#1D9E75';
+
+  var result = status==='ok'?'上限内（問題なし）':status==='warn'?'要注意':'上限超過（違反）';
+  var resultCol = status==='ok'?'#0F6E56':status==='warn'?'#854F0B':'#A32D2D';
+
+  var html = '<div class="result-box '+status+'">';
+  html += '<div class="result-big" style="color:'+resultCol+'">'+result+'</div>';
+  html += '<div class="result-sub" style="color:'+resultCol+'">年間残業：'+annual+'時間 ／ 上限：'+limits.annual+'時間</div>';
+  html += '</div>';
+
+  html += '<div class="sec">';
+  html += '<div class="calc-row"><span style="color:#666">月最大残業時間</span><span style="font-weight:600;color:'+(maxMonth>limits.monthly?'#A32D2D':maxMonth>45?'#854F0B':'#0F6E56')+'">'+maxMonth+'時間（上限'+limits.monthly+'時間）</span></div>';
+  html += '<div class="calc-row"><span style="color:#666">年間残業時間</span><span style="font-weight:600;color:'+annualCol+'">'+annual+'時間（上限'+limits.annual+'時間）</span></div>';
+  html += '<div class="calc-row"><span style="color:#666">残り使用可能時間</span><span style="font-weight:600">'+(limits.annual-annual>0?limits.annual-annual+'時間':'0時間（超過）')+'</span></div>';
+  html += '<div style="margin-top:.5rem">';
+  html += '<div style="font-size:11px;color:#666;margin-bottom:3px">年間使用率</div>';
+  html += '<div class="progress-bar-bg"><div class="progress-bar-fill" style="width:'+annualPct+'%;background:'+annualCol+'"></div></div>';
+  html += '<div style="font-size:11px;font-weight:600;color:'+annualCol+';margin-top:3px">'+annualPct+'%</div>';
+  html += '</div></div>';
+
+  if(messages.length > 0) {
+    messages.forEach(function(m){
+      html += '<div class="alert-box alert-'+m.type+'">'+( m.type==='ng'?'🔴 ':'🟡 ')+m.text+'</div>';
+    });
+  } else if(annual > 0) {
+    html += '<div class="alert-box alert-ok">✓ 現時点で36協定の上限内です。引き続き管理を続けてください。</div>';
+  }
+
+  document.getElementById('check-result').innerHTML = html;
+}
+
+function addEmployee() {
+  var monthlyHours = {};
+  for(var i=0;i<12;i++) monthlyHours[i]=0;
+  employees.push({name:'',dept:'',industry:'一般',special:false,months:monthlyHours});
+  renderEmployees();
+}
+function delEmployee(i){if(!confirm('削除しますか？'))return;employees.splice(i,1);renderEmployees();}
+function upEmployee(i,key,val){employees[i][key]=val;}
+function upMonth(i,m,val){employees[i].months[m]=parseFloat(val)||0;renderEmployees();}
+function toggleExpand(i){expanded[i]=!expanded[i];renderEmployees();}
+
+function getEmpStatus(emp) {
+  var limits = getLimits(emp.industry, emp.special);
+  var annual = Object.values(emp.months).reduce(function(a,b){return a+b;},0);
+  var maxMonth = Math.max.apply(null, Object.values(emp.months));
+  if(maxMonth > limits.monthly || annual > limits.annual) return 'ng';
+  if(maxMonth > 45 || annual > limits.annual*0.8) return 'warn';
+  return 'ok';
+}
+
+function renderEmployees() {
+  var html='';
+  if(employees.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">従業員がまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    var okCount=employees.filter(function(e){return getEmpStatus(e)==='ok';}).length;
+    var warnCount=employees.filter(function(e){return getEmpStatus(e)==='warn';}).length;
+    var ngCount=employees.filter(function(e){return getEmpStatus(e)==='ng';}).length;
+    html+='<div class="sec"><div class="summary-grid">';
+    html+='<div class="summary-card" style="background:#E1F5EE;border-color:#1D9E75"><div class="summary-num" style="color:#0F6E56">'+okCount+'</div><div class="summary-label">上限内</div></div>';
+    html+='<div class="summary-card" style="background:#FAEEDA;border-color:#EF9F27"><div class="summary-num" style="color:#854F0B">'+warnCount+'</div><div class="summary-label">要注意</div></div>';
+    html+='<div class="summary-card" style="background:#FCEBEB;border-color:#E24B4A"><div class="summary-num" style="color:#A32D2D">'+ngCount+'</div><div class="summary-label">上限超過</div></div>';
+    html+='</div></div>';
+    employees.forEach(function(emp,i){
+      var st=getEmpStatus(emp);
+      var annual=Object.values(emp.months).reduce(function(a,b){return a+b;},0);
+      var limits=getLimits(emp.industry,emp.special);
+      var isExp=expanded[i];
+      var badgeLbl=st==='ok'?'上限内':st==='warn'?'要注意':'上限超過';
+      var badgeCls=st==='ok'?'badge-ok':st==='warn'?'badge-warn':'badge-ng';
+      html+='<div class="emp-card '+st+'">';
+      html+='<div class="emp-header" onclick="toggleExpand('+i+')">';
+      html+='<div style="flex:1"><div style="font-size:13px;font-weight:700">'+(emp.name||'（氏名未入力）')+'</div>';
+      html+='<div style="font-size:11px;color:#888">'+(emp.dept||'部署未入力')+' ／ '+emp.industry+' ／ 年間：'+annual+'h／'+limits.annual+'h</div></div>';
+      html+='<span class="badge '+badgeCls+'">'+badgeLbl+'</span>';
+      html+='<span style="font-size:12px;color:#aaa;margin-left:4px">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+      html+='<div class="emp-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r3" style="margin-bottom:.75rem">';
+      html+='<div class="f"><label>氏名</label><input type="text" value="'+escH(emp.name)+'" placeholder="氏名" oninput="upEmployee('+i+',\'name\',this.value)"></div>';
+      html+='<div class="f"><label>部署</label><input type="text" value="'+escH(emp.dept)+'" placeholder="部署名" oninput="upEmployee('+i+',\'dept\',this.value)"></div>';
+      html+='<div class="f"><label>業種</label><select onchange="upEmployee('+i+',\'industry\',this.value);renderEmployees()">'+INDUSTRIES.map(function(ind){return'<option '+(emp.industry===ind?'selected':'')+'>'+ind+'</option>';}).join('')+'</select></div>';
+      html+='</div>';
+      html+='<div class="f"><label>特別条項</label><select onchange="upEmployee('+i+',\'special\',this.value===\'1\');renderEmployees()"><option value="0" '+(emp.special?'':'selected')+'>なし</option><option value="1" '+(emp.special?'selected':'')+'>あり</option></select></div>';
+      html+='<div style="font-size:12px;font-weight:600;color:#7B0D1E;margin:.5rem 0 6px">月別残業時間</div>';
+      html+='<div class="r3">';
+      for(var m=0;m<12;m++){
+        var mv=emp.months[m]||0;
+        var lim=getLimits(emp.industry,emp.special);
+        var mc=mv>lim.monthly?'#A32D2D':mv>45?'#854F0B':'#333';
+        html+='<div class="f"><label style="color:'+mc+'">'+MONTHS[m]+'</label><input type="number" value="'+mv+'" min="0" style="border-color:'+(mv>lim.monthly?'#E24B4A':mv>45?'#EF9F27':'#ddd')+'" oninput="upMonth('+i+','+m+',this.value)"></div>';
+      }
+      html+='</div>';
+      html+='<button class="del-btn" onclick="delEmployee('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addEmployee()">＋ 従業員を追加</button>';
+  document.getElementById('employees-content').innerHTML=html;
+}
+
+function renderLimits() {
+  var html='<div class="sec"><div class="sec-title">📋 36協定 上限時間 一覧表</div>';
+  html+='<div class="alert-ng" style="margin-bottom:1rem">⚠ 2024年4月から建設業・自動車運転・医療にも上限規制が適用されました。違反した場合は罰則があります。</div>';
+  html+='<table class="limit-table">';
+  html+='<tr><th>業種</th><th>月上限（原則）</th><th>月上限（特別条項）</th><th>年上限</th></tr>';
+  html+='<tr><td>一般業種</td><td>45時間</td><td>100時間未満</td><td>720時間</td></tr>';
+  html+='<tr><td>建設業</td><td>45時間</td><td>100時間未満</td><td>720時間</td></tr>';
+  html+='<tr><td>自動車運転</td><td>45時間</td><td>100時間未満</td><td>960時間</td></tr>';
+  html+='<tr><td>医療（医師）</td><td>—</td><td>155時間未満</td><td>960時間〜1860時間</td></tr>';
+  html+='<tr><td>研究開発</td><td>上限規制なし</td><td>—</td><td>—</td></tr>';
+  html+='</table>';
+  html+='<div class="sec-title" style="margin-top:1rem">📌 特別条項の注意事項</div>';
+  html+='<div class="alert-warn">🟡 特別条項を締結していても以下の制限があります</div>';
+  html+='<div style="font-size:12px;line-height:1.8;color:#333">';
+  html+='• 時間外労働が月100時間以上は違法（休日労働含む）<br>';
+  html+='• 2〜6か月の平均が月80時間超は違法（休日労働含む）<br>';
+  html+='• 特別条項適用は年6か月以内<br>';
+  html+='• 月45時間超は年6か月以内';
+  html+='</div>';
+  html+='</div>';
+  html+='<div class="sec"><div class="sec-title">⚠ 違反した場合の罰則</div>';
+  html+='<div class="alert-ng">🔴 6か月以下の懲役または30万円以下の罰金（労働基準法第119条）</div>';
+  html+='<div style="font-size:12px;color:#666;margin-top:.5rem;line-height:1.7">36協定（時間外・休日労働に関する協定届）を締結・届出していても、上限時間を超えた場合は罰則の対象となります。</div>';
+  html+='</div>';
+  document.getElementById('limits-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderCheck();
+</script>
+</body>
+</html>

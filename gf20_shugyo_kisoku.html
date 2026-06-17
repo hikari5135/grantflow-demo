@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>就業規則 整備チェックツール｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:760px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#0F6E56,#1D9E75);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#1D9E75;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#0F6E56;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E1F5EE;display:flex;justify-content:space-between;align-items:center}
+.sec-title span{font-size:11px;font-weight:400;color:#666}
+.alert-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:.75rem;line-height:1.7}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.alert-blue{background:#E6F1FB;border:1px solid #185FA5;color:#0C447C}
+.category{margin-bottom:1.25rem}
+.category-title{font-size:13px;font-weight:700;color:#0F6E56;margin-bottom:.5rem;display:flex;align-items:center;gap:8px}
+.category-progress{font-size:11px;color:#888;font-weight:400}
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.check-item:last-child{border-bottom:none}
+.chk{width:22px;height:22px;border-radius:6px;border:1.5px solid #ddd;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;margin-top:1px}
+.chk.done{background:#1D9E75;border-color:#1D9E75}
+.chk-body{flex:1}
+.chk-title{font-size:13px;font-weight:500;color:#333}
+.chk-title.done{color:#1D9E75;text-decoration:line-through;text-decoration-color:#1D9E75}
+.chk-desc{font-size:11px;color:#666;margin-top:2px;line-height:1.6}
+.chk-required{display:inline-block;font-size:9px;font-weight:700;color:#A32D2D;background:#FCEBEB;border-radius:4px;padding:1px 6px;margin-right:4px}
+.progress-bar-bg{height:8px;background:#eee;border-radius:4px;margin:8px 0 1rem}
+.progress-bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.result-box{border-radius:12px;padding:1.25rem;margin-bottom:1rem;text-align:center}
+.result-box.ok{background:#E1F5EE;border:1.5px solid #1D9E75}
+.result-box.warn{background:#FAEEDA;border:1.5px solid #EF9F27}
+.result-box.ng{background:#FCEBEB;border:1.5px solid #E24B4A}
+.result-big{font-size:32px;font-weight:700}
+.result-label{font-size:13px;font-weight:600;margin-top:4px}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:22px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.rule-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:.75rem}
+.rule-table th{background:#0F6E56;color:#fff;padding:8px 10px;text-align:left}
+.rule-table td{padding:7px 10px;border-bottom:1px solid #eee}
+.rule-table tr:nth-child(even) td{background:#fafafa}
+.cta-box{background:linear-gradient(135deg,#0F6E56,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 就業規則 整備チェックツール｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>📘 就業規則 整備チェックツール</h1>
+  <p>絶対的必要事項・相対的必要事項の整備状況を点検<br>常時10人以上の事業場は作成・届出が義務です</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('check',this)">✅ 整備チェック</button>
+  <button class="tab" onclick="switchTab('summary',this)">📊 整備状況サマリー</button>
+  <button class="tab" onclick="switchTab('rules',this)">📋 作成・届出ルール</button>
+</div>
+
+<div id="tab-check"><div id="check-content"></div></div>
+<div id="tab-summary" style="display:none"><div id="summary-content"></div></div>
+<div id="tab-rules" style="display:none"><div id="rules-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版で複数顧問先を一括点検</h3>
+  <p>本番版では複数顧問先の整備状況を一括管理・<br>点検結果のレポート出力・改定履歴管理をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var checks = {};
+
+var CATEGORIES = [
+  {
+    name:'絶対的必要事項（必ず記載）',
+    icon:'🔴',
+    items:[
+      {id:'a1',title:'始業・終業の時刻、休憩時間、休日、休暇',desc:'交替制の場合は就業時転換に関する事項も含む',required:true},
+      {id:'a2',title:'賃金の決定・計算・支払方法、締切・支払の時期、昇給',desc:'基本給・諸手当の決定方法、計算方法、支払方法等',required:true},
+      {id:'a3',title:'退職に関する事項（解雇の事由を含む）',desc:'退職手続き、解雇の事由・手続きを具体的に記載',required:true}
+    ]
+  },
+  {
+    name:'相対的必要事項（制度がある場合は記載）',
+    icon:'🟡',
+    items:[
+      {id:'b1',title:'退職手当に関する事項',desc:'適用される労働者の範囲、決定・計算・支払方法、支払時期',required:false},
+      {id:'b2',title:'臨時の賃金（賞与）・最低賃金額に関する事項',desc:'賞与の決定基準、最低賃金額の定め',required:false},
+      {id:'b3',title:'食費・作業用品等の負担に関する事項',desc:'労働者に負担させる場合の内容',required:false},
+      {id:'b4',title:'安全衛生に関する事項',desc:'安全衛生管理体制、健康診断等',required:false},
+      {id:'b5',title:'職業訓練に関する事項',desc:'教育訓練の内容・対象者等',required:false},
+      {id:'b6',title:'災害補償・業務外の傷病扶助に関する事項',desc:'労災保険の適用、見舞金等の制度',required:false},
+      {id:'b7',title:'表彰・制裁に関する事項',desc:'懲戒の種類・程度（減給の制限等に注意）',required:false},
+      {id:'b8',title:'休職に関する事項',desc:'休職の要件・期間・復職手続き等',required:false}
+    ]
+  },
+  {
+    name:'外国人雇用に関する整備（推奨）',
+    icon:'🌏',
+    items:[
+      {id:'c1',title:'多言語での就業規則の整備',desc:'外国人労働者が理解できる言語での周知',required:false},
+      {id:'c2',title:'宗教・文化的配慮に関する規定',desc:'礼拝時間・服装規定等の取扱い',required:false},
+      {id:'c3',title:'在留資格に関する取扱いの明記',desc:'在留資格の確認・更新手続きに関する規定',required:false}
+    ]
+  },
+  {
+    name:'近年の法改正対応（要確認）',
+    icon:'⚖️',
+    items:[
+      {id:'d1',title:'同一労働同一賃金への対応',desc:'パート・有期雇用労働者との待遇差の説明規定',required:false},
+      {id:'d2',title:'育児・介護休業規程の最新化',desc:'産後パパ育休等、2022年以降の法改正への対応',required:false},
+      {id:'d3',title:'ハラスメント防止規程',desc:'パワハラ・セクハラ・マタハラ防止措置（2022年4月中小企業も義務化）',required:false},
+      {id:'d4',title:'副業・兼業に関する規定',desc:'許可制・届出制等の取扱いの明記',required:false},
+      {id:'d5',title:'テレワーク勤務に関する規定',desc:'対象者・費用負担・労働時間管理等',required:false}
+    ]
+  }
+];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['check','summary','rules'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='check') renderCheck();
+  if(tab==='summary') renderSummary();
+  if(tab==='rules') renderRules();
+}
+
+function toggleCheck(id){checks[id]=!checks[id];renderCheck();}
+
+function getCategoryProgress(cat){
+  var done=cat.items.filter(function(i){return checks[i.id];}).length;
+  return {done:done, total:cat.items.length, pct:Math.round(done/cat.items.length*100)};
+}
+
+function renderCheck(){
+  var html='<div class="sec"><div class="alert-blue">常時10人以上の労働者を使用する事業場は、就業規則の作成と労働基準監督署への届出が必要です。絶対的必要事項は必ず記載してください。</div></div>';
+
+  CATEGORIES.forEach(function(cat){
+    var prog=getCategoryProgress(cat);
+    html+='<div class="sec category">';
+    html+='<div class="category-title">'+cat.icon+' '+cat.name+'<span class="category-progress" style="margin-left:auto">'+prog.done+'/'+prog.total+'</span></div>';
+    html+='<div class="progress-bar-bg"><div class="progress-bar-fill" style="width:'+prog.pct+'%;background:'+(prog.pct===100?'#1D9E75':prog.pct>0?'#EF9F27':'#ddd')+'"></div></div>';
+    cat.items.forEach(function(item){
+      var done=checks[item.id];
+      html+='<div class="check-item"><div class="chk'+(done?' done':'')+'" onclick="toggleCheck(\''+item.id+'\')">'+(done?'✓':'')+'</div><div class="chk-body"><div class="chk-title'+(done?' done':'')+'">'+(item.required?'<span class="chk-required">必須</span>':'')+item.title+'</div><div class="chk-desc">'+item.desc+'</div></div></div>';
+    });
+    html+='</div>';
+  });
+
+  document.getElementById('check-content').innerHTML=html;
+}
+
+function renderSummary(){
+  var allItems=[];
+  CATEGORIES.forEach(function(cat){allItems=allItems.concat(cat.items);});
+  var totalDone=allItems.filter(function(i){return checks[i.id];}).length;
+  var totalAll=allItems.length;
+  var pct=Math.round(totalDone/totalAll*100);
+
+  var requiredItems=allItems.filter(function(i){return i.required;});
+  var requiredDone=requiredItems.filter(function(i){return checks[i.id];}).length;
+
+  var status=requiredDone<requiredItems.length?'ng':pct<70?'warn':'ok';
+  var label=requiredDone<requiredItems.length?'絶対的必要事項に未整備項目があります':pct<70?'整備をさらに進めましょう':'整備状況は良好です';
+  var col=status==='ok'?'#0F6E56':status==='warn'?'#854F0B':'#A32D2D';
+
+  var html='<div class="result-box '+status+'"><div class="result-big" style="color:'+col+'">'+pct+'%</div><div class="result-label" style="color:'+col+'">'+label+'</div></div>';
+
+  html+='<div class="sec"><div class="summary-grid">';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#0F6E56">'+totalDone+'</div><div class="summary-label">整備済み項目</div></div>';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#888">'+(totalAll-totalDone)+'</div><div class="summary-label">未整備項目</div></div>';
+  html+='<div class="summary-card" style="background:'+(requiredDone<requiredItems.length?'#FCEBEB':'#E1F5EE')+';border-color:'+(requiredDone<requiredItems.length?'#E24B4A':'#1D9E75')+'"><div class="summary-num" style="color:'+(requiredDone<requiredItems.length?'#A32D2D':'#0F6E56')+'">'+requiredDone+'/'+requiredItems.length+'</div><div class="summary-label">絶対的必要事項</div></div>';
+  html+='</div>';
+
+  if(requiredDone<requiredItems.length){
+    html+='<div class="alert-ng">🔴 絶対的必要事項（始業・終業時刻、賃金、退職に関する事項）は必ず記載が必要です。未整備の場合は最優先で対応してください。</div>';
+  }
+
+  CATEGORIES.forEach(function(cat){
+    var prog=getCategoryProgress(cat);
+    if(prog.done<prog.total){
+      html+='<div style="font-size:12px;font-weight:600;color:#333;margin:8px 0 4px">'+cat.icon+' '+cat.name+'　('+prog.done+'/'+prog.total+')</div>';
+      cat.items.forEach(function(item){
+        if(!checks[item.id]){
+          html+='<div class="alert-warn" style="margin-bottom:4px">'+(item.required?'🔴 ':'🟡 ')+item.title+'</div>';
+        }
+      });
+    }
+  });
+
+  if(totalDone===0){
+    html='<div class="sec"><div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">整備チェックタブでチェックを入れるとサマリーが表示されます</div></div>';
+  } else {
+    html+='</div>';
+  }
+
+  document.getElementById('summary-content').innerHTML=html;
+}
+
+function renderRules(){
+  var html='<div class="sec"><div class="sec-title">📋 就業規則の作成・届出ルール</div>';
+  html+='<table class="rule-table">';
+  html+='<tr><th>項目</th><th>内容</th></tr>';
+  html+='<tr><td>作成義務</td><td>常時10人以上の労働者を使用する事業場（パート・アルバイト含む）</td></tr>';
+  html+='<tr><td>届出先</td><td>事業場を管轄する労働基準監督署</td></tr>';
+  html+='<tr><td>意見聴取</td><td>労働者の過半数で組織する労働組合（ない場合は過半数代表者）の意見書を添付</td></tr>';
+  html+='<tr><td>周知方法</td><td>常時各作業場の見やすい場所への掲示・備付け、書面の交付、データ記録の供覧等</td></tr>';
+  html+='<tr><td>変更時の手続き</td><td>変更の都度、意見聴取・届出・周知が必要</td></tr>';
+  html+='</table>';
+
+  html+='<div class="sec-title" style="margin-top:1rem">⚠ 違反した場合</div>';
+  html+='<div class="alert-ng">🔴 作成義務違反・届出義務違反・周知義務違反は、それぞれ30万円以下の罰金（労働基準法第120条）の対象となります。</div>';
+
+  html+='<div class="sec-title" style="margin-top:1rem">📌 見直しのタイミング</div>';
+  html+='<div style="font-size:12px;line-height:1.9;color:#333">';
+  html+='・法改正があったとき（同一労働同一賃金、育児・介護休業法改正等）<br>';
+  html+='・新しい制度を導入したとき（テレワーク、副業許可等）<br>';
+  html+='・外国人労働者を雇用するとき<br>';
+  html+='・労務トラブルが発生したとき（規定の不備が発覚することが多い）<br>';
+  html+='・最低でも<strong>3年に1度</strong>は見直しを推奨';
+  html+='</div>';
+  html+='</div>';
+  document.getElementById('rules-content').innerHTML=html;
+}
+
+renderCheck();
+</script>
+</body>
+</html>

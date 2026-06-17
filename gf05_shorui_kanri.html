@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>外国人雇用書類管理システム｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:720px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#0A3D2B,#1D9E75);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff}
+.topbar h1{font-size:14px;font-weight:700;margin-bottom:6px}
+.company-row{display:flex;gap:8px}
+.company-row input{flex:1;font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:#fff;outline:none}
+.company-row input::placeholder{color:rgba(255,255,255,.55)}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#1D9E75;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#0A3D2B;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E1F5EE;display:flex;align-items:center;justify-content:space-between}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select{width:100%;font-size:13px;padding:6px 10px;border:1px solid #ddd;border-radius:8px;outline:none}
+.f input:focus,.f select:focus{border-color:#1D9E75}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.worker-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem;transition:all .15s}
+.worker-card.ok{border-color:#1D9E75;background:#F0FFF8}
+.worker-card.warn{border-color:#EF9F27;background:#FFFBF0}
+.worker-card.ng{border-color:#E24B4A;background:#FFF5F5}
+.worker-header{display:flex;align-items:center;gap:8px;margin-bottom:.75rem;cursor:pointer}
+.worker-name{font-size:14px;font-weight:700;flex:1}
+.worker-meta{font-size:11px;color:#888}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#EEEDFE;color:#533AB7}
+.badge-gray{background:#f0f0f0;color:#666}
+.doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:.5rem}
+.doc-item{border:1px solid #eee;border-radius:8px;padding:8px 10px;cursor:pointer;transition:all .15s}
+.doc-item:hover{border-color:#1D9E75}
+.doc-item.submitted{border-color:#1D9E75;background:#E1F5EE}
+.doc-item.expiring{border-color:#EF9F27;background:#FAEEDA}
+.doc-item.expired{border-color:#E24B4A;background:#FCEBEB}
+.doc-item.missing{border-color:#ddd;background:#fafafa}
+.doc-name{font-size:11px;font-weight:600;color:#333;margin-bottom:3px}
+.doc-status{font-size:10px;font-weight:600}
+.doc-status.ok{color:#0F6E56}
+.doc-status.warn{color:#854F0B}
+.doc-status.ng{color:#A32D2D}
+.doc-status.missing{color:#aaa}
+.doc-date{font-size:10px;color:#888;margin-top:2px}
+.add-btn{width:100%;padding:10px;border:2px dashed #1D9E75;border-radius:10px;background:none;color:#1D9E75;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.add-btn:hover{background:#E1F5EE}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px 6px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:22px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.alert-box{border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:.5rem;line-height:1.6}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.expand-btn{font-size:11px;padding:4px 10px;border:1px solid #ddd;border-radius:6px;background:#f7f7f7;cursor:pointer;font-family:inherit;color:#666}
+.worker-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.worker-detail.open{display:block}
+.cta-box{background:linear-gradient(135deg,#0A3D2B,#1D9E75);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 外国人雇用書類管理システム｜無料デモ版　ログイン不要・データはブラウザ内のみ保存
+</div>
+<div class="topbar">
+  <h1>📂 外国人雇用書類管理システム</h1>
+  <div class="company-row">
+    <input id="company" placeholder="会社名・事業所名を入力" oninput="D.company=this.value">
+    <input id="manager" placeholder="担当者名" oninput="D.manager=this.value">
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('workers',this)">👤 スタッフ管理</button>
+  <button class="tab" onclick="switchTab('summary',this)">📊 一覧・アラート</button>
+  <button class="tab" onclick="switchTab('checklist',this)">📋 書類チェック</button>
+</div>
+
+<div id="tab-workers">
+  <div id="workers-content"></div>
+</div>
+<div id="tab-summary" style="display:none">
+  <div id="summary-content"></div>
+</div>
+<div id="tab-checklist" style="display:none">
+  <div id="checklist-content"></div>
+</div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版で複数スタッフを一元管理</h3>
+  <p>本番版ではクラウド保存・複数事業所管理・<br>期限アラートメール通知をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var DOCS = [
+  {id:'passport',name:'パスポート',cat:'身分証明'},
+  {id:'zairyu',name:'在留カード',cat:'在留資格'},
+  {id:'contract',name:'雇用契約書',cat:'雇用'},
+  {id:'labor',name:'労働条件通知書',cat:'雇用'},
+  {id:'insurance_health',name:'健康保険証',cat:'社会保険'},
+  {id:'insurance_pension',name:'年金手帳・基礎年金番号',cat:'社会保険'},
+  {id:'employment_ins',name:'雇用保険被保険者証',cat:'社会保険'},
+  {id:'mynumber',name:'マイナンバー提供書',cat:'マイナンバー'},
+  {id:'residence',name:'住民票',cat:'住所'},
+  {id:'bank',name:'銀行口座確認書類',cat:'給与'},
+  {id:'qualification',name:'資格・免許証',cat:'資格'},
+  {id:'support_plan',name:'1号支援計画書',cat:'支援'},
+];
+
+var DOC_STATUS = ['未提出','提出済','期限切れ間近','期限切れ','不要'];
+var DOC_ST_COLORS = ['#aaa','#0F6E56','#854F0B','#A32D2D','#bbb'];
+
+var NATIONALITIES = ['ベトナム','中国','フィリピン','インドネシア','ミャンマー','タイ','カンボジア','ネパール','その他'];
+var VISA_TYPES = ['特定技能1号','特定技能2号','技能実習1号','技能実習2号','技能実習3号','育成就労','技術・人文知識・国際業務','経営・管理','留学','家族滞在','永住者','日本人の配偶者等','その他'];
+
+var D = {company:'', manager:'', workers:[]};
+var expandedWorkers = {};
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['workers','summary','checklist'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='workers') renderWorkers();
+  if(tab==='summary') renderSummary();
+  if(tab==='checklist') renderChecklist();
+}
+
+function addWorker() {
+  var docStatuses = {};
+  DOCS.forEach(function(d){ docStatuses[d.id] = 0; });
+  D.workers.push({
+    name:'', nationality:'', visa:'', visaExpiry:'',
+    start:'', support:'yes', memo:'',
+    docs: docStatuses
+  });
+  renderWorkers();
+}
+
+function delWorker(i) {
+  if(!confirm('削除しますか？')) return;
+  D.workers.splice(i,1);
+  renderWorkers();
+}
+
+function upWorker(i,key,val){ D.workers[i][key]=val; }
+
+function toggleDoc(i, docId) {
+  var cur = D.workers[i].docs[docId];
+  D.workers[i].docs[docId] = (cur+1) % DOC_STATUS.length;
+  renderWorkers();
+}
+
+function toggleExpand(i) {
+  expandedWorkers[i] = !expandedWorkers[i];
+  renderWorkers();
+}
+
+function getWorkerStatus(w) {
+  if(!w.name) return 'gray';
+  var missing = DOCS.filter(function(d){
+    return w.support==='yes'
+      ? d.id!=='qualification'&&w.docs[d.id]===0
+      : ['passport','zairyu','contract','labor','insurance_health','insurance_pension','employment_ins','mynumber'].indexOf(d.id)>=0&&w.docs[d.id]===0;
+  }).length;
+  var expired = Object.values(w.docs).filter(function(v){return v===3;}).length;
+  var expiring = Object.values(w.docs).filter(function(v){return v===2;}).length;
+  if(expired>0) return 'ng';
+  if(missing>0||expiring>0) return 'warn';
+  return 'ok';
+}
+
+function getDocCount(w) {
+  var submitted = Object.values(w.docs).filter(function(v){return v===1||v===4;}).length;
+  var total = DOCS.filter(function(d){return w.docs[d.id]!==4;}).length;
+  return {submitted:submitted, total:total};
+}
+
+function daysUntil(dateStr) {
+  if(!dateStr) return null;
+  try {
+    var r = dateStr.match(/令和(\d+)年(\d+)月(\d+)日/);
+    if(!r) return null;
+    var y=2018+parseInt(r[1]),m=parseInt(r[2])-1,d=parseInt(r[3]);
+    return Math.ceil((new Date(y,m,d)-new Date())/86400000);
+  } catch(e){ return null; }
+}
+
+function renderWorkers() {
+  var html = '';
+  if(D.workers.length===0) {
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">外国人スタッフがまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    D.workers.forEach(function(w,i){
+      var wst = getWorkerStatus(w);
+      var cnt = getDocCount(w);
+      var days = daysUntil(w.visaExpiry);
+      var visaAlert = '';
+      if(days!==null) {
+        if(days<0) visaAlert='<span class="badge badge-ng">在留期限超過</span>';
+        else if(days<=30) visaAlert='<span class="badge badge-warn">期限まで'+days+'日</span>';
+        else if(days<=90) visaAlert='<span class="badge badge-warn">期限まで'+days+'日</span>';
+      }
+      var badgeLabel = wst==='ok'?'書類完備':wst==='warn'?'要確認':wst==='ng'?'要対応':'未入力';
+      var badgeCls = wst==='ok'?'badge-ok':wst==='warn'?'badge-warn':wst==='ng'?'badge-ng':'badge-gray';
+      var isExpanded = expandedWorkers[i];
+
+      html+='<div class="worker-card '+wst+'">';
+      html+='<div class="worker-header" onclick="toggleExpand('+i+')">';
+      html+='<div style="flex:1"><div class="worker-name">'+(w.name||'（氏名未入力）')+'</div>';
+      html+='<div class="worker-meta">'+(w.nationality||'国籍未入力')+' ／ '+(w.visa||'在留資格未入力')+(w.visaExpiry?' ／ 期限：'+w.visaExpiry:'')+'</div></div>';
+      html+='<span class="badge '+badgeCls+'">'+badgeLabel+'</span>';
+      if(visaAlert) html+=visaAlert;
+      html+='<div style="font-size:11px;color:#666;margin-left:4px">書類：'+cnt.submitted+'/'+cnt.total+'件</div>';
+      html+='<span style="font-size:12px;color:#aaa;margin-left:4px">'+(isExpanded?'▲':'▼')+'</span>';
+      html+='</div>';
+
+      html+='<div class="worker-detail'+(isExpanded?' open':'')+'">';
+      html+='<div class="r3" style="margin-bottom:.75rem">';
+      html+='<div class="f"><label>氏名</label><input type="text" value="'+escH(w.name)+'" placeholder="例：Nguyen Van A" oninput="upWorker('+i+',\'name\',this.value)"></div>';
+      html+='<div class="f"><label>国籍</label><select onchange="upWorker('+i+',\'nationality\',this.value)"><option value="">選択</option>'+NATIONALITIES.map(function(n){return'<option '+(w.nationality===n?'selected':'')+'>'+n+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>在留資格</label><select onchange="upWorker('+i+',\'visa\',this.value)"><option value="">選択</option>'+VISA_TYPES.map(function(v){return'<option '+(w.visa===v?'selected':'')+'>'+v+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>在留期限</label><input type="text" value="'+escH(w.visaExpiry)+'" placeholder="令和X年X月X日" oninput="upWorker('+i+',\'visaExpiry\',this.value)"></div>';
+      html+='<div class="f"><label>雇用開始日</label><input type="text" value="'+escH(w.start)+'" placeholder="令和X年X月X日" oninput="upWorker('+i+',\'start\',this.value)"></div>';
+      html+='<div class="f"><label>登録支援機関</label><select onchange="upWorker('+i+',\'support\',this.value)"><option value="yes" '+(w.support==='yes'?'selected':'')+'>あり</option><option value="no" '+(w.support==='no'?'selected':'')+'>なし</option></select></div>';
+      html+='</div>';
+
+      html+='<div style="font-size:12px;font-weight:600;color:#333;margin-bottom:6px">📄 書類ステータス（タップで変更）</div>';
+      html+='<div class="doc-grid">';
+      DOCS.forEach(function(doc){
+        var st = w.docs[doc.id];
+        var stLabel = DOC_STATUS[st];
+        var stColor = DOC_ST_COLORS[st];
+        var itemCls = st===1?'submitted':st===2?'expiring':st===3?'expired':'missing';
+        html+='<div class="doc-item '+itemCls+'" onclick="toggleDoc('+i+',\''+doc.id+'\')">';
+        html+='<div class="doc-name">'+doc.name+'</div>';
+        html+='<div class="doc-status" style="color:'+stColor+'">'+stLabel+'</div>';
+        html+='</div>';
+      });
+      html+='</div>';
+
+      html+='<div class="f" style="margin-top:.75rem"><label>メモ・備考</label><input type="text" value="'+escH(w.memo)+'" placeholder="配慮事項・特記事項など" oninput="upWorker('+i+',\'memo\',this.value)"></div>';
+      html+='<button class="del-btn" style="margin-top:.25rem" onclick="delWorker('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addWorker()">＋ 外国人スタッフを追加</button>';
+  document.getElementById('workers-content').innerHTML=html;
+}
+
+function renderSummary() {
+  var total = D.workers.length;
+  var okCount = D.workers.filter(function(w){return getWorkerStatus(w)==='ok';}).length;
+  var warnCount = D.workers.filter(function(w){return getWorkerStatus(w)==='warn';}).length;
+  var ngCount = D.workers.filter(function(w){return getWorkerStatus(w)==='ng';}).length;
+
+  var html='<div class="sec"><div class="sec-title">📊 全体サマリー</div>';
+  html+='<div class="summary-grid">';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#185FA5">'+total+'</div><div class="summary-label">登録者数</div></div>';
+  html+='<div class="summary-card" style="background:#E1F5EE;border-color:#1D9E75"><div class="summary-num" style="color:#0F6E56">'+okCount+'</div><div class="summary-label">書類完備</div></div>';
+  html+='<div class="summary-card" style="background:#FAEEDA;border-color:#EF9F27"><div class="summary-num" style="color:#854F0B">'+warnCount+'</div><div class="summary-label">要確認</div></div>';
+  html+='<div class="summary-card" style="background:#FCEBEB;border-color:#E24B4A"><div class="summary-num" style="color:#A32D2D">'+ngCount+'</div><div class="summary-label">要対応</div></div>';
+  html+='</div>';
+
+  if(total===0){
+    html+='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">スタッフタブからスタッフを登録してください</div>';
+  } else {
+    // 在留期限アラート
+    var expiryAlerts = [];
+    D.workers.forEach(function(w){
+      if(!w.visaExpiry||!w.name) return;
+      var days = daysUntil(w.visaExpiry);
+      if(days!==null&&days<=90) expiryAlerts.push({name:w.name,days:days,expiry:w.visaExpiry});
+    });
+    if(expiryAlerts.length>0){
+      html+='<div style="font-size:12px;font-weight:600;color:#854F0B;margin-bottom:6px">⚠ 在留期限アラート</div>';
+      expiryAlerts.forEach(function(a){
+        var cls = a.days<0?'alert-ng':a.days<=30?'alert-ng':'alert-warn';
+        html+='<div class="alert-box '+cls+'">'+escH(a.name)+'：在留期限 '+escH(a.expiry)+' — '+(a.days<0?Math.abs(a.days)+'日超過':'あと'+a.days+'日')+'</div>';
+      });
+    }
+
+    // 書類未提出アラート
+    var docAlerts = [];
+    D.workers.forEach(function(w){
+      if(!w.name) return;
+      var missing = DOCS.filter(function(d){return w.docs[d.id]===0&&d.id!=='qualification';});
+      if(missing.length>0) docAlerts.push({name:w.name,missing:missing});
+    });
+    if(docAlerts.length>0){
+      html+='<div style="font-size:12px;font-weight:600;color:#A32D2D;margin:8px 0 6px">📭 書類未提出アラート</div>';
+      docAlerts.forEach(function(a){
+        html+='<div class="alert-box alert-warn">'+escH(a.name)+'：未提出書類 '+a.missing.map(function(d){return d.name;}).join('・')+'</div>';
+      });
+    }
+
+    if(expiryAlerts.length===0&&docAlerts.length===0){
+      html+='<div class="alert-box alert-ok">✓ 現在アラートはありません。全スタッフの書類が揃っています。</div>';
+    }
+  }
+  html+='</div>';
+  document.getElementById('summary-content').innerHTML=html;
+}
+
+var checkItems = {};
+var CHECKLIST = [
+  {id:'cl1',title:'在留カードの原本を確認した',desc:'有効期限・就労可否・在留資格の種類を確認する'},
+  {id:'cl2',title:'就労制限の確認をした',desc:'在留資格ごとの就労可能業務・時間制限を確認する（特に留学・家族滞在）'},
+  {id:'cl3',title:'ハローワークへの外国人雇用状況届出を行った',desc:'雇入れ・離職の際は翌月末日までにハローワークへ届出が必要'},
+  {id:'cl4',title:'社会保険の加入手続きを完了した',desc:'週30時間以上または週20時間以上（条件あり）の場合は社会保険加入義務あり'},
+  {id:'cl5',title:'雇用保険の加入手続きを完了した',desc:'週20時間以上・31日以上雇用見込みの場合は加入義務あり'},
+  {id:'cl6',title:'労働条件通知書を母国語で交付した',desc:'特定技能・技能実習は母国語での労働条件通知書の交付が義務'},
+  {id:'cl7',title:'マイナンバーの取得・管理を適切に行った',desc:'給与支払い等のために必要。適切な安全管理措置が必要'},
+  {id:'cl8',title:'在留期限の更新管理体制を整えた',desc:'期限の3か月前には更新手続きを開始する。期限切れは不法就労になるため注意'},
+  {id:'cl9',title:'支援計画書の作成・実施をしている',desc:'特定技能1号は登録支援機関または自社での支援計画の作成・実施が義務'},
+  {id:'cl10',title:'定期面談の記録を保管している',desc:'特定技能は3か月に1回以上の定期面談と記録保管が義務'}
+];
+
+function toggleCheck(id){checkItems[id]=!checkItems[id];renderChecklist();}
+
+function renderChecklist(){
+  var done=CHECKLIST.filter(function(c){return checkItems[c.id];}).length;
+  var pct=Math.round(done/CHECKLIST.length*100);
+  var html='<div class="sec"><div class="sec-title">📋 法令対応チェックリスト<span style="font-size:11px;font-weight:400;color:#666">'+done+'/'+CHECKLIST.length+'完了</span></div>';
+  html+='<div style="height:6px;background:#eee;border-radius:3px;margin-bottom:1rem"><div style="height:100%;width:'+pct+'%;background:#1D9E75;border-radius:3px;transition:width .4s"></div></div>';
+  CHECKLIST.forEach(function(c){
+    var done=checkItems[c.id];
+    html+='<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0">';
+    html+='<div style="width:22px;height:22px;border-radius:6px;border:1.5px solid '+(done?'#1D9E75':'#ddd')+';cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;background:'+(done?'#1D9E75':'transparent')+';margin-top:1px" onclick="toggleCheck(\''+c.id+'\')">'+(done?'✓':'')+'</div>';
+    html+='<div style="flex:1"><div style="font-size:13px;font-weight:500;color:'+(done?'#1D9E75':'#333')+';text-decoration:'+(done?'line-through':'none')+'">'+c.title+'</div><div style="font-size:11px;color:#888;margin-top:2px">'+c.desc+'</div></div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  document.getElementById('checklist-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+renderWorkers();
+</script>
+</body>
+</html>

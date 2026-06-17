@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>入管申請 手続き進捗管理ツール｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:760px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#185FA5,#378ADD);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#185FA5;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#0C447C;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E6F1FB}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select,.f textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#185FA5}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-purple{background:#F4F0FF;color:#533AB7}
+.badge-gray{background:#f0f0f0;color:#666}
+.alert-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:.75rem;line-height:1.7}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.alert-blue{background:#E6F1FB;border:1px solid #185FA5;color:#0C447C}
+.case-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.case-card.urgent{border-color:#E24B4A;background:#FFF5F5}
+.case-card.progress{border-color:#185FA5;background:#EBF5FB}
+.case-card.done{border-color:#1D9E75;background:#F0FFF8}
+.case-header{display:flex;align-items:center;gap:8px;margin-bottom:.5rem;cursor:pointer}
+.case-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.case-detail.open{display:block}
+.add-btn{width:100%;padding:10px;border:2px dashed #185FA5;border-radius:10px;background:none;color:#185FA5;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px 6px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:20px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.step-track{display:flex;align-items:center;gap:2px;margin:8px 0}
+.step{flex:1;height:6px;border-radius:3px;background:#eee}
+.step.done{background:#1D9E75}
+.step.current{background:#EF9F27}
+.step-labels{display:flex;justify-content:space-between;font-size:9px;color:#888;margin-top:2px}
+.cta-box{background:linear-gradient(135deg,#0C447C,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 入管申請 手続き進捗管理ツール｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>📁 入管申請 手続き進捗管理ツール</h1>
+  <p>複数の入管申請案件の進捗を一元管理<br>申請期限・在留期限のアラートで対応漏れを防止</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('cases',this)">📁 案件一覧</button>
+  <button class="tab" onclick="switchTab('summary',this)">📊 進捗サマリー</button>
+  <button class="tab" onclick="switchTab('types',this)">📋 申請種別ガイド</button>
+</div>
+
+<div id="tab-cases"><div id="cases-content"></div></div>
+<div id="tab-summary" style="display:none"><div id="summary-content"></div></div>
+<div id="tab-types" style="display:none"><div id="types-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版で全案件を一括管理</h3>
+  <p>本番版では全案件の期限アラートメール通知・<br>顧客別の案件履歴管理をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var cases = [];
+var expanded = {};
+
+var APPLICATION_TYPES = ['在留資格変更許可申請','在留期間更新許可申請','永住許可申請','在留資格認定証明書交付申請','資格外活動許可申請','再入国許可申請','就労資格証明書交付申請','その他'];
+var STAGES = ['書類準備中','申請書作成中','申請済（審査中）','追加書類提出','許可・交付','不許可・取下げ'];
+var STAGE_PROGRESS = {'書類準備中':1,'申請書作成中':2,'申請済（審査中）':3,'追加書類提出':3.5,'許可・交付':5,'不許可・取下げ':5};
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['cases','summary','types'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='cases') renderCases();
+  if(tab==='summary') renderSummary();
+  if(tab==='types') renderTypes();
+}
+
+function addCase(){
+  cases.push({
+    client:'', worker_name:'', type:'', stage:'書類準備中',
+    apply_date:'', expected_date:'', visa_expiry:'', memo:''
+  });
+  renderCases();
+}
+function delCase(i){if(!confirm('削除しますか？'))return;cases.splice(i,1);renderCases();}
+function upCase(i,key,val){cases[i][key]=val;renderCases();}
+function toggleExpand(i){expanded[i]=!expanded[i];renderCases();}
+
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  try{var d=new Date(dateStr);return Math.ceil((d-new Date())/86400000);}catch(e){return null;}
+}
+
+function getCaseStatus(c){
+  if(c.stage==='許可・交付'||c.stage==='不許可・取下げ') return 'done';
+  var days=daysUntil(c.visa_expiry);
+  if(days!==null&&days<=30) return 'urgent';
+  return 'progress';
+}
+
+function renderCases(){
+  var html='';
+  if(cases.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">案件がまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    cases.forEach(function(c,i){
+      var st=getCaseStatus(c);
+      var isExp=expanded[i];
+      var days=daysUntil(c.visa_expiry);
+      var progress=STAGE_PROGRESS[c.stage]||1;
+      var pct=Math.min(100,progress/5*100);
+
+      html+='<div class="case-card '+st+'">';
+      html+='<div class="case-header" onclick="toggleExpand('+i+')">';
+      html+='<div style="flex:1">';
+      html+='<div style="font-size:13px;font-weight:700">'+(c.client||'（顧問先未入力）')+'　'+(c.worker_name?'／ '+c.worker_name:'')+'</div>';
+      html+='<div style="font-size:11px;color:#888">'+(c.type||'種別未選択')+'</div>';
+      html+='</div>';
+      var badgeCls=c.stage==='許可・交付'?'badge-ok':c.stage==='不許可・取下げ'?'badge-ng':c.stage==='申請済（審査中）'?'badge-blue':c.stage==='追加書類提出'?'badge-warn':'badge-purple';
+      html+='<span class="badge '+badgeCls+'">'+c.stage+'</span>';
+      if(days!==null&&days<=30&&st!=='done') html+='<span class="badge badge-ng" style="margin-left:4px">期限'+(days<0?Math.abs(days)+'日超過':'あと'+days+'日')+'</span>';
+      html+='<span style="font-size:12px;color:#aaa;margin-left:4px">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+
+      html+='<div class="step-track">';
+      for(var s=1;s<=5;s++){
+        html+='<div class="step '+(s<progress?'done':s===Math.ceil(progress)?'current':'')+'"></div>';
+      }
+      html+='</div>';
+
+      html+='<div class="case-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r2">';
+      html+='<div class="f"><label>顧問先名</label><input type="text" value="'+escH(c.client)+'" placeholder="例：株式会社〇〇" oninput="upCase('+i+',\'client\',this.value)"></div>';
+      html+='<div class="f"><label>対象者氏名</label><input type="text" value="'+escH(c.worker_name)+'" placeholder="例：Nguyen Van A" oninput="upCase('+i+',\'worker_name\',this.value)"></div>';
+      html+='<div class="f"><label>申請種別</label><select onchange="upCase('+i+',\'type\',this.value)"><option value="">選択</option>'+APPLICATION_TYPES.map(function(t){return'<option '+(c.type===t?'selected':'')+'>'+t+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>進捗ステージ</label><select onchange="upCase('+i+',\'stage\',this.value)">'+STAGES.map(function(s){return'<option '+(c.stage===s?'selected':'')+'>'+s+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>申請日</label><input type="date" value="'+escH(c.apply_date)+'" oninput="upCase('+i+',\'apply_date\',this.value)"></div>';
+      html+='<div class="f"><label>結果予定日</label><input type="date" value="'+escH(c.expected_date)+'" oninput="upCase('+i+',\'expected_date\',this.value)"></div>';
+      html+='<div class="f"><label>現在の在留期限</label><input type="date" value="'+escH(c.visa_expiry)+'" oninput="upCase('+i+',\'visa_expiry\',this.value)"></div>';
+      html+='</div>';
+      html+='<div class="f"><label>メモ・進捗状況</label><textarea rows="2" oninput="upCase('+i+',\'memo\',this.value)">'+escH(c.memo)+'</textarea></div>';
+      html+='<button class="del-btn" onclick="delCase('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addCase()">＋ 案件を追加</button>';
+  document.getElementById('cases-content').innerHTML=html;
+}
+
+function renderSummary(){
+  var total=cases.length;
+  var inProgress=cases.filter(function(c){return c.stage!=='許可・交付'&&c.stage!=='不許可・取下げ';}).length;
+  var done=cases.filter(function(c){return c.stage==='許可・交付';}).length;
+  var urgent=cases.filter(function(c){return getCaseStatus(c)==='urgent';}).length;
+
+  var html='<div class="sec"><div class="sec-title">📊 全体進捗サマリー</div>';
+  html+='<div class="summary-grid">';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#185FA5">'+total+'</div><div class="summary-label">総案件数</div></div>';
+  html+='<div class="summary-card" style="background:#EBF5FB;border-color:#185FA5"><div class="summary-num" style="color:#0C447C">'+inProgress+'</div><div class="summary-label">進行中</div></div>';
+  html+='<div class="summary-card" style="background:#E1F5EE;border-color:#1D9E75"><div class="summary-num" style="color:#0F6E56">'+done+'</div><div class="summary-label">許可済</div></div>';
+  html+='<div class="summary-card" style="background:#FCEBEB;border-color:#E24B4A"><div class="summary-num" style="color:#A32D2D">'+urgent+'</div><div class="summary-label">期限間近</div></div>';
+  html+='</div>';
+
+  if(total===0){
+    html+='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">案件一覧タブで案件を登録するとサマリーが表示されます</div>';
+  } else {
+    var byStage={};
+    STAGES.forEach(function(s){byStage[s]=0;});
+    cases.forEach(function(c){if(byStage[c.stage]!==undefined)byStage[c.stage]++;});
+    html+='<div style="font-size:12px;font-weight:600;color:#333;margin-bottom:8px">📋 ステージ別件数</div>';
+    STAGES.forEach(function(s){
+      if(byStage[s]>0){
+        html+='<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:13px"><span>'+s+'</span><span style="font-weight:600">'+byStage[s]+'件</span></div>';
+      }
+    });
+
+    var urgentCases=cases.filter(function(c){return getCaseStatus(c)==='urgent';});
+    if(urgentCases.length>0){
+      html+='<div style="font-size:12px;font-weight:600;color:#A32D2D;margin:8px 0 6px">🔴 在留期限が近い案件</div>';
+      urgentCases.forEach(function(c){
+        var days=daysUntil(c.visa_expiry);
+        html+='<div class="alert-ng">'+escH(c.client)+'（'+escH(c.worker_name)+'）：在留期限'+(days<0?Math.abs(days)+'日超過':'あと'+days+'日')+'</div>';
+      });
+    }
+  }
+  html+='</div>';
+  document.getElementById('summary-content').innerHTML=html;
+}
+
+var TYPE_INFO = [
+  {name:'在留資格変更許可申請',desc:'現在の在留資格から別の在留資格に変更する場合に必要。例：留学→技術・人文知識・国際業務',period:'申請から1〜3か月程度'},
+  {name:'在留期間更新許可申請',desc:'現在の在留資格のまま在留期間を更新する場合に必要。期限の3か月前から申請可能。',period:'申請から2週間〜1か月程度'},
+  {name:'永住許可申請',desc:'永住者の在留資格を取得するための申請。原則10年以上の在留が必要（一部例外あり）。',period:'申請から4か月〜1年程度'},
+  {name:'在留資格認定証明書交付申請',desc:'海外から呼び寄せる外国人について、入国前に在留資格の適合性を確認する手続き。',period:'申請から1〜3か月程度'},
+  {name:'資格外活動許可申請',desc:'現在の在留資格で許可されていない活動を行う場合に必要（留学生のアルバイト等）。',period:'申請から2週間程度'},
+  {name:'再入国許可申請',desc:'一時的に出国し再度入国する場合の手続き。みなし再入国制度の対象外の場合に必要。',period:'即日〜数日'},
+  {name:'就労資格証明書交付申請',desc:'転職時等に、現在の在留資格で就労が可能であることを証明する書類。義務ではないが推奨。',period:'申請から1〜2か月程度'}
+];
+
+function renderTypes(){
+  var html='<div class="sec"><div class="sec-title">📋 入管申請 種別ガイド</div>';
+  html+='<div class="alert-blue">在留期限の3か月前から更新手続きが可能です。期限切れに注意してください。</div>';
+  TYPE_INFO.forEach(function(t){
+    html+='<div style="border:1px solid #eee;border-radius:10px;padding:.85rem;margin-bottom:.6rem">';
+    html+='<div style="font-size:13px;font-weight:700;color:#0C447C;margin-bottom:4px">'+t.name+'</div>';
+    html+='<div style="font-size:11px;color:#666;line-height:1.6;margin-bottom:4px">'+t.desc+'</div>';
+    html+='<div style="font-size:11px;color:#185FA5;font-weight:600">標準処理期間：'+t.period+'</div>';
+    html+='</div>';
+  });
+  html+='<div class="alert-ng">🔴 在留期限を1日でも過ぎると不法滞在となり、退去強制の対象となる可能性があります。</div>';
+  html+='</div>';
+  document.getElementById('types-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderCases();
+</script>
+</body>
+</html>

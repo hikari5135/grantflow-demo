@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>外国人スタッフ 定着率向上支援ツール｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:720px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#0F6E56,#1D9E75);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#1D9E75;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#0F6E56;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E1F5EE}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select,.f textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#1D9E75}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.risk-meter{border-radius:12px;padding:1rem;margin-bottom:1rem;text-align:center}
+.risk-meter.low{background:#E1F5EE;border:1.5px solid #1D9E75}
+.risk-meter.mid{background:#FAEEDA;border:1.5px solid #EF9F27}
+.risk-meter.high{background:#FCEBEB;border:1.5px solid #E24B4A}
+.risk-score{font-size:48px;font-weight:700}
+.risk-label{font-size:14px;font-weight:600;margin-top:4px}
+.risk-sub{font-size:11px;margin-top:4px;opacity:.8}
+.factor-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.factor-item:last-child{border-bottom:none}
+.factor-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.factor-body{flex:1}
+.factor-title{font-size:13px;font-weight:500;color:#333}
+.factor-desc{font-size:11px;color:#666;margin-top:2px}
+.action-item{border:1px solid #eee;border-radius:8px;padding:.75rem;margin-bottom:.5rem}
+.action-item.priority{border-color:#E24B4A;background:#FFF5F5}
+.action-item.normal{border-color:#1D9E75;background:#F0FFF8}
+.action-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.action-desc{font-size:11px;color:#666;line-height:1.6}
+.interview-item{padding:10px 0;border-bottom:1px solid #f0f0f0}
+.interview-item:last-child{border-bottom:none}
+.interview-q{font-size:12px;font-weight:600;color:#0F6E56;margin-bottom:6px}
+.interview-a{display:flex;gap:6px;flex-wrap:wrap}
+.ans-btn{padding:5px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:12px;cursor:pointer;background:#fff;color:#555;font-family:inherit;transition:all .15s}
+.ans-btn.on{border-color:#1D9E75;background:#E1F5EE;color:#0F6E56;font-weight:500}
+.ans-btn.on-warn{border-color:#EF9F27;background:#FAEEDA;color:#854F0B;font-weight:500}
+.ans-btn.on-ng{border-color:#E24B4A;background:#FCEBEB;color:#A32D2D;font-weight:500}
+.worker-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.worker-card.low{border-color:#1D9E75;background:#F0FFF8}
+.worker-card.mid{border-color:#EF9F27;background:#FFFBF0}
+.worker-card.high{border-color:#E24B4A;background:#FFF5F5}
+.add-btn{width:100%;padding:10px;border:2px dashed #1D9E75;border-radius:10px;background:none;color:#1D9E75;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-gray{background:#f0f0f0;color:#666}
+.cta-box{background:linear-gradient(135deg,#0F6E56,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 外国人スタッフ定着率向上支援ツール｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>📈 外国人スタッフ 定着率向上支援ツール</h1>
+  <p>離職リスクを早期発見し、定着率を改善するためのツールです</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('diagnosis',this)">🔍 離職リスク診断</button>
+  <button class="tab" onclick="switchTab('interview',this)">💬 面談チェック</button>
+  <button class="tab" onclick="switchTab('staff',this)">👤 スタッフ管理</button>
+</div>
+
+<div id="tab-diagnosis">
+<div class="sec">
+<div class="sec-title">🔍 離職リスク診断</div>
+<div style="font-size:12px;color:#666;margin-bottom:1rem">以下の項目を選択してリスクを診断します</div>
+
+<div class="f"><label>①勤続年数</label>
+  <select id="q1" onchange="calcRisk()">
+    <option value="0">選択してください</option>
+    <option value="3">6か月未満（リスク高）</option>
+    <option value="2">6か月〜1年</option>
+    <option value="1">1年〜2年</option>
+    <option value="0">2年以上（安定）</option>
+  </select>
+</div>
+<div class="f"><label>②最近の遅刻・欠勤状況</label>
+  <select id="q2" onchange="calcRisk()">
+    <option value="0">選択してください</option>
+    <option value="3">増加している（月3回以上）</option>
+    <option value="2">時々ある（月1〜2回）</option>
+    <option value="1">ほとんどない</option>
+    <option value="0">全くない</option>
+  </select>
+</div>
+<div class="f"><label>③仕事への意欲・態度</label>
+  <select id="q3" onchange="calcRisk()">
+    <option value="0">選択してください</option>
+    <option value="3">明らかに低下している</option>
+    <option value="2">やや低下気味</option>
+    <option value="1">変化なし</option>
+    <option value="0">意欲的</option>
+  </select>
+</div>
+<div class="f"><label>④職場の人間関係</label>
+  <select id="q4" onchange="calcRisk()">
+    <option value="0">選択してください</option>
+    <option value="3">トラブルがある</option>
+    <option value="2">やや孤立気味</option>
+    <option value="1">普通</option>
+    <option value="0">良好</option>
+  </select>
+</div>
+<div class="f"><label>⑤日本語でのコミュニケーション</label>
+  <select id="q5" onchange="calcRisk()">
+    <option value="0">選択してください</option>
+    <option value="3">ほとんどできていない</option>
+    <option value="2">基本的な会話のみ</option>
+    <option value="1">日常会話は可能</option>
+    <option value="0">問題なく対話できる</option>
+  </select>
+</div>
+<div class="f"><label>⑥生活面の状況</label>
+  <select id="q6" onchange="calcRisk()">
+    <option value="0">選択してください</option>
+    <option value="3">住居・金銭トラブルあり</option>
+    <option value="2">生活面に不安あり</option>
+    <option value="1">特に問題なし</option>
+    <option value="0">安定している</option>
+  </select>
+</div>
+<div class="f"><label>⑦本国との連絡状況</label>
+  <select id="q7" onchange="calcRisk()">
+    <option value="0">選択してください</option>
+    <option value="2">本国家族に問題発生</option>
+    <option value="1">頻繁に連絡している</option>
+    <option value="0">普通</option>
+  </select>
+</div>
+<div class="f"><label>⑧給与・待遇への満足度</label>
+  <select id="q8" onchange="calcRisk()">
+    <option value="0">選択してください</option>
+    <option value="3">不満を表明している</option>
+    <option value="2">やや不満そう</option>
+    <option value="1">普通</option>
+    <option value="0">満足している</option>
+  </select>
+</div>
+
+<div id="risk-result"></div>
+</div>
+</div>
+
+<div id="tab-interview" style="display:none">
+<div class="sec">
+<div class="sec-title">💬 定期面談チェックリスト</div>
+<div style="font-size:12px;color:#666;margin-bottom:1rem">面談時に確認すべき項目です。回答を記録しておきましょう。</div>
+<div id="interview-content"></div>
+</div>
+</div>
+
+<div id="tab-staff" style="display:none">
+<div id="staff-content"></div>
+</div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版で継続的に管理</h3>
+  <p>本番版ではリスクスコアの推移グラフ・<br>複数スタッフの一括管理・アラート通知をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var INTERVIEW_QS = [
+  {q:'仕事の内容は理解できていますか？', opts:['よく理解できている','だいたい理解できている','少し難しい','ほとんどわからない']},
+  {q:'職場の人間関係はどうですか？', opts:['とても良好','普通','少し難しい','困っている']},
+  {q:'日本語でのコミュニケーションはできていますか？', opts:['問題ない','だいたいできる','難しいことがある','困っている']},
+  {q:'生活（住居・食事・健康）に問題はありますか？', opts:['問題ない','少し不安がある','困っていることがある','深刻な問題がある']},
+  {q:'給与・待遇に満足していますか？', opts:['満足している','普通','少し不満がある','不満がある']},
+  {q:'今後も日本で働き続けたいですか？', opts:['ぜひ続けたい','続けたい','わからない','帰国を考えている']},
+  {q:'困ったときに相談できる人がいますか？', opts:['いる','なんとかいる','あまりいない','いない']},
+  {q:'日本語の勉強をしていますか？', opts:['積極的にしている','少しずつしている','あまりしていない','していない']}
+];
+
+var interviewAnswers = {};
+var staffList = [];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['diagnosis','interview','staff'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='interview') renderInterview();
+  if(tab==='staff') renderStaff();
+}
+
+function calcRisk() {
+  var scores = [1,2,3,4,5,6,7,8].map(function(i){
+    var el = document.getElementById('q'+i);
+    return el ? parseInt(el.value||0) : 0;
+  });
+  var total = scores.reduce(function(a,b){return a+b;},0);
+  var answered = scores.filter(function(s){return s>0||document.getElementById('q'+scores.indexOf(s)+1)&&document.getElementById('q'+[1,2,3,4,5,6,7,8][scores.indexOf(s)])&&document.getElementById('q'+[1,2,3,4,5,6,7,8][scores.indexOf(s)]).value!=='0';}).length;
+
+  // 実際に選択された数を数える
+  var selectedCount = 0;
+  for(var i=1;i<=8;i++){
+    var el=document.getElementById('q'+i);
+    if(el&&el.value!=='0') selectedCount++;
+  }
+
+  if(selectedCount < 3){
+    document.getElementById('risk-result').innerHTML='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">3項目以上選択すると診断結果が表示されます</div>';
+    return;
+  }
+
+  var maxScore = selectedCount * 3;
+  var riskPct = maxScore > 0 ? Math.round(total/maxScore*100) : 0;
+  var level = riskPct >= 60 ? 'high' : riskPct >= 30 ? 'mid' : 'low';
+  var levelLabel = level==='high'?'離職リスク 高':level==='mid'?'離職リスク 中':'離職リスク 低';
+  var levelColor = level==='high'?'#A32D2D':level==='mid'?'#854F0B':'#0F6E56';
+
+  var factors = [];
+  var actions = [];
+
+  var q1v=parseInt(document.getElementById('q1').value||0);
+  var q2v=parseInt(document.getElementById('q2').value||0);
+  var q3v=parseInt(document.getElementById('q3').value||0);
+  var q4v=parseInt(document.getElementById('q4').value||0);
+  var q5v=parseInt(document.getElementById('q5').value||0);
+  var q6v=parseInt(document.getElementById('q6').value||0);
+  var q8v=parseInt(document.getElementById('q8').value||0);
+
+  if(q1v>=2) factors.push({col:'#EF9F27',t:'勤続年数が短い',d:'入社後1年以内は特に離職リスクが高い時期です。定期的なフォローが重要です。'});
+  if(q2v>=2) factors.push({col:'#E24B4A',t:'遅刻・欠勤が増加',d:'精神的・身体的な問題のサインである可能性があります。早急に面談を実施してください。'});
+  if(q3v>=2) factors.push({col:'#E24B4A',t:'仕事への意欲低下',d:'業務内容や職場環境に不満を抱えている可能性があります。'});
+  if(q4v>=2) factors.push({col:'#E24B4A',t:'人間関係の問題',d:'孤立・トラブルは離職の主要因です。間に入ってフォローが必要です。'});
+  if(q5v>=2) factors.push({col:'#EF9F27',t:'言語コミュニケーションの問題',d:'日本語での意思疎通が困難な場合、孤立・ミスのリスクが高まります。'});
+  if(q6v>=2) factors.push({col:'#E24B4A',t:'生活面の問題',d:'住居・金銭トラブルは仕事への集中を妨げます。生活支援の強化が必要です。'});
+  if(q8v>=2) factors.push({col:'#EF9F27',t:'給与・待遇への不満',d:'他社・他国への転職を検討している可能性があります。待遇改善を検討してください。'});
+
+  if(q2v>=2||q3v>=2) actions.push({pri:true,t:'早急に個別面談を実施する',d:'1on1面談を設定し、現状の悩みや不満を聞き出してください。'});
+  if(q4v>=2) actions.push({pri:true,t:'職場環境の改善を図る',d:'日本人スタッフとの交流の機会を増やし、孤立を防いでください。'});
+  if(q5v>=2) actions.push({pri:false,t:'日本語学習の支援を強化する',d:'日本語教室への参加支援・日本語教材の提供を検討してください。'});
+  if(q6v>=2) actions.push({pri:true,t:'生活支援の強化',d:'住居・金銭問題があれば登録支援機関や相談窓口につなげてください。'});
+  if(q8v>=2) actions.push({pri:false,t:'待遇改善の検討',d:'給与・手当・休暇制度の見直しを検討してください。'});
+  if(level==='low') actions.push({pri:false,t:'現状維持と定期フォロー',d:'定期面談を継続し、良好な関係を保ってください。'});
+
+  var html = '<div class="risk-meter '+level+'">';
+  html += '<div class="risk-score" style="color:'+levelColor+'">'+riskPct+'</div>';
+  html += '<div class="risk-label" style="color:'+levelColor+'">'+levelLabel+'</div>';
+  html += '<div class="risk-sub" style="color:'+levelColor+'">リスクスコア：'+total+'点（'+selectedCount+'項目回答）</div>';
+  html += '</div>';
+
+  if(factors.length>0){
+    html += '<div class="sec"><div class="sec-title">⚠ リスク要因</div>';
+    factors.forEach(function(f){
+      html += '<div class="factor-item"><div class="factor-dot" style="background:'+f.col+'"></div><div class="factor-body"><div class="factor-title">'+f.t+'</div><div class="factor-desc">'+f.d+'</div></div></div>';
+    });
+    html += '</div>';
+  }
+
+  if(actions.length>0){
+    html += '<div class="sec"><div class="sec-title">✅ 推奨アクション</div>';
+    actions.forEach(function(a){
+      html += '<div class="action-item '+(a.pri?'priority':'normal')+'">';
+      html += '<div class="action-title">'+(a.pri?'🔴 ':'✅ ')+a.t+'</div>';
+      html += '<div class="action-desc">'+a.d+'</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  document.getElementById('risk-result').innerHTML=html;
+}
+
+function renderInterview(){
+  var html='';
+  INTERVIEW_QS.forEach(function(q,i){
+    var ans = interviewAnswers[i];
+    html+='<div class="interview-item">';
+    html+='<div class="interview-q">Q'+(i+1)+'．'+q.q+'</div>';
+    html+='<div class="interview-a">';
+    q.opts.forEach(function(opt,j){
+      var isOk=j===0,isWarn=j===2,isNg=j===3;
+      var onCls=isNg?'on-ng':isWarn?'on-warn':'on';
+      html+='<button class="ans-btn'+(ans===j?' '+onCls:'')+'" onclick="setInterview('+i+','+j+',this,'+(isNg?'\'ng\'':(isWarn?'\'warn\'':'\'ok\''))+')">'+opt+'</button>';
+    });
+    html+='</div></div>';
+  });
+  document.getElementById('interview-content').innerHTML=html;
+}
+
+function setInterview(qi,ai,el,type){
+  interviewAnswers[qi]=ai;
+  var btns=el.parentElement.querySelectorAll('.ans-btn');
+  btns.forEach(function(b){b.classList.remove('on','on-warn','on-ng');});
+  el.classList.add(type==='ng'?'on-ng':type==='warn'?'on-warn':'on');
+}
+
+function addStaff(){
+  staffList.push({name:'',risk:'mid',memo:'',lastInterview:''});
+  renderStaff();
+}
+function delStaff(i){if(!confirm('削除しますか？'))return;staffList.splice(i,1);renderStaff();}
+function upStaff(i,key,val){staffList[i][key]=val;}
+
+function renderStaff(){
+  var html='';
+  if(staffList.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">スタッフがまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    staffList.forEach(function(s,i){
+      var badgeCls=s.risk==='high'?'badge-ng':s.risk==='mid'?'badge-warn':'badge-ok';
+      var badgeLbl=s.risk==='high'?'リスク高':s.risk==='mid'?'リスク中':'リスク低';
+      html+='<div class="worker-card '+s.risk+'">';
+      html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">';
+      html+='<div style="font-size:14px;font-weight:700;flex:1">'+(s.name||'（氏名未入力）')+'</div>';
+      html+='<span class="badge '+badgeCls+'">'+badgeLbl+'</span>';
+      html+='<button class="del-btn" onclick="delStaff('+i+')">削除</button>';
+      html+='</div>';
+      html+='<div class="r3">';
+      html+='<div class="f"><label>氏名</label><input type="text" value="'+escH(s.name)+'" placeholder="氏名" oninput="upStaff('+i+',\'name\',this.value)"></div>';
+      html+='<div class="f"><label>リスクレベル</label><select onchange="upStaff('+i+',\'risk\',this.value);renderStaff()"><option value="low" '+(s.risk==='low'?'selected':'')+'>低</option><option value="mid" '+(s.risk==='mid'?'selected':'')+'>中</option><option value="high" '+(s.risk==='high'?'selected':'')+'>高</option></select></div>';
+      html+='<div class="f"><label>最終面談日</label><input type="text" value="'+escH(s.lastInterview)+'" placeholder="令和X年X月X日" oninput="upStaff('+i+',\'lastInterview\',this.value)"></div>';
+      html+='</div>';
+      html+='<div class="f"><label>メモ・対応内容</label><input type="text" value="'+escH(s.memo)+'" placeholder="面談内容・対応状況など" oninput="upStaff('+i+',\'memo\',this.value)"></div>';
+      html+='</div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addStaff()">＋ スタッフを追加</button>';
+  document.getElementById('staff-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>

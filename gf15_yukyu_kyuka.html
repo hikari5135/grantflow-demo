@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>有給休暇 管理システム｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:720px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#0F6E56,#1D9E75);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#1D9E75;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#0F6E56;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E1F5EE}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus{border-color:#1D9E75}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-gray{background:#f0f0f0;color:#666}
+.alert-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:.75rem;line-height:1.7}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.alert-blue{background:#E6F1FB;border:1px solid #185FA5;color:#0C447C}
+.result-box{border-radius:12px;padding:1.25rem;margin-bottom:1rem;text-align:center}
+.result-box.ok{background:#E1F5EE;border:1.5px solid #1D9E75}
+.result-box.warn{background:#FAEEDA;border:1.5px solid #EF9F27}
+.result-box.ng{background:#FCEBEB;border:1.5px solid #E24B4A}
+.result-big{font-size:32px;font-weight:700}
+.result-label{font-size:13px;font-weight:600;margin-top:4px}
+.calc-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #eee;font-size:13px}
+.calc-row:last-child{border-bottom:none}
+.calc-row.total{font-weight:700;font-size:14px;padding-top:8px}
+.emp-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.emp-card.ok{border-color:#1D9E75;background:#F0FFF8}
+.emp-card.warn{border-color:#EF9F27;background:#FFFBF0}
+.emp-card.ng{border-color:#E24B4A;background:#FFF5F5}
+.emp-header{display:flex;align-items:center;gap:8px;margin-bottom:.5rem;cursor:pointer}
+.emp-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.emp-detail.open{display:block}
+.add-btn{width:100%;padding:10px;border:2px dashed #1D9E75;border-radius:10px;background:none;color:#1D9E75;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:22px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.grant-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:.75rem}
+.grant-table th{background:#0F6E56;color:#fff;padding:8px 6px;text-align:center}
+.grant-table td{padding:7px 6px;border-bottom:1px solid #eee;text-align:center}
+.grant-table tr:nth-child(even) td{background:#fafafa}
+.progress-bar-bg{height:10px;background:#eee;border-radius:5px;margin-top:4px}
+.progress-bar-fill{height:100%;border-radius:5px;transition:width .4s}
+.cta-box{background:linear-gradient(135deg,#0F6E56,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 有給休暇 管理システム｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>🌴 有給休暇 管理システム</h1>
+  <p>年5日の取得義務を達成しているか自動チェック<br>付与日数・取得日数・残日数を一元管理</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('check',this)">🔍 取得義務チェック</button>
+  <button class="tab" onclick="switchTab('employees',this)">👤 従業員管理</button>
+  <button class="tab" onclick="switchTab('grant',this)">📋 付与日数表</button>
+</div>
+
+<div id="tab-check"><div id="check-content"></div></div>
+<div id="tab-employees" style="display:none"><div id="employees-content"></div></div>
+<div id="tab-grant" style="display:none"><div id="grant-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版で全従業員を一括管理</h3>
+  <p>本番版では全従業員の有給休暇を一括管理・<br>取得義務未達のアラートメール通知をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var employees = [];
+var expanded = {};
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['check','employees','grant'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='check') renderCheck();
+  if(tab==='employees') renderEmployees();
+  if(tab==='grant') renderGrant();
+}
+
+function gv(id){var el=document.getElementById(id);return el?parseFloat(el.value||0):0;}
+
+function renderCheck() {
+  var html = '<div class="sec"><div class="sec-title">🔍 年5日取得義務チェック</div>';
+  html += '<div class="alert-blue">年10日以上の有給休暇が付与される従業員には、年5日以上の取得が義務付けられています（2019年4月〜）。違反した場合は労働者1人につき30万円以下の罰金です。</div>';
+  html += '<div class="r2">';
+  html += '<div class="f"><label>従業員名</label><input type="text" id="c-name" placeholder="例：山田太郎"></div>';
+  html += '<div class="f"><label>付与日数（日）</label><input type="number" id="c-granted" placeholder="例：10" oninput="calcCheck()"></div>';
+  html += '</div>';
+  html += '<div class="r2">';
+  html += '<div class="f"><label>付与日</label><input type="date" id="c-grantdate" oninput="calcCheck()"></div>';
+  html += '<div class="f"><label>取得日数（日）</label><input type="number" id="c-used" placeholder="例：3" oninput="calcCheck()"></div>';
+  html += '</div>';
+  html += '<div id="check-result"></div>';
+  html += '</div>';
+  document.getElementById('check-content').innerHTML = html;
+}
+
+function calcCheck() {
+  var granted = gv('c-granted');
+  var used = gv('c-used');
+  var grantDate = document.getElementById('c-grantdate').value;
+  var el = document.getElementById('check-result');
+  if(granted<=0){el.innerHTML='';return;}
+
+  var remaining = granted - used;
+  var needsObligation = granted >= 10;
+  var requiredDays = 5;
+  var shortage = Math.max(0, requiredDays - used);
+
+  var daysLeft = null;
+  if(grantDate){
+    try{
+      var d = new Date(grantDate);
+      d.setFullYear(d.getFullYear()+1);
+      daysLeft = Math.ceil((d-new Date())/86400000);
+    }catch(e){}
+  }
+
+  var status = 'ok';
+  if(needsObligation && used < 5) status = daysLeft!==null && daysLeft<=90 ? 'ng' : 'warn';
+  if(needsObligation && used >= 5) status = 'ok';
+
+  var resultLabel = !needsObligation ? '取得義務対象外（付与10日未満）' : used>=5 ? '取得義務 達成済み' : status==='ng' ? '取得義務 未達成（期限間近）' : '取得義務 未達成（要対応）';
+  var resultCol = status==='ok'?'#0F6E56':status==='warn'?'#854F0B':'#A32D2D';
+
+  var html = '<div class="result-box '+status+'">';
+  html += '<div class="result-big" style="color:'+resultCol+'">'+used+' / 5日</div>';
+  html += '<div class="result-label" style="color:'+resultCol+'">'+resultLabel+'</div>';
+  html += '</div>';
+
+  html += '<div class="sec">';
+  html += '<div class="calc-row"><span style="color:#666">付与日数</span><span style="font-weight:600">'+granted+'日</span></div>';
+  html += '<div class="calc-row"><span style="color:#666">取得日数</span><span style="font-weight:600">'+used+'日</span></div>';
+  html += '<div class="calc-row"><span style="color:#666">残日数</span><span style="font-weight:600">'+remaining+'日</span></div>';
+  if(needsObligation){
+    html += '<div class="calc-row total"><span>取得義務（年5日）まで</span><span style="color:'+(shortage>0?'#A32D2D':'#0F6E56')+'">'+(shortage>0?'あと'+shortage+'日取得が必要':'達成済み'):'</span></div>';
+  }
+  if(daysLeft!==null){
+    html += '<div class="calc-row"><span style="color:#666">付与期間の残り</span><span style="font-weight:600;color:'+(daysLeft<=90?'#854F0B':'#333')+'">'+(daysLeft>0?daysLeft+'日':'期間終了')+'</span></div>';
+  }
+  html += '<div style="margin-top:.5rem">';
+  html += '<div style="font-size:11px;color:#666;margin-bottom:3px">取得率</div>';
+  var pct=Math.min(100,Math.round(used/5*100));
+  html += '<div class="progress-bar-bg"><div class="progress-bar-fill" style="width:'+pct+'%;background:'+(pct>=100?'#1D9E75':pct>=60?'#EF9F27':'#E24B4A')+'"></div></div>';
+  html += '</div></div>';
+
+  if(needsObligation){
+    if(status==='ng'){
+      html += '<div class="alert-box alert-ng">🔴 付与から1年以内に5日取得できないと、労働者1人につき30万円以下の罰金が科される可能性があります。期限が近いため至急取得を促してください。</div>';
+    } else if(status==='warn'){
+      html += '<div class="alert-box alert-warn">🟡 まだ取得義務日数に達していません。計画的に取得を促してください。</div>';
+    } else {
+      html += '<div class="alert-box alert-ok">✓ 取得義務（年5日）を達成しています。</div>';
+    }
+  } else {
+    html += '<div class="alert-box alert-blue">📋 付与日数が10日未満のため、取得義務の対象外です。</div>';
+  }
+
+  el.innerHTML = html;
+}
+
+function addEmployee() {
+  employees.push({name:'',dept:'',joinDate:'',granted:10,used:0,grantDate:''});
+  renderEmployees();
+}
+function delEmployee(i){if(!confirm('削除しますか？'))return;employees.splice(i,1);renderEmployees();}
+function upEmployee(i,key,val){employees[i][key]=val;renderEmployees();}
+function toggleExpand(i){expanded[i]=!expanded[i];renderEmployees();}
+
+function getEmpStatus(emp){
+  var granted=parseFloat(emp.granted)||0;
+  var used=parseFloat(emp.used)||0;
+  if(granted<10) return 'gray';
+  if(used>=5) return 'ok';
+  var daysLeft=null;
+  if(emp.grantDate){
+    try{
+      var d=new Date(emp.grantDate);
+      d.setFullYear(d.getFullYear()+1);
+      daysLeft=Math.ceil((d-new Date())/86400000);
+    }catch(e){}
+  }
+  if(daysLeft!==null&&daysLeft<=90) return 'ng';
+  return 'warn';
+}
+
+function renderEmployees(){
+  var html='';
+  if(employees.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">従業員がまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    var okCount=employees.filter(function(e){return getEmpStatus(e)==='ok';}).length;
+    var warnCount=employees.filter(function(e){return getEmpStatus(e)==='warn';}).length;
+    var ngCount=employees.filter(function(e){return getEmpStatus(e)==='ng';}).length;
+    html+='<div class="sec"><div class="summary-grid">';
+    html+='<div class="summary-card" style="background:#E1F5EE;border-color:#1D9E75"><div class="summary-num" style="color:#0F6E56">'+okCount+'</div><div class="summary-label">達成済み</div></div>';
+    html+='<div class="summary-card" style="background:#FAEEDA;border-color:#EF9F27"><div class="summary-num" style="color:#854F0B">'+warnCount+'</div><div class="summary-label">未達成</div></div>';
+    html+='<div class="summary-card" style="background:#FCEBEB;border-color:#E24B4A"><div class="summary-num" style="color:#A32D2D">'+ngCount+'</div><div class="summary-label">期限間近</div></div>';
+    html+='</div></div>';
+    employees.forEach(function(emp,i){
+      var st=getEmpStatus(emp);
+      var isExp=expanded[i];
+      var granted=parseFloat(emp.granted)||0;
+      var used=parseFloat(emp.used)||0;
+      var badgeLbl=st==='ok'?'達成済み':st==='warn'?'未達成':st==='ng'?'期限間近':'対象外';
+      var badgeCls=st==='ok'?'badge-ok':st==='warn'?'badge-warn':st==='ng'?'badge-ng':'badge-gray';
+      html+='<div class="emp-card '+(st==='gray'?'':st)+'">';
+      html+='<div class="emp-header" onclick="toggleExpand('+i+')">';
+      html+='<div style="flex:1"><div style="font-size:13px;font-weight:700">'+(emp.name||'（氏名未入力）')+'</div>';
+      html+='<div style="font-size:11px;color:#888">'+(emp.dept||'部署未入力')+' ／ 付与'+granted+'日・取得'+used+'日</div></div>';
+      html+='<span class="badge '+badgeCls+'">'+badgeLbl+'</span>';
+      html+='<span style="font-size:12px;color:#aaa;margin-left:4px">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+      html+='<div class="emp-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r3">';
+      html+='<div class="f"><label>氏名</label><input type="text" value="'+escH(emp.name)+'" placeholder="氏名" oninput="upEmployee('+i+',\'name\',this.value)"></div>';
+      html+='<div class="f"><label>部署</label><input type="text" value="'+escH(emp.dept)+'" placeholder="部署名" oninput="upEmployee('+i+',\'dept\',this.value)"></div>';
+      html+='<div class="f"><label>付与日</label><input type="date" value="'+escH(emp.grantDate)+'" oninput="upEmployee('+i+',\'grantDate\',this.value)"></div>';
+      html+='<div class="f"><label>付与日数</label><input type="number" value="'+emp.granted+'" oninput="upEmployee('+i+',\'granted\',this.value)"></div>';
+      html+='<div class="f"><label>取得日数</label><input type="number" value="'+emp.used+'" oninput="upEmployee('+i+',\'used\',this.value)"></div>';
+      html+='<div class="f"><label>残日数</label><input type="text" value="'+(granted-used)+'" disabled style="background:#f7f7f7"></div>';
+      html+='</div>';
+      html+='<button class="del-btn" onclick="delEmployee('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addEmployee()">＋ 従業員を追加</button>';
+  document.getElementById('employees-content').innerHTML=html;
+}
+
+function renderGrant(){
+  var html='<div class="sec"><div class="sec-title">📋 有給休暇 付与日数表（一般労働者）</div>';
+  html+='<table class="grant-table">';
+  html+='<tr><th>勤続年数</th><th>0.5年</th><th>1.5年</th><th>2.5年</th><th>3.5年</th><th>4.5年</th><th>5.5年</th><th>6.5年以上</th></tr>';
+  html+='<tr><td>付与日数</td><td>10日</td><td>11日</td><td>12日</td><td>14日</td><td>16日</td><td>18日</td><td>20日</td></tr>';
+  html+='</table>';
+  html+='<div class="alert-blue">入社から6か月継続勤務し、全労働日の8割以上出勤した場合に10日が付与されます。以後1年ごとに上記の日数が付与されます。</div>';
+
+  html+='<div class="sec-title" style="margin-top:1rem">📋 パートタイム労働者の付与日数表</div>';
+  html+='<div style="font-size:11px;color:#666;margin-bottom:.5rem">週所定労働日数に応じて付与日数が変わります（週所定労働時間30時間未満の場合）</div>';
+  html+='<table class="grant-table">';
+  html+='<tr><th>週所定労働日数</th><th>0.5年</th><th>1.5年</th><th>2.5年</th><th>3.5年</th><th>4.5年</th><th>5.5年</th><th>6.5年以上</th></tr>';
+  html+='<tr><td>4日</td><td>7日</td><td>8日</td><td>9日</td><td>10日</td><td>12日</td><td>13日</td><td>15日</td></tr>';
+  html+='<tr><td>3日</td><td>5日</td><td>6日</td><td>6日</td><td>8日</td><td>9日</td><td>10日</td><td>11日</td></tr>';
+  html+='<tr><td>2日</td><td>3日</td><td>4日</td><td>4日</td><td>5日</td><td>6日</td><td>6日</td><td>7日</td></tr>';
+  html+='<tr><td>1日</td><td>1日</td><td>2日</td><td>2日</td><td>2日</td><td>3日</td><td>3日</td><td>3日</td></tr>';
+  html+='</table>';
+
+  html+='<div class="alert-ng">🔴 違反した場合：年5日の取得義務に違反すると、労働者1人につき30万円以下の罰金（労働基準法第120条）が科される可能性があります。対象者が複数いる場合、人数分の罰金となるリスクがあります。</div>';
+  html+='</div>';
+  document.getElementById('grant-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderCheck();
+</script>
+</body>
+</html>

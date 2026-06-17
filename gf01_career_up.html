@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>キャリアアップ助成金 統合管理システム｜デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:700px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:12px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.demo-banner h2{font-size:14px;font-weight:700;margin-bottom:4px}
+.demo-banner p{font-size:11px;opacity:.85;line-height:1.6}
+.topbar{background:linear-gradient(135deg,#0A3D2B,#1D9E75);border-radius:12px;padding:12px 16px;margin-bottom:1rem;color:#fff}
+.topbar h1{font-size:13px;font-weight:600;margin-bottom:8px}
+.sf{display:grid;grid-template-columns:2fr 1fr;gap:8px}
+.sf-g label{font-size:10px;opacity:.75;display:block;margin-bottom:2px}
+.sf-g input{width:100%;font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:#fff;outline:none}
+.sf-g input::placeholder{color:rgba(255,255,255,.55)}
+.prog{display:flex;align-items:center;margin-bottom:1rem;background:#fff;border:1px solid #eee;border-radius:12px;padding:10px 12px;gap:4px;overflow-x:auto;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.pi{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;cursor:pointer;min-width:46px}
+.pc{width:30px;height:30px;border-radius:50%;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;border:2px solid #eee;color:#666;background:#f7f7f7}
+.pc.done{color:#fff}.pc.cur{border-width:2.5px}
+.pl{font-size:9px;color:#666;text-align:center;line-height:1.3;white-space:pre-line}
+.pl.done,.pl.cur{font-weight:500}
+.pa{color:#ccc;font-size:12px;flex-shrink:0;align-self:center;padding:0 1px}
+.sec{background:#fff;border:1px solid #eee;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.st{font-size:14px;font-weight:500;margin-bottom:.75rem;display:flex;align-items:center;gap:8px}
+.sn{width:26px;height:26px;border-radius:50%;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.f{margin-bottom:.65rem}
+.f label{font-size:12px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rg{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.rb{padding:5px 12px;border:1px solid #ddd;border-radius:8px;font-size:12px;cursor:pointer;color:#555;background:#f7f7f7;user-select:none}
+.rb.danger.on{background:#FCEBEB!important;border-color:#A32D2D!important;color:#A32D2D!important;font-weight:500!important}
+.nav{display:flex;gap:8px;margin-top:.75rem}
+.bp{flex:1;font-size:13px;padding:9px;border:1px solid #ddd;border-radius:8px;cursor:pointer;background:#f7f7f7}
+.bn{flex:2;font-size:13px;padding:9px;border:none;border-radius:8px;cursor:pointer;font-weight:600;color:#fff}
+.gbox{background:#E1F5EE;border:1px solid #1D9E75;border-radius:8px;padding:8px 12px;font-size:12px;color:#0F6E56;margin-bottom:.6rem}
+.wbox{background:#FFF8F0;border:1px solid #EF9F27;border-radius:8px;padding:8px 12px;font-size:12px;color:#854F0B;margin-bottom:.6rem}
+.dbox{background:#FCEBEB;border:1px solid #E24B4A;border-radius:8px;padding:8px 12px;font-size:12px;color:#A32D2D;margin-bottom:.6rem}
+.ain{background:#FFF8F0;border:1px solid #EF9F27;border-radius:8px;padding:6px 10px;font-size:11px;color:#854F0B;margin-bottom:.6rem}
+.calc{background:#f7f7f7;border-radius:8px;padding:10px 12px;font-size:12px;margin-top:.5rem}
+.cr{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #eee}
+.cr:last-child{border-bottom:none}
+.carry{border-radius:8px;padding:9px 12px;margin-bottom:.75rem;font-size:12px;border-left:3px solid #185FA5;background:#E6F1FB;color:#0C447C}
+.carry .ct{font-weight:500;margin-bottom:5px}
+.carry-row{display:flex;flex-wrap:wrap;gap:4px}
+.carry-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:4px;font-size:11px;background:rgba(255,255,255,.6);border:1px solid rgba(24,95,165,.2)}
+.carry-chip.ok{background:#E1F5EE;color:#0F6E56;border-color:#1D9E75}
+.carry-chip.warn{background:#FAEEDA;color:#854F0B;border-color:#EF9F27}
+.carry-chip.danger{background:#FCEBEB;color:#A32D2D;border-color:#E24B4A}
+.ms-sec{margin-bottom:1rem}
+.ms-sec-title{font-size:12px;font-weight:600;color:#92400E;background:#FEF3C7;border-radius:8px;padding:6px 10px;margin-bottom:8px}
+.ms-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #eee}
+.ms-item:last-child{border-bottom:none}
+.ms-chk{width:22px;height:22px;border-radius:50%;border:1.5px solid #ccc;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;font-size:11px;color:#fff}
+.ms-chk.done{background:#1D9E75;border-color:#1D9E75}
+.ms-lbl{font-size:13px;font-weight:500;margin-bottom:4px}
+.ms-lbl.done{color:#0F6E56;text-decoration:line-through;text-decoration-color:#1D9E75}
+.ms-note{font-size:11px;color:#666;margin-top:2px}
+.ms-date-row{display:flex;align-items:center;gap:8px;margin-top:5px}
+.ms-date-row input{font-size:12px;padding:3px 8px;border:1px solid #ddd;border-radius:6px;width:150px}
+.ms-prog{height:6px;background:#eee;border-radius:3px;margin:4px 0}
+.ms-prog-fill{height:100%;border-radius:3px;background:#D97706;transition:width .4s}
+.badge{padding:2px 7px;border-radius:4px;font-size:11px;font-weight:500}
+.bok{background:#E1F5EE;color:#0F6E56}.bwn{background:#FAEEDA;color:#854F0B}.bng{background:#FCEBEB;color:#A32D2D}
+.doc-row{display:flex;align-items:center;border:1px solid #eee;border-radius:10px;margin-bottom:6px;overflow:hidden;background:#fff;cursor:pointer}
+.doc-main{flex:1;padding:9px 12px}
+.doc-name{font-size:12px;font-weight:600;color:#333;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.doc-pri{font-size:10px;font-weight:600;padding:1px 5px;border-radius:3px}
+.dl-chip{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500}
+.dl-r{background:#FCEBEB;color:#A32D2D}.dl-o{background:#FAEEDA;color:#854F0B}.dl-g{background:#E1F5EE;color:#0F6E56}
+button{cursor:pointer;font-family:inherit}
+.cta-box{background:linear-gradient(135deg,#0A3D2B,#1D9E75);border-radius:12px;padding:1.5rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:15px;font-weight:700;margin-bottom:8px}
+.cta-box p{font-size:12px;opacity:.9;margin-bottom:12px;line-height:1.8;text-align:left}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:14px;padding:12px 32px;border-radius:8px;text-decoration:none;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  <h2>🎯 キャリアアップ助成金 統合管理システム｜無料デモ版</h2>
+  <p>STEP1〜6の全機能をお試しいただけます。<br>ログイン不要・データはブラウザ内のみ保存（外部送信なし）。</p>
+</div>
+<div class="topbar">
+  <h1>🔗 キャリアアップ助成金 STEP1〜6 統合管理システム　<small style="font-weight:400;opacity:.8">デモ版</small></h1>
+  <div class="sf">
+    <div class="sf-g"><label>会社名</label><input id="gc" placeholder="株式会社〇〇" oninput="D.company=this.value"></div>
+    <div class="sf-g"><label>申請予定日</label><input id="gd" placeholder="2025年6月" oninput="D.plan=this.value"></div>
+  </div>
+</div>
+<div class="prog" id="prog"></div>
+<div id="content"></div>
+</div>
+
+<script>
+var SC = {
+  1:['#E1F5EE','#1D9E75','#0F6E56'],
+  2:['#E6F1FB','#185FA5','#0C447C'],
+  3:['#EEEDFE','#533AB7','#3C3489'],
+  4:['#EAF3DE','#3B6D11','#27500A'],
+  5:['#FBEAF0','#993556','#72243E'],
+  6:['#FEF3C7','#D97706','#92400E'],
+  7:['#FAEEDA','#BA7517','#92400e']
+};
+var SN = ['','簡易診断','詳細診断','申請準備','書類監査','資料管理','申請後\nフォロー','総合'];
+var DOCS = [
+  {id:'就業規則',p:'最優先'},{id:'出勤簿（6か月）',p:'最優先'},
+  {id:'賃金台帳（6か月）',p:'最優先'},{id:'雇用契約書（転換後）',p:'最優先'},
+  {id:'労働条件通知書',p:'最優先'},{id:'転換辞令',p:'最優先'},
+  {id:'36協定',p:'高'},{id:'賃金規程',p:'高'},
+  {id:'登記簿謄本',p:'高'},{id:'社会保険加入記録',p:'高'},
+  {id:'雇用保険資格取得確認',p:'高'},{id:'転換前後比較資料',p:'高'}
+];
+var DST_ICONS = ['📭','✅','🔄','↩️','✔️'];
+var DST_LABELS = ['未提出','提出済','修正依頼中','差戻し','確認完了'];
+var MS_KEYS = ['plan','conv','jirei','ins','six','wage6','apply','decision','payment'];
+var PC2 = {'最優先':'#A32D2D','高':'#854F0B'};
+
+function defD() {
+  return {
+    company:'', plan:'',
+    s1:{emp_type:[],six_months:'',shi:'',emp_ins:'',now_sal:'',new_sal:'',rules:'',conv_rule:'',risk_dismiss:'',risk_fraud:'',result:''},
+    s2:{weekly_h:'',base_before:'',base_after:'',fixed_ot:'',ins_missing:'',arrear:'',dismiss:'',result:'',score:0},
+    s3:{conv_date:'',jirei:'',mukiroyou:'',avg_ot:'',wage_before_base:'',wage_before_fixot:'',wage_after_base:'',wage_after_fixot:'',wage_result:'',rc1:'',rc2:'',rc3:'',rc4:'',result:''},
+    s4:{monthly_h:'',base:'',actual_ot:'',fixed_ot_h:'',ot_paid:'',anomalies:[],result:''},
+    s5:{statuses:{},result:''},
+    s6:{m:{
+      plan:{done:false,date:''},conv:{done:false,date:''},jirei:{done:false,date:''},
+      ins:{done:false,date:''},six:{done:false,date:''},wage6:{done:false,date:''},
+      apply:{done:false,date:''},decision:{done:false,date:'',amount:''},payment:{done:false,date:'',amount:''}
+    },result:''},
+    done:[]
+  };
+}
+
+var D = defD();
+var cur = 1;
+
+function escH(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function iDone(n) { return D.done.indexOf(n) >= 0; }
+function mDone(n) { if (D.done.indexOf(n) < 0) D.done.push(n); }
+function gv(id) {
+  var el = document.getElementById(id);
+  return el ? parseFloat(el.value||0) : 0;
+}
+function fmt(v) { return Math.round(v).toLocaleString('ja-JP') + '円'; }
+
+function rProg() {
+  var prog = document.getElementById('prog');
+  if (!prog) return;
+  var h = '';
+  for (var i = 1; i <= 7; i++) {
+    var dn = iDone(i), iC = cur===i, c = SC[i];
+    var bg = dn?c[1]:iC?c[0]:'#f7f7f7';
+    var bc = dn?c[1]:iC?c[1]:'#eee';
+    var fc = dn?'#fff':iC?c[2]:'#666';
+    var lbl = i===7?'総合\nサマリー':SN[i];
+    h += '<div class="pi" onclick="go('+i+')">';
+    h += '<div class="pc'+(dn?' done':'')+(iC?' cur':'')+'" style="background:'+bg+';border-color:'+bc+';color:'+fc+'">'+(dn?'✓':i)+'</div>';
+    h += '<div class="pl'+(dn?' done':'')+(iC?' cur':'')+'" style="color:'+(dn?c[1]:iC?c[2]:'#666')+'">'+lbl+'</div>';
+    h += '</div>';
+    if (i < 7) h += '<div class="pa">›</div>';
+  }
+  prog.innerHTML = h;
+}
+
+function go(n) { cur = n; rProg(); render(); }
+
+function render() {
+  var c = document.getElementById('content');
+  if (!c) return;
+  var fns = [null, p1, p2, p3, p4, p5, p6, p7];
+  c.innerHTML = fns[cur] ? fns[cur]() : '';
+  if (cur===1) cS1();
+  if (cur===2) cS2();
+  if (cur===4) cS4();
+  if (cur===5) rDocs();
+}
+
+function rbH(lbl, gk, vals, step) {
+  var pts = gk.split('.');
+  var o = D;
+  for (var i = 0; i < pts.length-1; i++) o = o[pts[i]];
+  var cv = o[pts[pts.length-1]];
+  var c = SC[step]||SC[1];
+  var btns = '';
+  for (var j = 0; j < vals.length; j++) {
+    var v = vals[j][0], dng = vals[j][1];
+    var on = cv===v;
+    var style = (on && !dng) ? ('background:'+c[0]+';border-color:'+c[1]+';color:'+c[2]+';font-weight:500') : '';
+    btns += '<div class="rb'+(dng?' danger':'')+(on?' on':'')+'" onclick="sG(\''+gk+'\',\''+v+'\',this,'+step+')" style="'+style+'">'+v+'</div>';
+  }
+  return '<div class="f"><label>'+lbl+'</label><div class="rg">'+btns+'</div></div>';
+}
+
+function sG(path, v, el, step) {
+  var p = path.split('.');
+  var o = D;
+  for (var i = 0; i < p.length-1; i++) o = o[p[i]];
+  o[p[p.length-1]] = v;
+  var sibs = el.parentElement.querySelectorAll('.rb');
+  for (var i = 0; i < sibs.length; i++) {
+    sibs[i].classList.remove('on');
+    if (!sibs[i].classList.contains('danger')) sibs[i].removeAttribute('style');
+  }
+  el.classList.add('on');
+  if (!el.classList.contains('danger')) {
+    var c = SC[step]||SC[1];
+    el.style.background = c[0]; el.style.borderColor = c[1];
+    el.style.color = c[2]; el.style.fontWeight = '500';
+  }
+  if (path.indexOf('s1.') === 0) cS1();
+  if (path.indexOf('s2.') === 0) cS2();
+  if (path.indexOf('s3.') === 0) cS3();
+}
+
+function tA(path, v, el, step) {
+  var p = path.split('.');
+  var o = D;
+  for (var i = 0; i < p.length-1; i++) o = o[p[i]];
+  var arr = o[p[p.length-1]];
+  var idx = arr.indexOf(v);
+  var c = SC[step]||SC[1];
+  if (idx === -1) {
+    arr.push(v);
+    el.style.background = c[0]; el.style.borderColor = c[1];
+    el.style.color = c[2]; el.style.fontWeight = '500';
+  } else {
+    arr.splice(idx, 1);
+    el.removeAttribute('style');
+  }
+}
+
+function ain() {
+  return '<div class="ain">⚠ AI判定は参考情報です。最終判断は担当社労士が行ってください。</div>';
+}
+
+function addM(jp, months) {
+  if (!jp) return '';
+  try {
+    var r1 = jp.match(/令和(\d+)年(\d+)月(\d+)日/);
+    var r2 = jp.match(/(\d{4})年(\d+)月(\d+)日/);
+    var y, m, d;
+    if (r1) { y=2018+parseInt(r1[1]); m=parseInt(r1[2])-1; d=parseInt(r1[3]); }
+    else if (r2) { y=parseInt(r2[1]); m=parseInt(r2[2])-1; d=parseInt(r2[3]); }
+    else return '';
+    var dt = new Date(y, m, d);
+    dt.setMonth(dt.getMonth() + months);
+    return '令和'+(dt.getFullYear()-2018)+'年'+(dt.getMonth()+1)+'月'+dt.getDate()+'日';
+  } catch(e) { return ''; }
+}
+
+function dUntil(jp) {
+  if (!jp) return null;
+  try {
+    var r1 = jp.match(/令和(\d+)年(\d+)月(\d+)日/);
+    if (!r1) return null;
+    var y=2018+parseInt(r1[1]), m=parseInt(r1[2])-1, d=parseInt(r1[3]);
+    return Math.ceil((new Date(y,m,d) - new Date()) / 86400000);
+  } catch(e) { return null; }
+}
+
+function dlChip(jp) {
+  var d = dUntil(jp);
+  if (d === null) return '';
+  var cls = d<0?'dl-r':d<=30?'dl-o':'dl-g';
+  return '<span class="dl-chip '+cls+'">'+(d<0?Math.abs(d)+'日超過':d===0?'本日期限':'あと'+d+'日')+'</span>';
+}
+
+// ── STEP1 ──
+function p1() {
+  var s = D.s1, c = SC[1];
+  var types = ['契約社員','パート','アルバイト','派遣社員'];
+  var empRow = '';
+  for (var i=0; i<types.length; i++) {
+    var t = types[i];
+    var on = s.emp_type.indexOf(t) >= 0;
+    var style = on ? ('background:'+c[0]+';border-color:'+c[1]+';color:'+c[2]+';font-weight:500') : '';
+    empRow += '<div class="rb" onclick="tA(\'s1.emp_type\',\''+t+'\',this,1)" style="'+style+'">'+t+'</div>';
+  }
+  return '<div class="sec">'
+    +'<div class="st"><div class="sn" style="background:'+c[0]+';color:'+c[1]+'">1</div>STEP1 — 簡易診断</div>'
+    + ain()
+    +'<div class="f"><label>雇用形態（複数可）</label><div class="rg">'+empRow+'</div></div>'
+    + rbH('勤続6か月以上','s1.six_months',[['はい'],['いいえ'],['まもなく']],1)
+    +'<div class="r2">'
+      + rbH('社会保険','s1.shi',[['加入済'],['未加入']],1)
+      + rbH('雇用保険','s1.emp_ins',[['加入済'],['未加入']],1)
+    +'</div>'
+    +'<div class="r2">'
+      +'<div class="f"><label>現在の月給（円）</label><input type="number" id="s1n" value="'+s.now_sal+'" placeholder="例：200000" oninput="D.s1.now_sal=this.value;cS1()"></div>'
+      +'<div class="f"><label>転換後予定月給（円）</label><input type="number" id="s1w" value="'+s.new_sal+'" placeholder="例：230000" oninput="D.s1.new_sal=this.value;cS1()"></div>'
+    +'</div>'
+    +'<div id="s1rc"></div>'
+    + rbH('就業規則','s1.rules',[['あり'],['なし'],['作成予定']],1)
+    + rbH('正社員転換制度','s1.conv_rule',[['あり'],['なし'],['整備予定']],1)
+    +'<div class="r2">'
+      + rbH('解雇予定','s1.risk_dismiss',[['なし'],['あり',true]],1)
+      + rbH('不正受給歴','s1.risk_fraud',[['なし'],['あり',true]],1)
+    +'</div>'
+    +'<div id="s1res"></div>'
+    +'</div>'
+    +'<div class="nav">'
+      +'<button class="bp" onclick="if(confirm(\'入力データをリセットしますか？\')){D=defD();go(1);}">🗑 リセット</button>'
+      +'<button class="bn" style="background:'+c[1]+'" onclick="mDone(1);go(2)">STEP2へ →</button>'
+    +'</div>';
+}
+
+function cS1() {
+  var s = D.s1;
+  var n = parseFloat(s.now_sal||0), w = parseFloat(s.new_sal||0);
+  var rc = document.getElementById('s1rc');
+  if (rc && n>0 && w>0) {
+    var diff = w-n, pct = (diff/n*100).toFixed(1);
+    rc.innerHTML = '<div class="'+(diff>0?'gbox':'dbox')+'">増額：'+(diff>0?'+':'')+Math.round(diff).toLocaleString()+'円（'+pct+'%）— '+(diff>0?'要件クリア ✓':'増額が必要 ✗')+'</div>';
+  } else if (rc) rc.innerHTML = '';
+  var ok = [
+    s.six_months==='はい', s.emp_ins==='加入済', s.shi==='加入済',
+    s.conv_rule==='あり'||s.conv_rule==='整備予定',
+    s.risk_dismiss!=='あり', s.risk_fraud!=='あり', w>n&&n>0
+  ].filter(Boolean).length;
+  var r = ok>=6?'可能性高':ok>=4?'要確認':'対象外';
+  D.s1.result = r;
+  var el = document.getElementById('s1res');
+  if (el) el.innerHTML = '<div class="'+(r==='可能性高'?'gbox':r==='要確認'?'wbox':'dbox')+'" style="margin-top:.5rem">🤖 簡易判定：<strong>'+r+'</strong>（'+ok+'/7充足） <small style="opacity:.7">※参考情報</small></div>';
+}
+
+// ── STEP2 ──
+function p2() {
+  var s = D.s2, s1 = D.s1, c = SC[2];
+  var bb = s.base_before||s1.now_sal, ba = s.base_after||s1.new_sal;
+  var sc1 = s1.result==='可能性高'?'ok':s1.result==='要確認'?'warn':'danger';
+  return '<div class="sec">'
+    +'<div class="st"><div class="sn" style="background:'+c[0]+';color:'+c[1]+'">2</div>STEP2 — 詳細診断</div>'
+    +'<div class="carry"><div class="ct">📋 STEP1から引き継ぎ</div><div class="carry-row">'
+      +'<span class="carry-chip '+(s1.shi==='加入済'?'ok':'danger')+'">✓ 社保：<strong>'+s1.shi+'</strong></span>'
+      +'<span class="carry-chip '+(s1.emp_ins==='加入済'?'ok':'danger')+'">✓ 雇保：<strong>'+s1.emp_ins+'</strong></span>'
+      +'<span class="carry-chip '+sc1+'">✓ S1：<strong>'+s1.result+'</strong></span>'
+    +'</div></div>'
+    + ain()
+    +'<div class="r2">'
+      +'<div class="f"><label>週所定労働時間</label><input type="number" id="s2wh" value="'+s.weekly_h+'" placeholder="例：40" oninput="D.s2.weekly_h=this.value;cS2()"></div>'
+      +'<div class="f"><label>固定残業代（円）</label><input type="number" id="s2fo" value="'+s.fixed_ot+'" placeholder="例：30000" oninput="D.s2.fixed_ot=this.value;cS2()"></div>'
+    +'</div>'
+    +'<div id="s2ww"></div>'
+    +'<div class="r2">'
+      +'<div class="f"><label>転換前基本給（円）</label><input type="number" id="s2bb" value="'+bb+'" placeholder="例：200000" oninput="D.s2.base_before=this.value;cS2()"></div>'
+      +'<div class="f"><label>転換後基本給（円）</label><input type="number" id="s2ba" value="'+ba+'" placeholder="例：230000" oninput="D.s2.base_after=this.value;cS2()"></div>'
+    +'</div>'
+    +'<div id="s2calc"></div>'
+    +'<div class="r2">'
+      + rbH('社会保険未加入者','s2.ins_missing',[['いない'],['いる',true]],2)
+      + rbH('労働保険滞納','s2.arrear',[['なし'],['あり',true]],2)
+    +'</div>'
+    + rbH('直近解雇歴（6か月以内）','s2.dismiss',[['なし'],['あり',true]],2)
+    +'<div id="s2res"></div>'
+    +'</div>'
+    +'<div class="nav">'
+      +'<button class="bp" onclick="go(1)">← STEP1</button>'
+      +'<button class="bn" style="background:'+c[1]+'" onclick="mDone(2);go(3)">STEP3へ →</button>'
+    +'</div>';
+}
+
+function cS2() {
+  var el_bb = document.getElementById('s2bb');
+  var el_ba = document.getElementById('s2ba');
+  var el_fo = document.getElementById('s2fo');
+  var el_wh = document.getElementById('s2wh');
+  var bb = parseFloat((el_bb?el_bb.value:'')||D.s2.base_before||D.s1.now_sal||0);
+  var ba = parseFloat((el_ba?el_ba.value:'')||D.s2.base_after||D.s1.new_sal||0);
+  var fo = parseFloat((el_fo?el_fo.value:'')||0);
+  var wh = parseFloat((el_wh?el_wh.value:'')||0);
+  var ww = document.getElementById('s2ww');
+  var calc = document.getElementById('s2calc');
+  if (ww) ww.innerHTML = (wh>0&&wh<20) ? '<div class="wbox">⚠ 週20時間未満は雇用保険対象外の可能性</div>' : '';
+  if (bb>0 && calc) {
+    var h=bb/160, ot=h*1.25, diff=ba-bb, pct=bb>0?diff/bb*100:0;
+    D.s2.base_before=String(bb); D.s2.base_after=String(ba); D.s2.fixed_ot=String(fo);
+    calc.innerHTML = '<div class="calc">'
+      +'<div class="cr"><span style="color:#666">増額率</span><span style="font-weight:500;color:'+(diff>0?'#1D9E75':'#E24B4A')+'">'+(diff>0?'+':'')+pct.toFixed(1)+'% ('+(diff>=0?'+':'')+fmt(diff)+')</span></div>'
+      +'<div class="cr"><span style="color:#666">基礎時給（概算）</span><span>'+Math.round(h).toLocaleString()+'円/時</span></div>'
+      +'<div class="cr"><span style="color:#666">残業単価（×1.25）</span><span>'+Math.round(ot).toLocaleString()+'円/時</span></div>'
+      +'</div>';
+  } else if (calc) calc.innerHTML = '';
+  var s = D.s2;
+  var ok = [ba>bb, s.ins_missing!=='いる', s.arrear!=='あり', s.dismiss!=='あり', wh>=20||!wh].filter(Boolean).length;
+  var sc = Math.round(ok/5*100);
+  D.s2.score = sc;
+  D.s2.result = sc>=80?'申請可能':sc>=60?'要整備':'申請困難';
+  var el = document.getElementById('s2res');
+  if (el) el.innerHTML = '<div class="'+(D.s2.result==='申請可能'?'gbox':D.s2.result==='要整備'?'wbox':'dbox')+'" style="margin-top:.5rem">🤖 詳細診断：<strong>'+D.s2.result+'</strong>（'+sc+'点） <small style="opacity:.7">※参考情報</small></div>';
+}
+
+// ── STEP3 ──
+function p3() {
+  var s = D.s3, c = SC[3];
+  var sc2 = D.s2.result==='申請可能'?'ok':D.s2.result==='要整備'?'warn':'danger';
+  var wb_val = s.wage_before_base||(D.s2.base_before||D.s1.now_sal||'');
+  var wa_val = s.wage_after_base||(D.s2.base_after||D.s1.new_sal||'');
+  return '<div class="sec">'
+    +'<div class="st"><div class="sn" style="background:'+c[0]+';color:'+c[1]+'">3</div>STEP3 — 申請準備</div>'
+    +'<div class="carry"><div class="ct">📋 STEP2から引き継ぎ</div><div class="carry-row">'
+      +'<span class="carry-chip '+sc2+'">✓ S2：<strong>'+D.s2.result+'</strong></span>'
+      +'<span class="carry-chip">✓ スコア：<strong>'+D.s2.score+'点</strong></span>'
+    +'</div></div>'
+    + ain()
+    +'<div class="r2">'
+      +'<div class="f"><label>転換日（予定）★STEP6に自動連携</label><input type="text" value="'+s.conv_date+'" placeholder="例：令和7年7月1日" oninput="D.s3.conv_date=this.value"></div>'
+      +'<div class="f"><label>月平均残業時間</label><input type="number" value="'+s.avg_ot+'" placeholder="例：15" oninput="D.s3.avg_ot=this.value;cS3()"></div>'
+    +'</div>'
+    +'<div id="s3otw"></div>'
+    +'<div class="r2">'
+      + rbH('転換辞令','s3.jirei',[['あり'],['作成予定'],['なし']],3)
+      + rbH('無期雇用確認','s3.mukiroyou',[['確認済'],['未確認']],3)
+    +'</div>'
+    +'<div style="font-size:12px;font-weight:600;margin:.85rem 0 .4rem;color:#3B6D11;padding-left:8px;border-left:3px solid #3B6D11">▌ 賃金比較表（転換前後・3%以上増額が要件）</div>'
+    +'<div class="r2">'
+      +'<div class="f"><label>転換前基本給（円）</label><input type="number" id="s3wb" value="'+wb_val+'" placeholder="例：200000" oninput="D.s3.wage_before_base=this.value;cWage()"></div>'
+      +'<div class="f"><label>転換前固定残業代（円）</label><input type="number" id="s3wbf" value="'+(s.wage_before_fixot||'')+'" placeholder="例：30000" oninput="D.s3.wage_before_fixot=this.value;cWage()"></div>'
+    +'</div>'
+    +'<div class="r2">'
+      +'<div class="f"><label>転換後基本給（円）</label><input type="number" id="s3wa" value="'+wa_val+'" placeholder="例：230000" oninput="D.s3.wage_after_base=this.value;cWage()"></div>'
+      +'<div class="f"><label>転換後固定残業代（円）</label><input type="number" id="s3waf" value="'+(s.wage_after_fixot||'')+'" placeholder="例：30000" oninput="D.s3.wage_after_fixot=this.value;cWage()"></div>'
+    +'</div>'
+    +'<div id="s3wage-result" style="margin-top:.4rem"></div>'
+    +'<div class="dbox" style="margin-top:.75rem">⛨ 対象外リスク確認 — 1つでも「あり」は申請不可</div>'
+    +'<div class="r2">'
+      + rbH('6か月以内解雇','s3.rc1',[['なし'],['あり',true]],3)
+      + rbH('最低賃金違反','s3.rc2',[['なし'],['あり',true]],3)
+    +'</div>'
+    +'<div class="r2">'
+      + rbH('違法残業','s3.rc3',[['なし'],['あり',true]],3)
+      + rbH('風俗営業','s3.rc4',[['なし'],['該当',true]],3)
+    +'</div>'
+    +'<div id="s3res"></div>'
+    +'</div>'
+    +'<div class="nav">'
+      +'<button class="bp" onclick="go(2)">← STEP2</button>'
+      +'<button class="bn" style="background:'+c[1]+'" onclick="mDone(3);go(4)">STEP4へ →</button>'
+    +'</div>';
+}
+
+function cWage() {
+  var el_wb = document.getElementById('s3wb');
+  var el_wbf = document.getElementById('s3wbf');
+  var el_wa = document.getElementById('s3wa');
+  var el_waf = document.getElementById('s3waf');
+  var wb = parseFloat((el_wb?el_wb.value:'')||D.s3.wage_before_base||0);
+  var wbf = parseFloat((el_wbf?el_wbf.value:'')||D.s3.wage_before_fixot||0);
+  var wa = parseFloat((el_wa?el_wa.value:'')||D.s3.wage_after_base||0);
+  var waf = parseFloat((el_waf?el_waf.value:'')||D.s3.wage_after_fixot||0);
+  var el = document.getElementById('s3wage-result');
+  if (!el) return;
+  if (wb<=0 && wa<=0) { el.innerHTML=''; return; }
+  var totalB=wb+wbf, totalA=wa+waf, diff=totalA-totalB, pct=totalB>0?diff/totalB*100:0, ok=pct>=3;
+  D.s3.wage_result = ok ? '要件クリア（+'+pct.toFixed(1)+'%）' : '要件未達（'+pct.toFixed(1)+'%）';
+  el.innerHTML = '<div class="calc">'
+    +'<div class="cr"><span style="color:#666">転換前合計</span><span>'+fmt(totalB)+'</span></div>'
+    +'<div class="cr"><span style="color:#666">転換後合計</span><span>'+fmt(totalA)+'</span></div>'
+    +'<div class="cr"><span style="color:#666">増額率</span><span style="font-weight:600;color:'+(ok?'#1D9E75':'#E24B4A')+'">'+(diff>=0?'+':'')+pct.toFixed(1)+'%　'+(ok?'✓ 要件クリア':'✗ 要件未達')+'</span></div>'
+    +'</div>';
+}
+
+function cS3() {
+  var hv = parseFloat(D.s3.avg_ot||0);
+  var w = document.getElementById('s3otw');
+  if (w) w.innerHTML = hv>80 ? '<div class="dbox">🔴 月80時間超は過労死ライン</div>' : hv>45 ? '<div class="wbox">⚠ 月45時間超は36協定特別条項要確認</div>' : '';
+  cWage();
+  var s = D.s3;
+  var risks = [s.rc1,s.rc2,s.rc3,s.rc4].filter(function(v){return v==='あり'||v==='該当';}).length;
+  var wageOk = D.s3.wage_result && D.s3.wage_result.indexOf('クリア') >= 0;
+  D.s3.result = risks>0 ? '申請非推奨' : (s.jirei==='あり'&&s.mukiroyou==='確認済'&&wageOk) ? '申請可能' : '修正後可能';
+  var el = document.getElementById('s3res');
+  if (el) {
+    var r = D.s3.result;
+    el.innerHTML = '<div class="'+(r==='申請可能'?'gbox':r.indexOf('非推奨')>=0?'dbox':'wbox')+'" style="margin-top:.5rem">🤖 申請準備判定：<strong>'+r+'</strong> <small style="opacity:.7">※参考情報</small></div>';
+  }
+}
+
+// ── STEP4 ──
+function p4() {
+  var s = D.s4, c = SC[4];
+  var ref = D.s2.base_after||D.s1.new_sal||'';
+  var sc3 = D.s3.result==='申請可能'?'ok':D.s3.result.indexOf('非推奨')>=0?'danger':'warn';
+  var wc = D.s3.wage_result ? ('<span class="carry-chip '+(D.s3.wage_result.indexOf('クリア')>=0?'ok':'danger')+'">✓ 賃金：<strong>'+D.s3.wage_result+'</strong></span>') : '';
+  return '<div class="sec">'
+    +'<div class="st"><div class="sn" style="background:'+c[0]+';color:'+c[1]+'">4</div>STEP4 — 書類整合性監査</div>'
+    +'<div class="carry"><div class="ct">📋 STEP1〜3から引き継ぎ</div><div class="carry-row">'
+      +'<span class="carry-chip '+sc3+'">✓ S3：<strong>'+D.s3.result+'</strong></span>'+wc
+    +'</div></div>'
+    + ain()
+    +'<div class="r2">'
+      +'<div class="f"><label>月平均所定労働時間</label><input type="number" id="s4mh" value="'+s.monthly_h+'" placeholder="例：160" oninput="D.s4.monthly_h=this.value;cS4()"></div>'
+      +'<div class="f"><label>基本給（円）</label><input type="number" id="s4bs" value="'+(s.base||ref)+'" placeholder="'+(ref||'例：230000')+'" oninput="D.s4.base=this.value;cS4()"></div>'
+    +'</div>'
+    +'<div class="r2">'
+      +'<div class="f"><label>実残業時間（時間/月）</label><input type="number" id="s4ot" value="'+s.actual_ot+'" placeholder="例：15" oninput="D.s4.actual_ot=this.value;cS4()"></div>'
+      +'<div class="f"><label>固定残業想定時間数</label><input type="number" id="s4fh" value="'+s.fixed_ot_h+'" placeholder="例：30" oninput="D.s4.fixed_ot_h=this.value;cS4()"></div>'
+    +'</div>'
+    +'<div class="f"><label>残業代実際支払い（円）</label><input type="number" id="s4op" value="'+s.ot_paid+'" placeholder="例：25000" oninput="D.s4.ot_paid=this.value;cS4()"></div>'
+    +'<div id="s4calc"></div><div id="s4an" style="margin-top:.4rem"></div>'
+    +'</div>'
+    +'<div class="nav">'
+      +'<button class="bp" onclick="go(3)">← STEP3</button>'
+      +'<button class="bn" style="background:'+c[1]+'" onclick="mDone(4);go(5)">STEP5へ →</button>'
+    +'</div>';
+}
+
+function cS4() {
+  var mh=gv('s4mh'), base=gv('s4bs')||parseFloat(D.s2.base_after||D.s1.new_sal||0);
+  var ot=gv('s4ot'), fh=gv('s4fh'), op=gv('s4op');
+  var calc=document.getElementById('s4calc'), an=document.getElementById('s4an');
+  var anom=[];
+  if (base>0 && mh>0) {
+    var h=base/mh, otr=h*1.25;
+    var cotYen=ot>0?ot*otr:0;
+    var isUnder=cotYen>0&&op>=0&&(op-cotYen)<0;
+    if (ot>80) anom.push({t:'月残業80時間超（過労死ライン）',lv:'r'});
+    else if (ot>45) anom.push({t:'月残業45時間超（36協定特別条項要確認）',lv:'w'});
+    if (fh>0&&ot>fh) anom.push({t:'固定残業超過（固定:'+fh+'h / 実績:'+ot+'h）',lv:'r'});
+    if (isUnder) anom.push({t:'割増賃金未払いの疑い（理論値:'+fmt(cotYen)+' / 実支払:'+fmt(op)+'）',lv:'r'});
+    if (h<1000) anom.push({t:'最低賃金割れの疑い（時給'+Math.round(h)+'円）',lv:'r'});
+    if (calc) calc.innerHTML = '<div class="calc">'
+      +'<div class="cr"><span style="color:#666">基礎時給</span><span>'+Math.round(h).toLocaleString()+'円/時</span></div>'
+      +'<div class="cr"><span style="color:#666">残業単価（×1.25）</span><span>'+Math.round(otr).toLocaleString()+'円/時</span></div>'
+      +(ot>0?'<div class="cr"><span style="color:#666">時間外割増（'+ot+'h×1.25）</span><span>'+fmt(cotYen)+'</span></div>':'')
+      +(fh>0?'<div class="cr"><span style="color:#666">固定残業超過</span><span style="color:'+(ot>fh?'#E24B4A':'#1D9E75')+'">'+(ot>fh?'⚠ '+(ot-fh)+'h超過':'問題なし ✓')+'</span></div>':'')
+      +'</div>';
+  } else if (calc) calc.innerHTML = '';
+  if (D.s3.wage_result && D.s3.wage_result.indexOf('クリア') < 0) {
+    anom.push({t:'賃金比較表：増額率3%未満 — 転換後賃金の見直しが必要',lv:'r'});
+  }
+  D.s4.anomalies = anom;
+  D.s4.result = anom.length===0 ? '問題なし' : anom.some(function(a){return a.lv==='r';}) ? '重大な不整合あり' : '軽微な不整合あり';
+  if (an) {
+    if (anom.length===0 && base>0) {
+      an.innerHTML = '<div class="gbox">✓ 異常値は検出されませんでした</div>';
+    } else {
+      an.innerHTML = anom.map(function(a){
+        return '<div class="'+(a.lv==='r'?'dbox':'wbox')+'" style="margin-bottom:4px">'+(a.lv==='r'?'🔴':'🟡')+' '+a.t+'</div>';
+      }).join('');
+    }
+  }
+}
+
+// ── STEP5 ──
+function p5() {
+  var c = SC[5];
+  var totalDone = DOCS.filter(function(d){return [1,4].indexOf(D.s5.statuses[d.id]||0)>=0;}).length;
+  var missCount = DOCS.filter(function(d){return (D.s5.statuses[d.id]||0)===0;}).length;
+  var sc4 = D.s4.result==='問題なし'?'ok':D.s4.result.indexOf('重大')>=0?'danger':'warn';
+  return '<div class="sec">'
+    +'<div class="st"><div class="sn" style="background:'+c[0]+';color:'+c[1]+'">5</div>STEP5 — 資料管理</div>'
+    +'<div class="carry"><div class="ct">📋 STEP4から引き継ぎ</div><div class="carry-row">'
+      +'<span class="carry-chip '+sc4+'">✓ 書類監査：<strong>'+D.s4.result+'</strong></span>'
+    +'</div></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.85rem">'
+      +'<div style="text-align:center;padding:8px;background:#E1F5EE;border-radius:8px;border:1px solid #1D9E75"><div style="font-size:22px;font-weight:700;color:#0F6E56">'+totalDone+'</div><div style="font-size:10px;color:#0F6E56">提出済</div></div>'
+      +'<div style="text-align:center;padding:8px;background:'+(missCount?'#FCEBEB':'#f7f7f7')+';border-radius:8px;border:1px solid '+(missCount?'#E24B4A':'#eee')+'"><div style="font-size:22px;font-weight:700;color:'+(missCount?'#A32D2D':'#999')+'">'+missCount+'</div><div style="font-size:10px;color:'+(missCount?'#A32D2D':'#999')+'">未提出</div></div>'
+    +'</div>'
+    +'<div style="font-size:11px;color:#aaa;margin-bottom:8px">タップしてステータスを順番に変更できます</div>'
+    +'<div id="doclist"></div>'
+    +'<div id="docsum" style="margin-top:.65rem"></div>'
+    +'</div>'
+    +'<div class="nav">'
+      +'<button class="bp" onclick="go(4)">← STEP4</button>'
+      +'<button class="bn" style="background:'+c[1]+'" onclick="mDone(5);go(6)">STEP6へ →</button>'
+    +'</div>';
+}
+
+function rDocs() {
+  var dl = document.getElementById('doclist');
+  if (!dl) return;
+  var total = DOCS.length;
+  var done = DOCS.filter(function(d){return [1,4].indexOf(D.s5.statuses[d.id]||0)>=0;}).length;
+  var pct = Math.round(done/total*100);
+  var col = pct>=80?'#1D9E75':pct>=50?'#EF9F27':'#E24B4A';
+  D.s5.result = done+'/'+total+'件提出済（'+pct+'%）';
+  var html = '';
+  for (var i=0; i<DOCS.length; i++) {
+    var d = DOCS[i];
+    var si = D.s5.statuses[d.id]||0;
+    var nextSt = (si+1)%5;
+    html += '<div class="doc-row" onclick="D.s5.statuses[\''+d.id+'\']='+nextSt+';rDocs()">'
+      +'<div class="doc-main">'
+        +'<div class="doc-name"><span>'+DST_ICONS[si]+'</span>'+escH(d.id)+'<span class="doc-pri" style="background:'+PC2[d.p]+'22;color:'+PC2[d.p]+'">'+d.p+'</span></div>'
+        +'<div style="font-size:11px;color:#888">'+DST_LABELS[si]+' → タップで変更</div>'
+      +'</div></div>';
+  }
+  dl.innerHTML = html;
+  var miss = DOCS.filter(function(d){return (D.s5.statuses[d.id]||0)===0;});
+  var ds = document.getElementById('docsum');
+  if (ds) {
+    var missNames = miss.slice(0,4).map(function(d){return d.id;}).join('、') + (miss.length>4?'…他':'');
+    ds.innerHTML = '<div style="background:#f7f7f7;border-radius:8px;padding:9px 12px">'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
+        +'<div style="flex:1;height:5px;background:#eee;border-radius:3px"><div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:3px"></div></div>'
+        +'<span style="font-size:12px;font-weight:600;color:'+col+'">'+done+'/'+total+'件 '+pct+'%</span>'
+      +'</div>'
+      +'<div style="font-size:11px;color:'+(miss.length?'#A32D2D':'#1D9E75')+'">'+(miss.length?'⚠ 未提出：'+missNames:'✓ 全書類提出済み')+'</div>'
+      +'</div>';
+  }
+}
+
+// ── STEP6 ──
+function p6() {
+  var c = SC[6], m = D.s6.m;
+  var convDate = D.s3.conv_date;
+  var sixDate = convDate ? addM(convDate, 6) : '';
+  var applyDL = convDate ? addM(convDate, 8) : '';
+  var doneCnt = MS_KEYS.filter(function(k){return m[k]&&m[k].done;}).length;
+  var progPct = Math.round(doneCnt/MS_KEYS.length*100);
+
+  function msI(key, lbl, sub) {
+    var dn = m[key] && m[key].done || false;
+    return '<div class="ms-item">'
+      +'<div class="ms-chk '+(dn?'done':'')+'" onclick="togMs(\''+key+'\')">'+(dn?'✓':'')+'</div>'
+      +'<div style="flex:1">'
+        +'<div class="ms-lbl '+(dn?'done':'')+'" id="msl_'+key+'">'+lbl+'</div>'
+        +(sub?'<div class="ms-note">'+sub+'</div>':'')
+        +'<div class="ms-date-row"><label style="font-size:11px;color:#666">実施日：</label>'
+          +'<input type="text" value="'+(m[key]&&m[key].date||'')+'" placeholder="令和X年X月X日" oninput="D.s6.m[\''+key+'\'].date=this.value">'
+        +'</div>'
+      +'</div>'
+      +'</div>';
+  }
+
+  var convChip = convDate ? '<span class="carry-chip ok">✓ 転換予定日：<strong>'+convDate+'</strong></span>' : '';
+  var sixChip = sixDate ? '<span class="carry-chip ok">📅 6か月到達：<strong>'+sixDate+'</strong></span>' : '';
+  var dlRow = applyDL ? '<div class="carry-row" style="margin-top:4px"><span class="carry-chip">⚠ 支給申請期限：<strong>'+applyDL+'</strong>　'+dlChip(applyDL)+'</span></div>' : '';
+
+  return '<div class="sec">'
+    +'<div class="st"><div class="sn" style="background:'+c[0]+';color:'+c[1]+'">6</div>STEP6 — 申請後フォロー</div>'
+    +'<div class="carry"><div class="ct">📋 STEP3・5から引き継ぎ（期限自動計算）</div>'
+      +'<div class="carry-row">'+convChip+sixChip+'</div>'+dlRow
+    +'</div>'
+    +'<div style="margin-bottom:.75rem">'
+      +'<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">'
+        +'<span>進捗：'+doneCnt+'/'+MS_KEYS.length+' 完了</span>'
+        +'<span id="ms_prog_pct" style="font-weight:500;color:'+c[1]+'">'+progPct+'%</span>'
+      +'</div>'
+      +'<div class="ms-prog"><div class="ms-prog-fill" id="ms_prog_fill" style="width:'+progPct+'%"></div></div>'
+    +'</div>'
+    +'<div class="ms-sec"><div class="ms-sec-title">① キャリアアップ計画届の提出（転換「前」に必須）</div>'
+      + msI('plan','計画届を労働局・ハローワークへ提出','⚠ 正社員転換より前に提出が必要です')
+    +'</div>'
+    +'<div class="ms-sec"><div class="ms-sec-title">② 正社員転換の実施</div>'
+      + msI('conv','正社員転換を実施', convDate?'転換予定日：'+convDate:'')
+      + msI('jirei','転換辞令を交付')
+      + msI('ins','社会保険等の変更手続き完了')
+    +'</div>'
+    +'<div class="ms-sec"><div class="ms-sec-title">③ 転換後6か月の継続雇用確認'+(sixDate?'（到達予定：'+sixDate+'）':'')+'</div>'
+      + msI('six','6か月継続雇用を確認')
+      + msI('wage6','転換後6か月分の賃金台帳・出勤簿を整備')
+    +'</div>'
+    +'<div class="ms-sec"><div class="ms-sec-title">④ 支給申請書の提出'+(applyDL?'（期限：'+applyDL+'）':'')+'</div>'
+      + msI('apply','支給申請書（様式第5号）を提出')
+    +'</div>'
+    +'<div class="ms-sec"><div class="ms-sec-title">⑤ 支給決定・助成金入金</div>'
+      + msI('decision','支給決定通知を受領')
+      + msI('payment','助成金の入金を確認')
+    +'</div>'
+    +'</div>'
+    +'<div class="nav">'
+      +'<button class="bp" onclick="go(5)">← STEP5</button>'
+      +'<button class="bn" style="background:'+c[1]+'" onclick="mDone(6);go(7)">総合サマリーへ →</button>'
+    +'</div>';
+}
+
+function togMs(key) {
+  var m = D.s6.m;
+  if (!m[key]) m[key] = {done:false, date:''};
+  m[key].done = !m[key].done;
+  var lbl = document.getElementById('msl_'+key);
+  if (lbl) lbl.classList.toggle('done', m[key].done);
+  var chkEls = document.querySelectorAll('.ms-chk');
+  for (var i=0; i<chkEls.length; i++) {
+    var el = chkEls[i];
+    var k = el.getAttribute('onclick');
+    if (k && k.indexOf("'"+key+"'") >= 0) {
+      el.classList.toggle('done', m[key].done);
+      el.innerHTML = m[key].done ? '✓' : '';
+    }
+  }
+  var dc = MS_KEYS.filter(function(k){return m[k]&&m[k].done;}).length;
+  var pp = Math.round(dc/MS_KEYS.length*100);
+  D.s6.result = dc===9?'受給完了':dc>=7?'支給申請済':dc>=4?'転換実施済':dc>=1?'計画届提出済':'未着手';
+  var pf = document.getElementById('ms_prog_fill');
+  var ppc = document.getElementById('ms_prog_pct');
+  if (pf) pf.style.width = pp+'%';
+  if (ppc) ppc.textContent = pp+'%';
+  rProg();
+}
+
+// ── STEP7 総合サマリー ──
+function p7() {
+  var s1r=D.s1.result, s2r=D.s2.result, s3r=D.s3.result, s4r=D.s4.result;
+  var wageOk = D.s3.wage_result && D.s3.wage_result.indexOf('クリア') >= 0;
+  var hasNG = (D.s4.anomalies||[]).some(function(a){return a.lv==='r';}) || D.s3.result==='申請非推奨';
+  var overall = (s1r==='可能性高'&&s2r==='申請可能'&&s3r==='申請可能'&&s4r==='問題なし'&&wageOk) ? '申請可能' : hasNG ? '要整備・修正が必要' : '概ね問題なし';
+  var col = overall==='申請可能'?'#0F6E56':overall==='要整備・修正が必要'?'#A32D2D':'#854F0B';
+  var bgc = overall==='申請可能'?'#E1F5EE':overall==='要整備・修正が必要'?'#FCEBEB':'#FAEEDA';
+  var bdc = overall==='申請可能'?'#1D9E75':overall==='要整備・修正が必要'?'#E24B4A':'#EF9F27';
+
+  var steps = '';
+  for (var n=1; n<=6; n++) {
+    var res = n===1?D.s1.result:n===2?D.s2.result:n===3?D.s3.result:n===4?D.s4.result:n===5?D.s5.result:D.s6.result;
+    var ok = res&&(res.indexOf('可能性高')>=0||res.indexOf('申請可能')>=0||res.indexOf('問題なし')>=0||res.indexOf('受給')>=0);
+    var ng = res&&(res.indexOf('対象外')>=0||res.indexOf('非推奨')>=0||res.indexOf('困難')>=0||res.indexOf('重大')>=0);
+    var bc = iDone(n) ? SC[n][1] : '#eee';
+    steps += '<div style="display:flex;align-items:center;gap:5px;font-size:12px">'
+      +'<div style="width:7px;height:7px;border-radius:50%;background:'+bc+'"></div>'
+      +'<span>STEP'+n+'：'+SN[n].replace('\n','')+'</span>'
+      +(res ? '<span class="badge '+(ok?'bok':ng?'bng':'bwn')+'">'+res+'</span>' : '<span style="font-size:10px;color:#aaa">未完了</span>')
+      +'</div>';
+  }
+
+  return '<div class="sec">'
+    +'<div class="st" style="color:#BA7517">🎯 総合サマリー</div>'
+    +'<div style="background:'+bgc+';border:1.5px solid '+bdc+';border-radius:12px;padding:1.25rem;text-align:center;margin-bottom:1rem">'
+      +'<div style="font-size:20px;font-weight:700;color:'+col+'">'+overall+'</div>'
+      +'<div style="font-size:11px;color:'+col+';margin-top:4px;opacity:.8">※AI簡易判定・参考情報です</div>'
+    +'</div>'
+    +'<div style="background:#f7f7f7;border-radius:8px;padding:10px 12px;margin-bottom:1rem">'
+      +'<div style="font-size:12px;font-weight:500;margin-bottom:8px">全STEPの診断結果</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'+steps+'</div>'
+    +'</div>'
+    + ain()
+    +'</div>'
+    +'<div class="cta-box">'
+      +'<h3>🌿 GrantFlow 本番版で全機能をご利用ください</h3>'
+      +'<p>✅ クラウド保存・複数案件管理<br>✅ 複数対象者（最大5名）同時管理<br>✅ AIレポート・書類整合性チェック<br>✅ Excel出力・印刷・顧客管理機能<br><br><strong>📅 14日間 完全無料でお試しいただけます</strong></p>'
+      +'<a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a><br>'
+      +'<div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>'
+    +'</div>'
+    +'<div style="display:flex;gap:8px;margin-top:1rem">'
+      +'<button style="flex:1;font-size:13px;padding:9px;border:1px solid #ddd;border-radius:8px;background:#f7f7f7" onclick="go(6)">← STEP6</button>'
+      +'<button style="flex:1;font-size:13px;padding:9px;border:1px solid #ddd;border-radius:8px;background:#f7f7f7" onclick="go(1)">最初から</button>'
+    +'</div>';
+}
+
+// 初期化
+rProg();
+render();
+</script>
+</body>
+</html>

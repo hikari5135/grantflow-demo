@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI面接・採用管理ツール｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:720px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#1a1a2e;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #eee}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select,.f textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#1a1a2e}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.candidate-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.candidate-card.pass{border-color:#1D9E75;background:#F0FFF8}
+.candidate-card.pending{border-color:#EF9F27;background:#FFFBF0}
+.candidate-card.fail{border-color:#E24B4A;background:#FFF5F5}
+.candidate-header{display:flex;align-items:center;gap:8px;margin-bottom:.75rem;cursor:pointer}
+.candidate-name{font-size:14px;font-weight:700;flex:1}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-gray{background:#f0f0f0;color:#666}
+.score-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.score-label{font-size:11px;color:#666;width:120px;flex-shrink:0}
+.score-bar-bg{flex:1;height:6px;background:#eee;border-radius:3px}
+.score-bar-fill{height:100%;border-radius:3px;transition:width .4s}
+.score-val{font-size:11px;font-weight:600;width:30px;text-align:right}
+.total-score{text-align:center;padding:1rem;border-radius:10px;margin-bottom:.75rem}
+.total-num{font-size:36px;font-weight:700}
+.total-label{font-size:12px;margin-top:4px}
+.add-btn{width:100%;padding:10px;border:2px dashed #1a1a2e;border-radius:10px;background:none;color:#1a1a2e;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.candidate-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.candidate-detail.open{display:block}
+.eval-item{margin-bottom:.75rem}
+.eval-label{font-size:12px;font-weight:600;color:#333;margin-bottom:4px}
+.stars{display:flex;gap:4px}
+.star{font-size:20px;cursor:pointer;transition:transform .1s}
+.star:hover{transform:scale(1.2)}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:24px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.ranking-item{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #eee;border-radius:8px;margin-bottom:6px}
+.rank-num{width:28px;height:28px;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rank-1{background:#FFD700;color:#333}
+.rank-2{background:#C0C0C0;color:#333}
+.rank-3{background:#CD7F32;color:#fff}
+.rank-other{background:#f0f0f0;color:#666}
+.cta-box{background:linear-gradient(135deg,#1a1a2e,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow AI面接・採用管理ツール｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>🎯 AI面接・採用管理ツール</h1>
+  <p>面接評価を数値化・可視化して採用の精度を上げます</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('candidates',this)">👤 候補者管理</button>
+  <button class="tab" onclick="switchTab('eval',this)">📊 評価・採点</button>
+  <button class="tab" onclick="switchTab('ranking',this)">🏆 ランキング</button>
+</div>
+
+<div id="tab-candidates"><div id="candidates-content"></div></div>
+<div id="tab-eval" style="display:none"><div id="eval-content"></div></div>
+<div id="tab-ranking" style="display:none"><div id="ranking-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版でAI採用支援</h3>
+  <p>本番版ではAIによる面接評価・採点の自動化・<br>複数面接官での評価共有をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var candidates = [];
+var expanded = {};
+
+var EVAL_ITEMS = [
+  {id:'japanese',label:'日本語能力'},
+  {id:'communication',label:'コミュニケーション力'},
+  {id:'motivation',label:'仕事への意欲'},
+  {id:'experience',label:'経験・スキル'},
+  {id:'reliability',label:'信頼性・誠実さ'},
+  {id:'adaptability',label:'適応力・柔軟性'}
+];
+
+var NATIONALITIES = ['ベトナム','中国','フィリピン','インドネシア','ミャンマー','タイ','カンボジア','ネパール','その他'];
+var VISA_TYPES = ['特定技能1号','技術・人文知識・国際業務','育成就労','技能実習','留学','その他'];
+var POSITIONS = ['製造スタッフ','介護スタッフ','建設作業員','飲食スタッフ','事務スタッフ','その他'];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['candidates','eval','ranking'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='candidates') renderCandidates();
+  if(tab==='eval') renderEval();
+  if(tab==='ranking') renderRanking();
+}
+
+function addCandidate() {
+  var scores = {};
+  EVAL_ITEMS.forEach(function(item){ scores[item.id] = 0; });
+  candidates.push({
+    name:'', nationality:'', visa:'', position:'',
+    interviewDate:'', interviewer:'', memo:'', result:'pending',
+    scores: scores, comment:''
+  });
+  renderCandidates();
+}
+
+function delCandidate(i) {
+  if(!confirm('削除しますか？')) return;
+  candidates.splice(i,1);
+  renderCandidates();
+}
+
+function upCandidate(i,key,val){ candidates[i][key]=val; }
+function toggleExpand(i){ expanded[i]=!expanded[i]; renderCandidates(); }
+
+function getTotalScore(c) {
+  var total = Object.values(c.scores).reduce(function(a,b){return a+b;},0);
+  var max = EVAL_ITEMS.length * 5;
+  return Math.round(total/max*100);
+}
+
+function getResult(c) {
+  if(c.result==='pass') return {cls:'pass',badge:'badge-ok',label:'採用'};
+  if(c.result==='fail') return {cls:'fail',badge:'badge-ng',label:'不採用'};
+  return {cls:'pending',badge:'badge-warn',label:'検討中'};
+}
+
+function setScore(ci, itemId, score) {
+  candidates[ci].scores[itemId] = score;
+  renderCandidates();
+}
+
+function renderCandidates() {
+  var html='';
+  if(candidates.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">候補者がまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    candidates.forEach(function(c,i){
+      var r = getResult(c);
+      var score = getTotalScore(c);
+      var isExp = expanded[i];
+      html+='<div class="candidate-card '+r.cls+'">';
+      html+='<div class="candidate-header" onclick="toggleExpand('+i+')">';
+      html+='<div style="flex:1"><div class="candidate-name">'+(c.name||'（氏名未入力）')+'</div>';
+      html+='<div style="font-size:11px;color:#888">'+(c.nationality||'国籍未入力')+' ／ '+(c.position||'職種未入力')+(c.interviewDate?' ／ 面接日：'+c.interviewDate:'')+'</div></div>';
+      html+='<span class="badge '+r.badge+'">'+r.label+'</span>';
+      if(score>0) html+='<span style="font-size:12px;font-weight:700;color:#333;margin-left:4px">'+score+'点</span>';
+      html+='<span style="font-size:12px;color:#aaa;margin-left:4px">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+      html+='<div class="candidate-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r3" style="margin-bottom:.75rem">';
+      html+='<div class="f"><label>氏名</label><input type="text" value="'+escH(c.name)+'" placeholder="例：Nguyen Van A" oninput="upCandidate('+i+',\'name\',this.value)"></div>';
+      html+='<div class="f"><label>国籍</label><select onchange="upCandidate('+i+',\'nationality\',this.value)"><option value="">選択</option>'+NATIONALITIES.map(function(n){return'<option '+(c.nationality===n?'selected':'')+'>'+n+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>希望在留資格</label><select onchange="upCandidate('+i+',\'visa\',this.value)"><option value="">選択</option>'+VISA_TYPES.map(function(v){return'<option '+(c.visa===v?'selected':'')+'>'+v+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>応募職種</label><select onchange="upCandidate('+i+',\'position\',this.value)"><option value="">選択</option>'+POSITIONS.map(function(p){return'<option '+(c.position===p?'selected':'')+'>'+p+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>面接日</label><input type="text" value="'+escH(c.interviewDate)+'" placeholder="令和X年X月X日" oninput="upCandidate('+i+',\'interviewDate\',this.value)"></div>';
+      html+='<div class="f"><label>面接担当者</label><input type="text" value="'+escH(c.interviewer)+'" placeholder="担当者名" oninput="upCandidate('+i+',\'interviewer\',this.value)"></div>';
+      html+='</div>';
+      html+='<div style="font-size:12px;font-weight:600;color:#333;margin-bottom:8px">📊 評価スコア（各項目1〜5点）</div>';
+      EVAL_ITEMS.forEach(function(item){
+        var sc = c.scores[item.id]||0;
+        html+='<div class="score-row">';
+        html+='<div class="score-label">'+item.label+'</div>';
+        html+='<div class="stars">';
+        for(var s=1;s<=5;s++){
+          html+='<span class="star" onclick="setScore('+i+',\''+item.id+'\','+s+')" style="color:'+(s<=sc?'#FFD700':'#ddd')+'">★</span>';
+        }
+        html+='</div>';
+        html+='<div class="score-val" style="color:'+(sc>=4?'#0F6E56':sc>=3?'#854F0B':'#A32D2D')+'">'+sc+'/5</div>';
+        html+='</div>';
+      });
+      var total = getTotalScore(c);
+      html+='<div style="background:#f7f7f7;border-radius:8px;padding:8px 12px;margin:.5rem 0;display:flex;align-items:center;justify-content:space-between">';
+      html+='<span style="font-size:12px;font-weight:600">総合スコア</span>';
+      html+='<span style="font-size:18px;font-weight:700;color:'+(total>=70?'#0F6E56':total>=50?'#854F0B':'#A32D2D')+'">'+total+'点</span>';
+      html+='</div>';
+      html+='<div class="f"><label>面接メモ・コメント</label><textarea rows="3" oninput="upCandidate('+i+',\'comment\',this.value)">'+escH(c.comment)+'</textarea></div>';
+      html+='<div class="f"><label>採用判定</label><select onchange="upCandidate('+i+',\'result\',this.value);renderCandidates()"><option value="pending" '+(c.result==='pending'?'selected':'')+'>検討中</option><option value="pass" '+(c.result==='pass'?'selected':'')+'>採用</option><option value="fail" '+(c.result==='fail'?'selected':'')+'>不採用</option></select></div>';
+      html+='<button class="del-btn" onclick="delCandidate('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addCandidate()">＋ 候補者を追加</button>';
+  document.getElementById('candidates-content').innerHTML=html;
+}
+
+function renderEval() {
+  var total=candidates.length;
+  var pass=candidates.filter(function(c){return c.result==='pass';}).length;
+  var pending=candidates.filter(function(c){return c.result==='pending';}).length;
+  var fail=candidates.filter(function(c){return c.result==='fail';}).length;
+
+  var html='<div class="sec"><div class="sec-title">📊 採用状況サマリー</div>';
+  html+='<div class="summary-grid">';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#185FA5">'+total+'</div><div class="summary-label">応募者数</div></div>';
+  html+='<div class="summary-card" style="background:#E1F5EE;border-color:#1D9E75"><div class="summary-num" style="color:#0F6E56">'+pass+'</div><div class="summary-label">採用</div></div>';
+  html+='<div class="summary-card" style="background:#FAEEDA;border-color:#EF9F27"><div class="summary-num" style="color:#854F0B">'+pending+'</div><div class="summary-label">検討中</div></div>';
+  html+='</div>';
+
+  if(total>0){
+    html+='<div style="font-size:12px;font-weight:600;color:#333;margin-bottom:8px">📈 評価項目別 平均スコア</div>';
+    EVAL_ITEMS.forEach(function(item){
+      var avg = candidates.reduce(function(sum,c){return sum+(c.scores[item.id]||0);},0)/total;
+      var pct = avg/5*100;
+      var col = pct>=70?'#1D9E75':pct>=50?'#EF9F27':'#E24B4A';
+      html+='<div class="score-row" style="margin-bottom:8px">';
+      html+='<div class="score-label">'+item.label+'</div>';
+      html+='<div class="score-bar-bg"><div class="score-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div>';
+      html+='<div class="score-val" style="color:'+col+'">'+avg.toFixed(1)+'</div>';
+      html+='</div>';
+    });
+  } else {
+    html+='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">候補者を登録すると評価サマリーが表示されます</div>';
+  }
+  html+='</div>';
+  document.getElementById('eval-content').innerHTML=html;
+}
+
+function renderRanking() {
+  var ranked = candidates
+    .filter(function(c){return c.name;})
+    .map(function(c,i){return {c:c,i:i,score:getTotalScore(c)};})
+    .sort(function(a,b){return b.score-a.score;});
+
+  var html='<div class="sec"><div class="sec-title">🏆 候補者ランキング</div>';
+  if(ranked.length===0){
+    html+='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">候補者を登録するとランキングが表示されます</div>';
+  } else {
+    ranked.forEach(function(item,rank){
+      var r = getResult(item.c);
+      var rankCls = rank===0?'rank-1':rank===1?'rank-2':rank===2?'rank-3':'rank-other';
+      html+='<div class="ranking-item">';
+      html+='<div class="rank-num '+rankCls+'">'+(rank+1)+'</div>';
+      html+='<div style="flex:1">';
+      html+='<div style="font-size:13px;font-weight:700">'+escH(item.c.name)+'</div>';
+      html+='<div style="font-size:11px;color:#888">'+(item.c.nationality||'—')+' ／ '+(item.c.position||'—')+'</div>';
+      html+='</div>';
+      html+='<div style="text-align:right">';
+      html+='<div style="font-size:18px;font-weight:700;color:'+(item.score>=70?'#0F6E56':item.score>=50?'#854F0B':'#A32D2D')+'">'+item.score+'点</div>';
+      html+='<span class="badge '+r.badge+'">'+r.label+'</span>';
+      html+='</div>';
+      html+='</div>';
+    });
+  }
+  html+='</div>';
+  document.getElementById('ranking-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderCandidates();
+</script>
+</body>
+</html>

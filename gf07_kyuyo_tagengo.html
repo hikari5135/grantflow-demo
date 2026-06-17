@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI給与明細 多言語自動生成システム｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:720px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#92400E,#D97706);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#92400E;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #FEF3C7}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none}
+.f input:focus,.f select:focus{border-color:#D97706}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.lang-tabs{display:flex;gap:4px;margin-bottom:1rem;flex-wrap:wrap}
+.lang-tab{padding:6px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:12px;cursor:pointer;background:#fff;color:#555;font-family:inherit;transition:all .15s}
+.lang-tab.on{border-color:#D97706;background:#FEF3C7;color:#92400E;font-weight:600}
+.payslip{border:2px solid #D97706;border-radius:12px;padding:1.25rem;background:#FFFBF0}
+.payslip-header{text-align:center;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:2px solid #FEF3C7}
+.payslip-title{font-size:16px;font-weight:700;color:#92400E;margin-bottom:4px}
+.payslip-sub{font-size:12px;color:#666}
+.payslip-section{margin-bottom:.75rem}
+.payslip-section-title{font-size:12px;font-weight:700;color:#92400E;background:#FEF3C7;padding:4px 10px;border-radius:6px;margin-bottom:6px}
+.payslip-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #eee;font-size:12px}
+.payslip-row:last-child{border-bottom:none}
+.payslip-row.total{font-weight:700;font-size:14px;padding-top:8px;border-top:2px solid #D97706;border-bottom:none}
+.payslip-amount{font-weight:600;color:#333}
+.payslip-total-amount{font-weight:700;font-size:16px;color:#92400E}
+.gen-btn{width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#92400E,#D97706);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:1rem}
+.gen-btn:hover{opacity:.9}
+.print-btn{width:100%;padding:10px;border:1.5px solid #D97706;border-radius:10px;background:#FEF3C7;color:#92400E;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge-amber{background:#FEF3C7;color:#92400E}
+.cta-box{background:linear-gradient(135deg,#92400E,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow AI給与明細 多言語自動生成システム｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>💴 AI給与明細 多言語自動生成システム</h1>
+  <p>給与情報を入力するだけで多言語の給与明細を自動生成</p>
+</div>
+
+<div class="sec">
+<div class="sec-title">👤 従業員情報</div>
+<div class="r2">
+  <div class="f"><label>従業員名</label><input type="text" id="emp-name" placeholder="例：Nguyen Van A"></div>
+  <div class="f"><label>国籍・言語</label>
+    <select id="emp-lang">
+      <option value="vi">ベトナム語</option>
+      <option value="zh">中国語（簡体字）</option>
+      <option value="id">インドネシア語</option>
+      <option value="my">ミャンマー語</option>
+      <option value="th">タイ語</option>
+      <option value="tl">フィリピン語（タガログ語）</option>
+      <option value="en">英語</option>
+    </select>
+  </div>
+  <div class="f"><label>部署・所属</label><input type="text" id="emp-dept" placeholder="例：製造部 第1ライン"></div>
+  <div class="f"><label>対象年月</label><input type="month" id="emp-month" value="2025-06"></div>
+</div>
+</div>
+
+<div class="sec">
+<div class="sec-title">💰 支給項目</div>
+<div class="r2">
+  <div class="f"><label>基本給（円）</label><input type="number" id="pay-base" placeholder="例：200000" oninput="calcTotal()"></div>
+  <div class="f"><label>時間外手当（円）</label><input type="number" id="pay-ot" placeholder="例：25000" oninput="calcTotal()"></div>
+  <div class="f"><label>深夜手当（円）</label><input type="number" id="pay-night" placeholder="例：8000" oninput="calcTotal()"></div>
+  <div class="f"><label>休日手当（円）</label><input type="number" id="pay-holiday" placeholder="例：0" oninput="calcTotal()"></div>
+  <div class="f"><label>皆勤手当（円）</label><input type="number" id="pay-attend" placeholder="例：5000" oninput="calcTotal()"></div>
+  <div class="f"><label>通勤手当（円）</label><input type="number" id="pay-commute" placeholder="例：10000" oninput="calcTotal()"></div>
+</div>
+<div id="pay-total-display"></div>
+</div>
+
+<div class="sec">
+<div class="sec-title">➖ 控除項目</div>
+<div class="r2">
+  <div class="f"><label>健康保険料（円）</label><input type="number" id="ded-health" placeholder="例：10000" oninput="calcTotal()"></div>
+  <div class="f"><label>厚生年金保険料（円）</label><input type="number" id="ded-pension" placeholder="例：18000" oninput="calcTotal()"></div>
+  <div class="f"><label>雇用保険料（円）</label><input type="number" id="ded-emp" placeholder="例：1200" oninput="calcTotal()"></div>
+  <div class="f"><label>所得税（源泉徴収）（円）</label><input type="number" id="ded-tax" placeholder="例：5000" oninput="calcTotal()"></div>
+  <div class="f"><label>住民税（円）</label><input type="number" id="ded-city" placeholder="例：8000" oninput="calcTotal()"></div>
+  <div class="f"><label>その他控除（円）</label><input type="number" id="ded-other" placeholder="例：0" oninput="calcTotal()"></div>
+</div>
+</div>
+
+<button class="gen-btn" onclick="generatePayslip()">💴 多言語給与明細を生成する</button>
+
+<div id="payslip-area"></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版でさらに便利に</h3>
+  <p>本番版ではAIによる自動翻訳・PDF出力・<br>複数従業員の一括生成をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var TRANSLATIONS = {
+  vi:{
+    title:'Bảng lương', period:'Kỳ lương', name:'Họ tên', dept:'Phòng ban',
+    salary_items:'Các khoản thu nhập', base:'Lương cơ bản', ot:'Phụ cấp làm thêm giờ',
+    night:'Phụ cấp ca đêm', holiday:'Phụ cấp ngày nghỉ', attend:'Thưởng chuyên cần',
+    commute:'Phụ cấp đi lại', total_pay:'Tổng thu nhập',
+    deduction_items:'Các khoản khấu trừ', health:'Bảo hiểm y tế', pension:'Bảo hiểm hưu trí',
+    emp_ins:'Bảo hiểm thất nghiệp', income_tax:'Thuế thu nhập', city_tax:'Thuế địa phương',
+    other_ded:'Khấu trừ khác', total_ded:'Tổng khấu trừ', net_pay:'Thực lĩnh',
+    currency:'JPY (Yên Nhật)', lang_name:'Tiếng Việt'
+  },
+  zh:{
+    title:'工资条', period:'工资周期', name:'姓名', dept:'部门',
+    salary_items:'收入项目', base:'基本工资', ot:'加班费',
+    night:'夜班补贴', holiday:'休息日补贴', attend:'全勤奖',
+    commute:'交通补贴', total_pay:'应发工资',
+    deduction_items:'扣除项目', health:'健康保险', pension:'厚生年金',
+    emp_ins:'失业保险', income_tax:'所得税', city_tax:'住民税',
+    other_ded:'其他扣除', total_ded:'合计扣除', net_pay:'实发工资',
+    currency:'日元(JPY)', lang_name:'中文（简体）'
+  },
+  id:{
+    title:'Slip Gaji', period:'Periode Gaji', name:'Nama', dept:'Departemen',
+    salary_items:'Item Pendapatan', base:'Gaji Pokok', ot:'Lembur',
+    night:'Tunjangan Malam', holiday:'Tunjangan Hari Libur', attend:'Tunjangan Kehadiran',
+    commute:'Tunjangan Transportasi', total_pay:'Total Pendapatan',
+    deduction_items:'Item Potongan', health:'Asuransi Kesehatan', pension:'Asuransi Pensiun',
+    emp_ins:'Asuransi Ketenagakerjaan', income_tax:'Pajak Penghasilan', city_tax:'Pajak Daerah',
+    other_ded:'Potongan Lain', total_ded:'Total Potongan', net_pay:'Gaji Bersih',
+    currency:'JPY (Yen Jepang)', lang_name:'Bahasa Indonesia'
+  },
+  my:{
+    title:'လစာစာရင်း', period:'လစာကာလ', name:'အမည်', dept:'ဌာန',
+    salary_items:'ဝင်ငွေများ', base:'အခြေခံလစာ', ot:'နာရီပိုကြေး',
+    night:'ညပိုင်းကြေး', holiday:'ရုံးပိတ်ရက်ကြေး', attend:'အခြေအမြဲတက်ကြေး',
+    commute:'သွားလာကြေး', total_pay:'စုစုပေါင်းဝင်ငွေ',
+    deduction_items:'နုတ်ယူမှုများ', health:'ကျန်းမာရေးအာမခံ', pension:'ပင်စင်အာမခံ',
+    emp_ins:'အလုပ်လက်မဲ့အာမခံ', income_tax:'ဝင်ငွေခွန်', city_tax:'ဒေသဆိုင်ရာအခွန်',
+    other_ded:'အခြားနုတ်ယူမှု', total_ded:'စုစုပေါင်းနုတ်ယူမှု', net_pay:'လက်ငင်းလစာ',
+    currency:'JPY (ဂျပန်ယမ်း)', lang_name:'မြန်မာဘာသာ'
+  },
+  th:{
+    title:'สลิปเงินเดือน', period:'งวดเงินเดือน', name:'ชื่อ', dept:'แผนก',
+    salary_items:'รายการรายได้', base:'เงินเดือนพื้นฐาน', ot:'ค่าล่วงเวลา',
+    night:'ค่ากะกลางคืน', holiday:'ค่าทำงานวันหยุด', attend:'เบี้ยขยัน',
+    commute:'ค่าเดินทาง', total_pay:'รวมรายได้',
+    deduction_items:'รายการหัก', health:'ประกันสุขภาพ', pension:'ประกันบำเหน็จ',
+    emp_ins:'ประกันการจ้างงาน', income_tax:'ภาษีเงินได้', city_tax:'ภาษีท้องถิ่น',
+    other_ded:'หักอื่นๆ', total_ded:'รวมหัก', net_pay:'เงินสุทธิ',
+    currency:'JPY (เยนญี่ปุ่น)', lang_name:'ภาษาไทย'
+  },
+  tl:{
+    title:'Payslip', period:'Panahon ng Sahod', name:'Pangalan', dept:'Departamento',
+    salary_items:'Mga Kita', base:'Batayang Sahod', ot:'Overtime',
+    night:'Gabi na Allowance', holiday:'Allowance sa Holiday', attend:'Attendance Bonus',
+    commute:'Allowance sa Biyahe', total_pay:'Kabuuang Kita',
+    deduction_items:'Mga Bawas', health:'Health Insurance', pension:'Pension Insurance',
+    emp_ins:'Employment Insurance', income_tax:'Income Tax', city_tax:'Local Tax',
+    other_ded:'Iba pang Bawas', total_ded:'Kabuuang Bawas', net_pay:'Net na Sahod',
+    currency:'JPY (Japanese Yen)', lang_name:'Filipino'
+  },
+  en:{
+    title:'Pay Slip', period:'Pay Period', name:'Name', dept:'Department',
+    salary_items:'Earnings', base:'Base Salary', ot:'Overtime Pay',
+    night:'Night Shift Allowance', holiday:'Holiday Pay', attend:'Attendance Bonus',
+    commute:'Commuting Allowance', total_pay:'Gross Pay',
+    deduction_items:'Deductions', health:'Health Insurance', pension:'Pension Insurance',
+    emp_ins:'Employment Insurance', income_tax:'Income Tax', city_tax:'Local Tax',
+    other_ded:'Other Deductions', total_ded:'Total Deductions', net_pay:'Net Pay',
+    currency:'JPY (Japanese Yen)', lang_name:'English'
+  }
+};
+
+function gv(id){var el=document.getElementById(id);return el?parseFloat(el.value||0):0;}
+function fmt(v){return Math.round(v).toLocaleString('ja-JP')+'円';}
+
+function calcTotal(){
+  var totalPay = gv('pay-base')+gv('pay-ot')+gv('pay-night')+gv('pay-holiday')+gv('pay-attend')+gv('pay-commute');
+  var totalDed = gv('ded-health')+gv('ded-pension')+gv('ded-emp')+gv('ded-tax')+gv('ded-city')+gv('ded-other');
+  var net = totalPay - totalDed;
+  var el = document.getElementById('pay-total-display');
+  if(totalPay>0&&el){
+    el.innerHTML='<div style="background:#FEF3C7;border:1px solid #D97706;border-radius:8px;padding:8px 12px;font-size:12px;color:#92400E;margin-top:.5rem">'
+      +'支給合計：<strong>'+fmt(totalPay)+'</strong>　控除合計：<strong>'+fmt(totalDed)+'</strong>　差引支給額：<strong style="font-size:14px">'+fmt(net)+'</strong>'
+      +'</div>';
+  }
+}
+
+function generatePayslip(){
+  var lang = document.getElementById('emp-lang').value;
+  var t = TRANSLATIONS[lang];
+  var name = document.getElementById('emp-name').value||'—';
+  var dept = document.getElementById('emp-dept').value||'—';
+  var month = document.getElementById('emp-month').value||'—';
+
+  var payBase=gv('pay-base'),payOt=gv('pay-ot'),payNight=gv('pay-night');
+  var payHoliday=gv('pay-holiday'),payAttend=gv('pay-attend'),payCommute=gv('pay-commute');
+  var totalPay=payBase+payOt+payNight+payHoliday+payAttend+payCommute;
+
+  var dedHealth=gv('ded-health'),dedPension=gv('ded-pension'),dedEmp=gv('ded-emp');
+  var dedTax=gv('ded-tax'),dedCity=gv('ded-city'),dedOther=gv('ded-other');
+  var totalDed=dedHealth+dedPension+dedEmp+dedTax+dedCity+dedOther;
+  var net=totalPay-totalDed;
+
+  var fmtBi=function(v){return Math.round(v).toLocaleString('ja-JP')+' '+t.currency.split(' ')[0];};
+
+  var html='<div class="payslip">';
+  html+='<div class="payslip-header">';
+  html+='<div class="payslip-title">'+t.title+'　／　給与明細書</div>';
+  html+='<div class="payslip-sub">'+t.period+' / 対象年月：'+month+'</div>';
+  html+='<div class="payslip-sub">'+t.name+' / 氏名：'+escH(name)+'　　'+t.dept+' / 部署：'+escH(dept)+'</div>';
+  html+='<div style="margin-top:4px"><span class="badge badge-amber">'+t.lang_name+'</span></div>';
+  html+='</div>';
+
+  html+='<div class="payslip-section">';
+  html+='<div class="payslip-section-title">'+t.salary_items+' / 支給項目</div>';
+  if(payBase>0) html+='<div class="payslip-row"><span>'+t.base+' / 基本給</span><span class="payslip-amount">'+fmtBi(payBase)+'</span></div>';
+  if(payOt>0) html+='<div class="payslip-row"><span>'+t.ot+' / 時間外手当</span><span class="payslip-amount">'+fmtBi(payOt)+'</span></div>';
+  if(payNight>0) html+='<div class="payslip-row"><span>'+t.night+' / 深夜手当</span><span class="payslip-amount">'+fmtBi(payNight)+'</span></div>';
+  if(payHoliday>0) html+='<div class="payslip-row"><span>'+t.holiday+' / 休日手当</span><span class="payslip-amount">'+fmtBi(payHoliday)+'</span></div>';
+  if(payAttend>0) html+='<div class="payslip-row"><span>'+t.attend+' / 皆勤手当</span><span class="payslip-amount">'+fmtBi(payAttend)+'</span></div>';
+  if(payCommute>0) html+='<div class="payslip-row"><span>'+t.commute+' / 通勤手当</span><span class="payslip-amount">'+fmtBi(payCommute)+'</span></div>';
+  html+='<div class="payslip-row total"><span>'+t.total_pay+' / 支給合計</span><span class="payslip-total-amount">'+fmtBi(totalPay)+'</span></div>';
+  html+='</div>';
+
+  html+='<div class="payslip-section">';
+  html+='<div class="payslip-section-title">'+t.deduction_items+' / 控除項目</div>';
+  if(dedHealth>0) html+='<div class="payslip-row"><span>'+t.health+' / 健康保険料</span><span class="payslip-amount">'+fmtBi(dedHealth)+'</span></div>';
+  if(dedPension>0) html+='<div class="payslip-row"><span>'+t.pension+' / 厚生年金保険料</span><span class="payslip-amount">'+fmtBi(dedPension)+'</span></div>';
+  if(dedEmp>0) html+='<div class="payslip-row"><span>'+t.emp_ins+' / 雇用保険料</span><span class="payslip-amount">'+fmtBi(dedEmp)+'</span></div>';
+  if(dedTax>0) html+='<div class="payslip-row"><span>'+t.income_tax+' / 所得税</span><span class="payslip-amount">'+fmtBi(dedTax)+'</span></div>';
+  if(dedCity>0) html+='<div class="payslip-row"><span>'+t.city_tax+' / 住民税</span><span class="payslip-amount">'+fmtBi(dedCity)+'</span></div>';
+  if(dedOther>0) html+='<div class="payslip-row"><span>'+t.other_ded+' / その他控除</span><span class="payslip-amount">'+fmtBi(dedOther)+'</span></div>';
+  html+='<div class="payslip-row total"><span>'+t.total_ded+' / 控除合計</span><span class="payslip-total-amount" style="color:#A32D2D">'+fmtBi(totalDed)+'</span></div>';
+  html+='</div>';
+
+  html+='<div style="background:#0A3D2B;border-radius:8px;padding:12px 16px;text-align:center;margin-top:.5rem">';
+  html+='<div style="font-size:12px;color:rgba(255,255,255,.8);margin-bottom:4px">'+t.net_pay+' / 差引支給額</div>';
+  html+='<div style="font-size:28px;font-weight:700;color:#ffd700">'+fmtBi(net)+'</div>';
+  html+='</div>';
+
+  html+='<div style="font-size:10px;color:#888;text-align:center;margin-top:.75rem">※ 日本語と'+t.lang_name+'の併記版です / Bilingual version (Japanese & '+t.lang_name+')</div>';
+  html+='</div>';
+
+  html+='<button class="print-btn" onclick="window.print()" style="margin-top:.75rem">🖨️ 印刷する</button>';
+
+  document.getElementById('payslip-area').innerHTML=html;
+  document.getElementById('payslip-area').scrollIntoView({behavior:'smooth'});
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>助成金自動診断ツール｜GrantFlow</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:680px;width:100%}
+.topbar{background:linear-gradient(135deg,#0A3D2B,#1D9E75);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85}
+.progress-wrap{background:#fff;border-radius:12px;padding:12px 16px;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.progress-bar-bg{height:6px;background:#eee;border-radius:3px;margin-bottom:6px}
+.progress-bar-fill{height:100%;background:#1D9E75;border-radius:3px;transition:width .4s}
+.progress-text{font-size:11px;color:#666;display:flex;justify-content:space-between}
+.card{background:#fff;border-radius:12px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.q-num{font-size:11px;color:#1D9E75;font-weight:600;margin-bottom:6px}
+.q-text{font-size:15px;font-weight:600;color:#0A3D2B;margin-bottom:.25rem;line-height:1.5}
+.q-sub{font-size:12px;color:#888;margin-bottom:1rem}
+.choices{display:flex;flex-direction:column;gap:8px}
+.choice{padding:12px 16px;border:1.5px solid #ddd;border-radius:10px;cursor:pointer;font-size:13px;color:#333;transition:all .15s;background:#fff;text-align:left;display:flex;align-items:center;gap:10px}
+.choice:hover{border-color:#1D9E75;background:#f0fff8}
+.choice.selected{border-color:#1D9E75;background:#E1F5EE;color:#0F6E56;font-weight:500}
+.choice-icon{width:20px;height:20px;border-radius:50%;border:1.5px solid #ddd;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff}
+.choice.selected .choice-icon{background:#1D9E75;border-color:#1D9E75}
+.nav{display:flex;gap:8px;margin-top:1rem}
+.btn-back{flex:1;padding:10px;border:1px solid #ddd;border-radius:8px;background:#f7f7f7;cursor:pointer;font-size:13px}
+.btn-next{flex:2;padding:10px;border:none;border-radius:8px;background:#1D9E75;color:#fff;font-weight:600;cursor:pointer;font-size:13px}
+.btn-next:disabled{background:#ccc;cursor:not-allowed}
+.result-card{background:#fff;border-radius:12px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.result-header{text-align:center;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #eee}
+.result-count{font-size:48px;font-weight:700;color:#1D9E75}
+.result-label{font-size:13px;color:#666;margin-top:4px}
+.subsidy-item{border:1.5px solid #eee;border-radius:10px;padding:1rem;margin-bottom:.75rem}
+.subsidy-item.high{border-color:#1D9E75;background:#F0FFF8}
+.subsidy-item.mid{border-color:#EF9F27;background:#FFFBF0}
+.subsidy-item.low{border-color:#ddd;background:#fafafa}
+.subsidy-header{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px}
+.subsidy-name{font-size:13px;font-weight:700;color:#0A3D2B;flex:1;line-height:1.4}
+.subsidy-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;flex-shrink:0;margin-top:2px}
+.badge-high{background:#E1F5EE;color:#0F6E56}
+.badge-mid{background:#FAEEDA;color:#854F0B}
+.badge-low{background:#f0f0f0;color:#666}
+.subsidy-amount{font-size:14px;font-weight:700;color:#533AB7;margin-bottom:6px}
+.subsidy-desc{font-size:12px;color:#555;line-height:1.6;margin-bottom:4px}
+.subsidy-cond{font-size:11px;color:#888;padding-top:4px;border-top:1px solid #eee}
+.warn-box{background:#FFF8F0;border:1px solid #EF9F27;border-radius:8px;padding:8px 12px;font-size:11px;color:#854F0B;margin-top:.75rem}
+.cta-box{background:linear-gradient(135deg,#0A3D2B,#1D9E75);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+.restart-btn{width:100%;padding:10px;border:1px solid #1D9E75;border-radius:8px;background:#E1F5EE;color:#0F6E56;font-weight:600;cursor:pointer;font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="topbar">
+  <h1>🌿 助成金 自動診断ツール</h1>
+  <p>8つの質問に答えるだけで、使える可能性のある助成金がわかります</p>
+</div>
+<div class="progress-wrap">
+  <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="progress-text"><span id="prog-text">質問 1 / 8</span><span id="prog-pct">0%</span></div>
+</div>
+<div id="main"></div>
+</div>
+<script>
+var questions=[
+  {id:'company_size',text:'会社の従業員数を教えてください',sub:'パート・アルバイトを含む目安の人数です',choices:[{label:'小規模事業者（20人以下）',val:'micro'},{label:'中小企業（21〜100人）',val:'small'}]},
+  {id:'industry',text:'主な業種を教えてください',sub:'最も主要なものを選択してください',choices:[{label:'製造業',val:'manufacturing'},{label:'介護・福祉',val:'care'},{label:'建設業',val:'construction'},{label:'飲食・宿泊業',val:'food'},{label:'その他サービス業',val:'service'},{label:'その他',val:'other'}]},
+  {id:'foreign_worker',text:'外国人労働者を雇用していますか？',sub:'または今後雇用を検討していますか？',choices:[{label:'はい（現在雇用中）',val:'yes_current'},{label:'はい（今後検討中）',val:'yes_plan'},{label:'いいえ',val:'no'}]},
+  {id:'part_time',text:'パート・アルバイト・契約社員を雇用していますか？',sub:'正社員転換を検討している方がいる場合も含みます',choices:[{label:'はい（正社員転換を検討中）',val:'yes_convert'},{label:'はい（転換の予定なし）',val:'yes_no_convert'},{label:'いいえ',val:'no'}]},
+  {id:'disabled',text:'障害者の雇用状況を教えてください',sub:'法定雇用率（2.5%）への対応状況も含みます',choices:[{label:'障害者を雇用したい・増やしたい',val:'want_hire'},{label:'すでに雇用しており環境整備をしたい',val:'already_hire'},{label:'法定雇用率を達成できていない',val:'not_achieve'},{label:'特に予定なし',val:'none'}]},
+  {id:'training',text:'従業員の教育・研修に取り組んでいますか？',sub:'OJT、OFF-JT、資格取得支援なども含みます',choices:[{label:'積極的に取り組んでいる',val:'yes_active'},{label:'取り組みたいが費用が課題',val:'yes_cost'},{label:'あまり取り組めていない',val:'no'}]},
+  {id:'work_style',text:'働き方改革に取り組んでいますか？',sub:'残業削減・有給取得促進・テレワーク導入など',choices:[{label:'積極的に取り組んでいる',val:'yes_active'},{label:'取り組みたいが方法がわからない',val:'yes_plan'},{label:'あまり取り組めていない',val:'no'}]},
+  {id:'recruitment',text:'人材確保・採用に課題を感じていますか？',sub:'離職率の改善も含みます',choices:[{label:'採用・定着に苦労している',val:'yes'},{label:'外国人人材の採用に取り組みたい',val:'foreign'},{label:'特に課題はない',val:'no'}]}
+];
+
+var SUBSIDIES=[
+  {name:'キャリアアップ助成金（正社員化コース）',amount:'最大80万円／人（中小企業）',desc:'パート・アルバイト・契約社員を正社員に転換した場合に支給。小規模・中小企業ともに対象で、転換後6か月の継続雇用が要件です。',cond:'有期雇用6か月以上・社会保険加入・就業規則の整備が必要',match:function(a){return a.part_time==='yes_convert';},pri:function(a){return 'high';}},
+  {name:'人材確保等支援助成金（外国人労働者就労環境整備助成コース）',amount:'最大57万円',desc:'外国人労働者の就労環境を整備した場合に支給。多言語化・相談窓口設置・職場環境改善などが対象です。',cond:'外国人労働者を雇用していること・就労環境整備計画の作成',match:function(a){return a.foreign_worker==='yes_current'||a.foreign_worker==='yes_plan';},pri:function(a){return a.foreign_worker==='yes_current'?'high':'mid';}},
+  {name:'障害者雇用安定助成金（雇用管理サポートコース）',amount:'最大180万円',desc:'障害者を雇用するための職場環境整備や雇用管理改善を行った場合に支給されます。',cond:'障害者の雇用・継続雇用を目的とした環境整備計画の作成',match:function(a){return a.disabled==='want_hire'||a.disabled==='already_hire';},pri:function(a){return 'high';}},
+  {name:'障害者雇用調整金・報奨金',amount:'月額2.7万〜5万円／人',desc:'法定雇用率を超えて障害者を雇用している企業に支払われる調整金・報奨金制度です。',cond:'法定雇用率（2.5%）を超えた障害者雇用の実績',match:function(a){return a.disabled==='already_hire'||a.disabled==='want_hire';},pri:function(a){return a.disabled==='already_hire'?'high':'mid';}},
+  {name:'障害者介助等助成金',amount:'各種（介助者配置費用等）',desc:'重度障害者の就業に必要な介助者の配置・手話通訳者の配置などの費用を助成します。',cond:'重度障害者の雇用・介助が必要な業務への配置',match:function(a){return a.disabled==='want_hire'||a.disabled==='already_hire';},pri:function(a){return 'mid';}},
+  {name:'人材開発支援助成金（人への投資促進コース）',amount:'経費の最大75%・賃金助成あり',desc:'従業員のスキルアップ・資格取得・デジタル人材育成を支援した場合に支給されます。',cond:'OFF-JT・OJT・資格取得支援の実施と訓練計画の届出',match:function(a){return a.training==='yes_active'||a.training==='yes_cost';},pri:function(a){return a.training==='yes_cost'?'high':'mid';}},
+  {name:'業務改善助成金',amount:'最大600万円（小規模は特に有利）',desc:'生産性向上のための設備投資を行い、最低賃金を引き上げた場合に支給されます。従業員30人以下の小規模事業者は特別加算があります。',cond:'最低賃金の引き上げ（30円以上）・生産性向上設備の導入・中小企業であること',match:function(a){return a.company_size==='micro'||a.company_size==='small';},pri:function(a){return a.company_size==='micro'?'high':'mid';}},
+  {name:'働き方改革推進支援助成金（労働時間短縮・年休促進支援コース）',amount:'最大200万円（60人以下は特別条件あり）',desc:'時間外労働の削減や年次有給休暇の取得促進に取り組んだ中小企業を支援します。従業員60人以下は上限額が優遇されます。',cond:'中小企業・時間外労働の上限規制対応・労働時間管理の整備',match:function(a){return (a.company_size==='micro'||a.company_size==='small')&&(a.work_style==='yes_active'||a.work_style==='yes_plan');},pri:function(a){return a.work_style==='yes_plan'?'high':'mid';}},
+  {name:'特定求職者雇用開発助成金（特定就職困難者コース）',amount:'最大240万円／人',desc:'高齢者・障害者・母子家庭の母などの就職困難者をハローワーク経由で採用した場合に支給されます。',cond:'ハローワーク等の紹介による採用・6か月以上の継続雇用',match:function(a){return a.recruitment==='yes'||a.disabled!=='none';},pri:function(a){return a.disabled!=='none'&&a.recruitment==='yes'?'high':'mid';}},
+  {name:'介護離職防止支援助成金',amount:'最大60万円',desc:'家族の介護を行う従業員のために介護休業制度を整備・活用した場合に支給されます。',cond:'介護休業取得者の発生・職場復帰プランの作成と実施',match:function(a){return a.industry==='care'||a.work_style!=='no';},pri:function(a){return a.industry==='care'?'high':'low';}},
+  {name:'建設労働者確保育成助成金',amount:'経費の最大3/4',desc:'建設業における技能労働者の育成・確保のための助成金です。技能実習・若年者育成が対象です。',cond:'建設業の許可業者・技能者育成計画の作成と届出',match:function(a){return a.industry==='construction';},pri:function(a){return 'high';}}
+];
+
+var answers={},cur=0;
+
+function getMatched(){
+  var r=[];
+  for(var i=0;i<SUBSIDIES.length;i++){
+    var s=SUBSIDIES[i];
+    if(s.match(answers)) r.push({s:s,p:s.pri(answers)});
+  }
+  r.sort(function(a,b){var o={high:0,mid:1,low:2};return o[a.p]-o[b.p];});
+  return r;
+}
+
+function updProg(){
+  var pct=Math.round(cur/questions.length*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-text').textContent='質問 '+(cur+1)+' / '+questions.length;
+  document.getElementById('prog-pct').textContent=pct+'%';
+}
+
+function render(){
+  updProg();
+  var q=questions[cur];
+  var h='<div class="card"><div class="q-num">質問 '+(cur+1)+' / '+questions.length+'</div>'
+    +'<div class="q-text">'+q.text+'</div><div class="q-sub">'+q.sub+'</div><div class="choices">';
+  for(var i=0;i<q.choices.length;i++){
+    var c=q.choices[i],sel=answers[q.id]===c.val;
+    h+='<button class="choice'+(sel?' selected':'')+'" onclick="pick(\''+q.id+'\',\''+c.val+'\',this)">'
+      +'<div class="choice-icon">'+(sel?'✓':'')+'</div>'+c.label+'</button>';
+  }
+  h+='</div><div class="nav">';
+  if(cur>0)h+='<button class="btn-back" onclick="back()">← 戻る</button>';
+  h+='<button class="btn-next" id="btn-next" onclick="next()"'+(answers[q.id]?'':' disabled')+'>'+(cur===questions.length-1?'診断結果を見る →':'次へ →')+'</button>';
+  h+='</div></div>';
+  document.getElementById('main').innerHTML=h;
+}
+
+function pick(qid,val,el){
+  answers[qid]=val;
+  var bs=el.parentElement.querySelectorAll('.choice');
+  for(var i=0;i<bs.length;i++){bs[i].classList.remove('selected');bs[i].querySelector('.choice-icon').textContent='';}
+  el.classList.add('selected');el.querySelector('.choice-icon').textContent='✓';
+  document.getElementById('btn-next').disabled=false;
+}
+
+function next(){if(!answers[questions[cur].id])return;if(cur<questions.length-1){cur++;render();}else showResult();}
+function back(){if(cur>0){cur--;render();}}
+
+function showResult(){
+  var matched=getMatched();
+  var high=matched.filter(function(m){return m.p==='high';}).length;
+  document.getElementById('prog-fill').style.width='100%';
+  document.getElementById('prog-text').textContent='診断完了';
+  document.getElementById('prog-pct').textContent='100%';
+  var h='<div class="result-card"><div class="result-header">'
+    +'<div class="result-count">'+matched.length+'</div>'
+    +'<div class="result-label">件の助成金が該当する可能性があります<br>'
+    +'<span style="font-size:11px;color:#1D9E75">うち優先度高：'+high+'件</span></div>'
+    +'</div>';
+  for(var i=0;i<matched.length;i++){
+    var m=matched[i],s=m.s,p=m.p;
+    h+='<div class="subsidy-item '+p+'">'
+      +'<div class="subsidy-header"><div class="subsidy-name">'+s.name+'</div>'
+      +'<span class="subsidy-badge badge-'+p+'">'+(p==='high'?'優先度高':p==='mid'?'要確認':'参考')+'</span></div>'
+      +'<div class="subsidy-amount">'+s.amount+'</div>'
+      +'<div class="subsidy-desc">'+s.desc+'</div>'
+      +'<div class="subsidy-cond">📋 '+s.cond+'</div>'
+      +'</div>';
+  }
+  h+='<div class="warn-box">⚠ この診断は参考情報です。実際の申請要件・金額は変更される場合があります。詳細は担当社労士にご確認ください。</div>';
+  h+='</div>'
+    +'<div class="cta-box"><h3>🌿 GrantFlow で助成金申請を効率化</h3>'
+    +'<p>診断結果をもとに申請サポートをご提供します。<br>14日間無料トライアル実施中！</p>'
+    +'<a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料相談・トライアルを申し込む</a><br>'
+    +'<div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>'
+    +'</div>'
+    +'<button class="restart-btn" onclick="restart()">🔄 もう一度診断する</button>';
+  document.getElementById('main').innerHTML=h;
+}
+
+function restart(){answers={};cur=0;render();}
+render();
+</script>
+</body>
+</html>

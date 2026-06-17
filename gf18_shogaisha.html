@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>障害者雇用管理システム｜GrantFlow</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:700px;width:100%}
+.topbar{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;transition:all .2s;font-family:inherit}
+.tab.on{background:#533AB7;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#533AB7;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #EEEDFE;display:flex;align-items:center;gap:8px}
+.f{margin-bottom:.65rem}
+.f label{font-size:12px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;transition:border-color .15s}
+.f input:focus,.f select:focus{border-color:#533AB7}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.result-box{border-radius:12px;padding:1.25rem;margin-bottom:1rem;text-align:center}
+.result-box.ok{background:#E1F5EE;border:1.5px solid #1D9E75}
+.result-box.warn{background:#FAEEDA;border:1.5px solid #EF9F27}
+.result-box.ng{background:#FCEBEB;border:1.5px solid #E24B4A}
+.result-big{font-size:36px;font-weight:700}
+.result-label{font-size:13px;margin-top:4px}
+.result-sub{font-size:11px;margin-top:6px;opacity:.8}
+.calc-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:13px}
+.calc-row:last-child{border-bottom:none}
+.calc-row.total{font-weight:700;padding-top:8px;font-size:14px}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#EEEDFE;color:#533AB7}
+.worker-card{border:1.5px solid #eee;border-radius:10px;padding:1rem;margin-bottom:.75rem}
+.worker-card.active{border-color:#533AB7;background:#FAFAFE}
+.worker-header{display:flex;align-items:center;gap:8px;margin-bottom:.75rem}
+.worker-name{font-size:13px;font-weight:700;flex:1}
+.worker-body{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.add-btn{width:100%;padding:10px;border:2px dashed #533AB7;border-radius:10px;background:none;color:#533AB7;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.add-btn:hover{background:#EEEDFE}
+.del-btn{padding:4px 10px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.alert-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:.75rem;line-height:1.6}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.alert-blue{background:#EEEDFE;border:1px solid #533AB7;color:#3C3489}
+.subsidy-item{border:1px solid #eee;border-radius:8px;padding:.75rem;margin-bottom:.5rem}
+.subsidy-item.match{border-color:#533AB7;background:#FAFAFE}
+.subsidy-name{font-size:13px;font-weight:600;color:#333;margin-bottom:3px}
+.subsidy-amount{font-size:13px;font-weight:700;color:#533AB7;margin-bottom:3px}
+.subsidy-desc{font-size:11px;color:#666;line-height:1.6}
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.check-item:last-child{border-bottom:none}
+.chk{width:22px;height:22px;border-radius:6px;border:1.5px solid #ddd;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;margin-top:1px}
+.chk.done{background:#533AB7;border-color:#533AB7}
+.chk-body{flex:1}
+.chk-title{font-size:13px;font-weight:500;color:#333}
+.chk-title.done{color:#533AB7;text-decoration:line-through;text-decoration-color:#533AB7}
+.chk-desc{font-size:11px;color:#666;margin-top:2px}
+.cta-box{background:linear-gradient(135deg,#533AB7,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="topbar">
+  <h1>♿ 障害者雇用管理システム</h1>
+  <p>法定雇用率の計算・障害者スタッフの管理・<br>助成金診断をまとめて行えます</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('rate',this)">📊 雇用率計算</button>
+  <button class="tab" onclick="switchTab('workers',this)">👤 スタッフ管理</button>
+  <button class="tab" onclick="switchTab('subsidy',this)">💴 助成金診断</button>
+  <button class="tab" onclick="switchTab('checklist',this)">📋 手続きチェック</button>
+</div>
+
+<div id="tab-rate">
+<div class="sec">
+<div class="sec-title">📊 法定雇用率 自動計算</div>
+<div class="alert-blue" style="margin-bottom:1rem">
+  📋 法定雇用率：<strong>2.5%（2024年4月〜）→ 2.7%（2026年7月〜予定）</strong><br>
+  常時雇用労働者数をもとに自動計算します。
+</div>
+<div class="r2">
+  <div class="f"><label>常時雇用労働者数（人）</label><input type="number" id="total_emp" placeholder="例：50" oninput="calcRate()"></div>
+  <div class="f"><label>週30時間以上の労働者（人）</label><input type="number" id="full_emp" placeholder="例：40" oninput="calcRate()"></div>
+</div>
+<div class="r2">
+  <div class="f"><label>週20〜30時間未満の短時間労働者（人）</label><input type="number" id="part_emp" placeholder="例：10" oninput="calcRate()"></div>
+  <div class="f"><label>適用除外（役員等）（人）</label><input type="number" id="exclude_emp" placeholder="例：0" oninput="calcRate()"></div>
+</div>
+<div id="rate-result"></div>
+</div>
+
+<div class="sec">
+<div class="sec-title">👥 現在の障害者雇用数入力</div>
+<div class="r3">
+  <div class="f"><label>身体障害者（人）</label><input type="number" id="d_body" placeholder="0" oninput="calcRate()"></div>
+  <div class="f"><label>知的障害者（人）</label><input type="number" id="d_intel" placeholder="0" oninput="calcRate()"></div>
+  <div class="f"><label>精神障害者（人）</label><input type="number" id="d_mental" placeholder="0" oninput="calcRate()"></div>
+</div>
+<div class="r3">
+  <div class="f"><label>重度身体障害者（人）</label><input type="number" id="d_body_heavy" placeholder="0" oninput="calcRate()"></div>
+  <div class="f"><label>重度知的障害者（人）</label><input type="number" id="d_intel_heavy" placeholder="0" oninput="calcRate()"></div>
+  <div class="f"><label>短時間精神障害者（人）</label><input type="number" id="d_mental_part" placeholder="0" oninput="calcRate()"></div>
+</div>
+<div id="count-result"></div>
+</div>
+</div>
+
+<div id="tab-workers" style="display:none">
+<div id="workers-content"></div>
+</div>
+
+<div id="tab-subsidy" style="display:none">
+<div id="subsidy-content"></div>
+</div>
+
+<div id="tab-checklist" style="display:none">
+<div id="checklist-content"></div>
+</div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版で継続管理</h3>
+  <p>本番版ではデータのクラウド保存・複数事業所管理・<br>雇用率レポートの自動生成をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var workers = [];
+var checks = {};
+
+var CHECKS = [
+  {id:'ch1',title:'法定雇用率を確認した',desc:'現在の法定雇用率（2.5%）と2026年7月からの引き上げ（2.7%）を確認'},
+  {id:'ch2',title:'障害者雇用状況報告書を提出した',desc:'毎年6月1日時点の雇用状況をハローワークに報告（6月15日締切）'},
+  {id:'ch3',title:'就業規則に障害者雇用に関する規定を整備した',desc:'合理的配慮の提供・相談窓口の設置などを就業規則に明記'},
+  {id:'ch4',title:'合理的配慮の提供体制を整えた',desc:'障害の種類に応じた配慮（設備改修・業務調整・通院配慮等）を準備'},
+  {id:'ch5',title:'相談窓口・担当者を設置した',desc:'障害者スタッフからの相談を受け付ける担当者・窓口を設置'},
+  {id:'ch6',title:'ハローワークへの求人登録を行った',desc:'障害者向け求人をハローワークに登録し、採用活動を開始'},
+  {id:'ch7',title:'障害者雇用調整金・報奨金の申請を確認した',desc:'法定雇用率超過分の調整金・報奨金の受給資格・申請時期を確認'},
+  {id:'ch8',title:'助成金申請の準備をした',desc:'障害者雇用安定助成金・特定求職者雇用開発助成金の申請要件を確認'},
+  {id:'ch9',title:'定期面談の実施計画を立てた',desc:'障害者スタッフとの定期面談（月1回以上推奨）の計画を作成'},
+  {id:'ch10',title:'職場環境の整備を行った',desc:'バリアフリー・休憩スペース・トイレ等の整備状況を確認'}
+];
+
+var SUBSIDIES = [
+  {name:'障害者雇用安定助成金（雇用管理サポートコース）',amount:'最大180万円',desc:'障害者を雇用するための職場環境整備や雇用管理改善に支給。専門家による助言・指導費用も対象です。',cond:'障害者の継続雇用を目的とした環境整備計画の作成'},
+  {name:'障害者雇用安定助成金（障害者職場定着支援コース）',amount:'最大240万円',desc:'障害者の職場定着を支援するための措置（メンター配置・短時間勤務制度等）に支給されます。',cond:'雇用する障害者の職場定着に向けた特別の措置の実施'},
+  {name:'特定求職者雇用開発助成金（障害者コース）',amount:'最大240万円／人',desc:'ハローワーク等の紹介で障害者を採用した場合に支給。重度障害者はさらに高額になります。',cond:'ハローワーク等の紹介による障害者の採用・6か月以上の継続雇用'},
+  {name:'障害者雇用調整金',amount:'月額2.7万円／人（超過1人あたり）',desc:'法定雇用率を超えて障害者を雇用している場合に毎月受け取れる調整金です。',cond:'法定雇用率（2.5%）を超えた障害者雇用の実績'},
+  {name:'障害者介助等助成金',amount:'各種（介助者配置・手話通訳等）',desc:'重度障害者の就業に必要な介助者・手話通訳者の配置費用を助成します。',cond:'重度障害者の雇用・介助が必要な業務への配置'},
+  {name:'職場適応援助者（ジョブコーチ）助成金',amount:'支援費用の3/4',desc:'ジョブコーチによる職場適応支援を実施した場合に支給されます。',cond:'ジョブコーチ支援機関との契約・支援計画の作成'}
+];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['rate','workers','subsidy','checklist'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='workers') renderWorkers();
+  if(tab==='subsidy') renderSubsidy();
+  if(tab==='checklist') renderChecklist();
+}
+
+function gv(id){var el=document.getElementById(id);return el?parseFloat(el.value||0):0;}
+function fmt(v){return Math.round(v).toLocaleString('ja-JP');}
+
+function calcRate(){
+  var total = gv('total_emp');
+  var full = gv('full_emp');
+  var part = gv('part_emp');
+  var excl = gv('exclude_emp');
+  var dBody = gv('d_body');
+  var dIntel = gv('d_intel');
+  var dMental = gv('d_mental');
+  var dBodyH = gv('d_body_heavy');
+  var dIntelH = gv('d_intel_heavy');
+  var dMentalP = gv('d_mental_part');
+
+  if(total <= 0){
+    document.getElementById('rate-result').innerHTML='';
+    document.getElementById('count-result').innerHTML='';
+    return;
+  }
+
+  // 雇用率計算の分母
+  var base = full + (part * 0.5) - excl;
+  var required25 = base * 0.025;
+  var required27 = base * 0.027;
+
+  // 障害者カウント（重度は2倍カウント）
+  var disabledCount = dBody + dIntel + (dMental * 0.5) + (dBodyH * 2) + (dIntelH * 2) + (dMentalP * 0.5);
+  var currentRate = base > 0 ? disabledCount / base * 100 : 0;
+
+  var shortage25 = Math.max(0, required25 - disabledCount);
+  var shortage27 = Math.max(0, required27 - disabledCount);
+  var excess25 = Math.max(0, disabledCount - required25);
+
+  var isOk25 = currentRate >= 2.5;
+  var isOk27 = currentRate >= 2.7;
+
+  var resultCls = isOk27?'ok':isOk25?'warn':'ng';
+  var resultMsg = isOk27?'法定雇用率 達成（2.7%基準も達成）':isOk25?'法定雇用率 達成（2.7%基準は未達）':'法定雇用率 未達';
+  var resultCol = isOk27?'#0F6E56':isOk25?'#854F0B':'#A32D2D';
+
+  document.getElementById('rate-result').innerHTML =
+    '<div class="result-box '+resultCls+'">'
+    +'<div class="result-big" style="color:'+resultCol+'">'+currentRate.toFixed(2)+'%</div>'
+    +'<div class="result-label" style="color:'+resultCol+'">'+resultMsg+'</div>'
+    +'<div class="result-sub" style="color:'+resultCol+'">障害者カウント数：'+disabledCount.toFixed(1)+'人　／　分母：'+base.toFixed(1)+'人</div>'
+    +'</div>'
+    +'<div class="sec" style="margin-bottom:.75rem">'
+    +'<div class="calc-row"><span style="color:#666">法定雇用率（2.5%）必要数</span><span style="font-weight:600">'+required25.toFixed(1)+'人以上</span></div>'
+    +'<div class="calc-row"><span style="color:#666">法定雇用率（2.7%）必要数</span><span style="font-weight:600">'+required27.toFixed(1)+'人以上</span></div>'
+    +'<div class="calc-row"><span style="color:#666">現在のカウント数</span><span style="font-weight:600;color:'+resultCol+'">'+disabledCount.toFixed(1)+'人</span></div>'
+    +(shortage25>0?'<div class="calc-row"><span style="color:#A32D2D">2.5%達成に必要な追加雇用数</span><span style="font-weight:600;color:#A32D2D">あと'+Math.ceil(shortage25)+'人</span></div>':'')
+    +(shortage27>0&&isOk25?'<div class="calc-row"><span style="color:#854F0B">2.7%達成に必要な追加雇用数</span><span style="font-weight:600;color:#854F0B">あと'+Math.ceil(shortage27)+'人</span></div>':'')
+    +(excess25>0?'<div class="calc-row"><span style="color:#0F6E56">超過雇用数（調整金対象）</span><span style="font-weight:600;color:#0F6E56">'+Math.floor(excess25)+'人分</span></div>':'')
+    +(excess25>0?'<div class="calc-row total"><span>調整金 概算（月額）</span><span style="color:#533AB7">月約'+fmt(Math.floor(excess25)*27000)+'円</span></div>':'')
+    +'</div>';
+
+  document.getElementById('count-result').innerHTML =
+    '<div style="font-size:12px;color:#666;padding:8px 0;border-top:1px solid #eee">'
+    +'<div style="margin-bottom:4px">📋 カウント方法：重度障害者は2倍・短時間労働者は0.5倍でカウント</div>'
+    +'<div>精神障害者（短時間）は0.5倍カウント（初めて雇用後3年間は1倍の特例あり）</div>'
+    +'</div>';
+}
+
+function addWorker(){
+  workers.push({name:'',type:'',degree:'normal',hours:'full',start:'',memo:''});
+  renderWorkers();
+}
+function delWorker(i){if(!confirm('削除しますか？'))return;workers.splice(i,1);renderWorkers();}
+function upWorker(i,key,val){workers[i][key]=val;}
+
+function renderWorkers(){
+  var html='';
+  if(workers.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:1.5rem;color:#aaa;font-size:13px">障害者スタッフがまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    workers.forEach(function(w,i){
+      html+='<div class="worker-card active">'
+        +'<div class="worker-header">'
+          +'<div class="worker-name">'+(w.name||'（氏名未入力）')+'</div>'
+          +'<span class="badge badge-blue">'+(w.type||'種別未選択')+'</span>'
+          +'<button class="del-btn" onclick="delWorker('+i+')">削除</button>'
+        +'</div>'
+        +'<div class="worker-body">'
+          +'<div class="f"><label>氏名</label><input type="text" value="'+escH(w.name)+'" placeholder="例：山田 花子" oninput="upWorker('+i+',\'name\',this.value)"></div>'
+          +'<div class="f"><label>障害種別</label><select onchange="upWorker('+i+',\'type\',this.value)"><option value="">選択</option><option '+(w.type==='身体障害'?'selected':'')+'>身体障害</option><option '+(w.type==='知的障害'?'selected':'')+'>知的障害</option><option '+(w.type==='精神障害'?'selected':'')+'>精神障害</option><option '+(w.type==='発達障害'?'selected':'')+'>発達障害</option></select></div>'
+          +'<div class="f"><label>障害程度</label><select onchange="upWorker('+i+',\'degree\',this.value)"><option value="heavy" '+(w.degree==='heavy'?'selected':'')+'>重度</option><option value="normal" '+(w.degree==='normal'?'selected':'')+'>その他</option></select></div>'
+          +'<div class="f"><label>労働時間区分</label><select onchange="upWorker('+i+',\'hours\',this.value)"><option value="full" '+(w.hours==='full'?'selected':'')+'>週30時間以上</option><option value="part" '+(w.hours==='part'?'selected':'')+'>週20〜30時間未満</option></select></div>'
+          +'<div class="f"><label>雇用開始日</label><input type="text" value="'+escH(w.start)+'" placeholder="令和X年X月X日" oninput="upWorker('+i+',\'start\',this.value)"></div>'
+          +'<div class="f"><label>メモ・配慮事項</label><input type="text" value="'+escH(w.memo)+'" placeholder="合理的配慮の内容など" oninput="upWorker('+i+',\'memo\',this.value)"></div>'
+        +'</div>'
+        +'</div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addWorker()">＋ 障害者スタッフを追加</button>';
+  document.getElementById('workers-content').innerHTML=html;
+}
+
+function renderSubsidy(){
+  var html='';
+  html+='<div class="sec"><div class="sec-title">💴 利用可能な助成金一覧</div>';
+  SUBSIDIES.forEach(function(s){
+    html+='<div class="subsidy-item match">'
+      +'<div class="subsidy-name">'+s.name+'</div>'
+      +'<div class="subsidy-amount">'+s.amount+'</div>'
+      +'<div class="subsidy-desc">'+s.desc+'</div>'
+      +'<div style="font-size:11px;color:#888;margin-top:4px;padding-top:4px;border-top:1px solid #eee">📋 '+s.cond+'</div>'
+      +'</div>';
+  });
+  html+='<div style="background:#FFF8F0;border:1px solid #EF9F27;border-radius:8px;padding:8px 12px;font-size:11px;color:#854F0B;margin-top:.5rem">⚠ 助成金の要件・金額は変更される場合があります。詳細は担当社労士にご確認ください。</div>';
+  html+='</div>';
+  document.getElementById('subsidy-content').innerHTML=html;
+}
+
+function toggleCheck(id){
+  checks[id]=!checks[id];
+  renderChecklist();
+}
+
+function renderChecklist(){
+  var done=CHECKS.filter(function(c){return checks[c.id];}).length;
+  var pct=Math.round(done/CHECKS.length*100);
+  var html='<div class="sec">'
+    +'<div class="sec-title">📋 手続きチェックリスト　<span style="font-size:11px;font-weight:400;color:#666">'+done+'/'+CHECKS.length+'完了</span></div>'
+    +'<div style="height:6px;background:#eee;border-radius:3px;margin-bottom:1rem"><div style="height:100%;width:'+pct+'%;background:#533AB7;border-radius:3px;transition:width .4s"></div></div>';
+  CHECKS.forEach(function(c){
+    var done=checks[c.id];
+    html+='<div class="check-item">'
+      +'<div class="chk'+(done?' done':'')+'" onclick="toggleCheck(\''+c.id+'\')">'+(done?'✓':'')+'</div>'
+      +'<div class="chk-body">'
+        +'<div class="chk-title'+(done?' done':'')+'">'+c.title+'</div>'
+        +'<div class="chk-desc">'+c.desc+'</div>'
+      +'</div>'
+      +'</div>';
+  });
+  html+='</div>';
+  document.getElementById('checklist-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>

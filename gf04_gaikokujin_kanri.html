@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>外国人雇用管理システム｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:720px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#0A3D2B,#1D9E75);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff}
+.topbar h1{font-size:14px;font-weight:700;margin-bottom:6px}
+.company-row{display:flex;gap:8px}
+.company-row input{flex:1;font-size:12px;padding:5px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.15);color:#fff;outline:none}
+.company-row input::placeholder{color:rgba(255,255,255,.55)}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#1D9E75;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#0A3D2B;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E1F5EE;display:flex;align-items:center;justify-content:space-between}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select{width:100%;font-size:13px;padding:6px 10px;border:1px solid #ddd;border-radius:8px;outline:none}
+.f input:focus,.f select:focus{border-color:#1D9E75}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.worker-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.worker-card.ok{border-color:#1D9E75;background:#F0FFF8}
+.worker-card.warn{border-color:#EF9F27;background:#FFFBF0}
+.worker-card.ng{border-color:#E24B4A;background:#FFF5F5}
+.worker-header{display:flex;align-items:center;gap:8px;margin-bottom:.5rem;cursor:pointer}
+.worker-name{font-size:14px;font-weight:700;flex:1}
+.worker-meta{font-size:11px;color:#888;margin-bottom:.5rem}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#EEEDFE;color:#533AB7}
+.badge-gray{background:#f0f0f0;color:#666}
+.info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:.5rem 0}
+.info-item{background:#f7f7f7;border-radius:8px;padding:6px 10px}
+.info-label{font-size:10px;color:#888;margin-bottom:2px}
+.info-value{font-size:12px;font-weight:600;color:#333}
+.add-btn{width:100%;padding:10px;border:2px dashed #1D9E75;border-radius:10px;background:none;color:#1D9E75;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.add-btn:hover{background:#E1F5EE}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px 6px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:22px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.alert-box{border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:.5rem;line-height:1.6}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.worker-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.worker-detail.open{display:block}
+.tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px;margin-right:4px;margin-bottom:4px}
+.tag-blue{background:#E6F1FB;color:#185FA5}
+.tag-green{background:#E1F5EE;color:#0F6E56}
+.tag-amber{background:#FEF3C7;color:#92400E}
+.cta-box{background:linear-gradient(135deg,#0A3D2B,#1D9E75);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 外国人雇用管理システム｜無料デモ版　ログイン不要・データはブラウザ内のみ保存
+</div>
+<div class="topbar">
+  <h1>🌍 外国人雇用管理システム</h1>
+  <div class="company-row">
+    <input id="company" placeholder="会社名・事業所名を入力" oninput="D.company=this.value">
+    <input id="manager" placeholder="担当者名" oninput="D.manager=this.value">
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('workers',this)">👤 スタッフ一覧</button>
+  <button class="tab" onclick="switchTab('summary',this)">📊 ダッシュボード</button>
+  <button class="tab" onclick="switchTab('support',this)">📋 支援記録</button>
+</div>
+
+<div id="tab-workers"><div id="workers-content"></div></div>
+<div id="tab-summary" style="display:none"><div id="summary-content"></div></div>
+<div id="tab-support" style="display:none"><div id="support-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版で複数事業所を一元管理</h3>
+  <p>本番版ではクラウド保存・複数事業所管理・<br>在留期限アラートメール通知をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var NATIONALITIES = ['ベトナム','中国','フィリピン','インドネシア','ミャンマー','タイ','カンボジア','ネパール','スリランカ','その他'];
+var VISA_TYPES = ['特定技能1号','特定技能2号','技能実習1号','技能実習2号','技能実習3号','育成就労','技術・人文知識・国際業務','経営・管理','留学','家族滞在','永住者','日本人の配偶者等','その他'];
+var INDUSTRIES = ['製造業','建設業','介護','農業','漁業','飲食料品製造','外食業','宿泊','ビルクリーニング','素形材・産業機械','電気電子情報','建設','造船・舶用','自動車整備','航空','その他'];
+var SUPPORT_ITEMS = [
+  '空港への出迎え・見送り',
+  '住居確保の支援',
+  '生活に必要な契約支援（銀行・携帯等）',
+  '日本語学習の機会提供',
+  '相談・苦情への対応',
+  '日本人との交流促進',
+  '定期面談の実施',
+  '転職支援（非自発的離職時）',
+  '社会保険等の手続き支援',
+  '帰国時の支援'
+];
+
+var D = {company:'', manager:'', workers:[]};
+var expanded = {};
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['workers','summary','support'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='workers') renderWorkers();
+  if(tab==='summary') renderSummary();
+  if(tab==='support') renderSupport();
+}
+
+function addWorker() {
+  var supportStatus = {};
+  SUPPORT_ITEMS.forEach(function(s,i){ supportStatus['s'+i] = false; });
+  D.workers.push({
+    name:'', nameKana:'', nationality:'', visa:'',
+    visaExpiry:'', birthdate:'', gender:'',
+    industry:'', workplace:'', start:'',
+    phone:'', address:'', emergency:'',
+    japanese:'', salary:'', memo:'',
+    support: supportStatus
+  });
+  renderWorkers();
+}
+
+function delWorker(i) {
+  if(!confirm('削除しますか？')) return;
+  D.workers.splice(i,1);
+  renderWorkers();
+}
+
+function upWorker(i,key,val){ D.workers[i][key]=val; }
+function toggleExpand(i){ expanded[i]=!expanded[i]; renderWorkers(); }
+function toggleSupport(wi,key){ D.workers[wi].support[key]=!D.workers[wi].support[key]; renderWorkers(); }
+
+function daysUntil(dateStr) {
+  if(!dateStr) return null;
+  try {
+    var r = dateStr.match(/令和(\d+)年(\d+)月(\d+)日/);
+    if(!r) return null;
+    var y=2018+parseInt(r[1]),m=parseInt(r[2])-1,d=parseInt(r[3]);
+    return Math.ceil((new Date(y,m,d)-new Date())/86400000);
+  } catch(e){ return null; }
+}
+
+function getStatus(w) {
+  if(!w.name) return 'gray';
+  var days = daysUntil(w.visaExpiry);
+  if(days!==null&&days<0) return 'ng';
+  if(days!==null&&days<=90) return 'warn';
+  return 'ok';
+}
+
+function renderWorkers() {
+  var html='';
+  if(D.workers.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">外国人スタッフがまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    D.workers.forEach(function(w,i){
+      var st = getStatus(w);
+      var days = daysUntil(w.visaExpiry);
+      var badgeLbl = st==='ok'?'管理中':st==='warn'?'期限注意':st==='ng'?'期限切れ':'未入力';
+      var badgeCls = st==='ok'?'badge-ok':st==='warn'?'badge-warn':st==='ng'?'badge-ng':'badge-gray';
+      var isExp = expanded[i];
+
+      html+='<div class="worker-card '+st+'">';
+      html+='<div class="worker-header" onclick="toggleExpand('+i+')">';
+      html+='<div style="flex:1">';
+      html+='<div class="worker-name">'+(w.name||'（氏名未入力）')+'</div>';
+      html+='<div class="worker-meta">'+(w.nationality||'国籍未入力')+' ／ '+(w.visa||'在留資格未入力')+(w.workplace?' ／ '+w.workplace:'')+'</div>';
+      html+='</div>';
+      html+='<span class="badge '+badgeCls+'">'+badgeLbl+'</span>';
+      if(days!==null&&days<=90){
+        html+='<span class="badge '+(days<0?'badge-ng':'badge-warn')+'" style="margin-left:4px">'+(days<0?Math.abs(days)+'日超過':'期限'+days+'日前')+'</span>';
+      }
+      html+='<span style="font-size:12px;color:#aaa;margin-left:4px">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+
+      html+='<div class="worker-detail'+(isExp?' open':'')+'">';
+      html+='<div style="font-size:12px;font-weight:600;color:#0A3D2B;margin-bottom:6px">👤 基本情報</div>';
+      html+='<div class="r3">';
+      html+='<div class="f"><label>氏名（ローマ字）</label><input type="text" value="'+escH(w.name)+'" placeholder="Nguyen Van A" oninput="upWorker('+i+',\'name\',this.value)"></div>';
+      html+='<div class="f"><label>氏名（カタカナ）</label><input type="text" value="'+escH(w.nameKana)+'" placeholder="グエン バン エー" oninput="upWorker('+i+',\'nameKana\',this.value)"></div>';
+      html+='<div class="f"><label>国籍</label><select onchange="upWorker('+i+',\'nationality\',this.value)"><option value="">選択</option>'+NATIONALITIES.map(function(n){return'<option '+(w.nationality===n?'selected':'')+'>'+n+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>在留資格</label><select onchange="upWorker('+i+',\'visa\',this.value)"><option value="">選択</option>'+VISA_TYPES.map(function(v){return'<option '+(w.visa===v?'selected':'')+'>'+v+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>在留期限</label><input type="text" value="'+escH(w.visaExpiry)+'" placeholder="令和X年X月X日" oninput="upWorker('+i+',\'visaExpiry\',this.value)"></div>';
+      html+='<div class="f"><label>生年月日</label><input type="text" value="'+escH(w.birthdate)+'" placeholder="令和X年X月X日" oninput="upWorker('+i+',\'birthdate\',this.value)"></div>';
+      html+='<div class="f"><label>性別</label><select onchange="upWorker('+i+',\'gender\',this.value)"><option value="">選択</option><option '+(w.gender==='男性'?'selected':'')+'>男性</option><option '+(w.gender==='女性'?'selected':'')+'>女性</option></select></div>';
+      html+='<div class="f"><label>業種</label><select onchange="upWorker('+i+',\'industry\',this.value)"><option value="">選択</option>'+INDUSTRIES.map(function(v){return'<option '+(w.industry===v?'selected':'')+'>'+v+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>勤務先</label><input type="text" value="'+escH(w.workplace)+'" placeholder="配属先・部署名" oninput="upWorker('+i+',\'workplace\',this.value)"></div>';
+      html+='</div>';
+
+      html+='<div style="font-size:12px;font-weight:600;color:#0A3D2B;margin:.75rem 0 6px">📞 連絡・居住情報</div>';
+      html+='<div class="r3">';
+      html+='<div class="f"><label>雇用開始日</label><input type="text" value="'+escH(w.start)+'" placeholder="令和X年X月X日" oninput="upWorker('+i+',\'start\',this.value)"></div>';
+      html+='<div class="f"><label>電話番号</label><input type="text" value="'+escH(w.phone)+'" placeholder="090-XXXX-XXXX" oninput="upWorker('+i+',\'phone\',this.value)"></div>';
+      html+='<div class="f"><label>日本語能力</label><select onchange="upWorker('+i+',\'japanese\',this.value)"><option value="">選択</option><option '+(w.japanese==='N1'?'selected':'')+'>N1</option><option '+(w.japanese==='N2'?'selected':'')+'>N2</option><option '+(w.japanese==='N3'?'selected':'')+'>N3</option><option '+(w.japanese==='N4'?'selected':'')+'>N4</option><option '+(w.japanese==='N5'?'selected':'')+'>N5</option><option '+(w.japanese==='なし'?'selected':'')+'>なし</option></select></div>';
+      html+='<div class="f" style="grid-column:1/-1"><label>住所</label><input type="text" value="'+escH(w.address)+'" placeholder="現住所" oninput="upWorker('+i+',\'address\',this.value)"></div>';
+      html+='<div class="f"><label>緊急連絡先</label><input type="text" value="'+escH(w.emergency)+'" placeholder="母国の家族など" oninput="upWorker('+i+',\'emergency\',this.value)"></div>';
+      html+='<div class="f"><label>月額給与（円）</label><input type="number" value="'+escH(w.salary)+'" placeholder="例：200000" oninput="upWorker('+i+',\'salary\',this.value)"></div>';
+      html+='</div>';
+
+      html+='<div class="f"><label>メモ・備考</label><input type="text" value="'+escH(w.memo)+'" placeholder="配慮事項・特記事項など" oninput="upWorker('+i+',\'memo\',this.value)"></div>';
+      html+='<button class="del-btn" onclick="delWorker('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addWorker()">＋ 外国人スタッフを追加</button>';
+  document.getElementById('workers-content').innerHTML=html;
+}
+
+function renderSummary() {
+  var total=D.workers.length;
+  var byNationality={}, byVisa={}, expiryAlerts=[];
+
+  D.workers.forEach(function(w){
+    if(w.nationality) byNationality[w.nationality]=(byNationality[w.nationality]||0)+1;
+    if(w.visa) byVisa[w.visa]=(byVisa[w.visa]||0)+1;
+    if(w.visaExpiry&&w.name){
+      var days=daysUntil(w.visaExpiry);
+      if(days!==null&&days<=90) expiryAlerts.push({name:w.name,days:days,expiry:w.visaExpiry});
+    }
+  });
+
+  var okCount=D.workers.filter(function(w){return getStatus(w)==='ok';}).length;
+  var warnCount=D.workers.filter(function(w){return getStatus(w)==='warn';}).length;
+  var ngCount=D.workers.filter(function(w){return getStatus(w)==='ng';}).length;
+
+  var html='<div class="sec"><div class="sec-title">📊 ダッシュボード</div>';
+  html+='<div class="summary-grid">';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#185FA5">'+total+'</div><div class="summary-label">登録者数</div></div>';
+  html+='<div class="summary-card" style="background:#E1F5EE;border-color:#1D9E75"><div class="summary-num" style="color:#0F6E56">'+okCount+'</div><div class="summary-label">管理中</div></div>';
+  html+='<div class="summary-card" style="background:#FAEEDA;border-color:#EF9F27"><div class="summary-num" style="color:#854F0B">'+warnCount+'</div><div class="summary-label">期限注意</div></div>';
+  html+='<div class="summary-card" style="background:#FCEBEB;border-color:#E24B4A"><div class="summary-num" style="color:#A32D2D">'+ngCount+'</div><div class="summary-label">期限切れ</div></div>';
+  html+='</div>';
+
+  if(expiryAlerts.length>0){
+    html+='<div style="font-size:12px;font-weight:600;color:#854F0B;margin-bottom:6px">⚠ 在留期限アラート</div>';
+    expiryAlerts.forEach(function(a){
+      html+='<div class="alert-box '+(a.days<0?'alert-ng':'alert-warn')+'">'+escH(a.name)+'：在留期限 '+escH(a.expiry)+' — '+(a.days<0?Math.abs(a.days)+'日超過':'あと'+a.days+'日')+'</div>';
+    });
+  } else if(total>0){
+    html+='<div class="alert-box alert-ok">✓ 現在アラートはありません。</div>';
+  }
+
+  if(Object.keys(byNationality).length>0){
+    html+='<div style="font-size:12px;font-weight:600;color:#333;margin:.75rem 0 6px">🌍 国籍別内訳</div>';
+    html+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
+    Object.keys(byNationality).forEach(function(k){
+      html+='<span class="tag tag-blue">'+escH(k)+' '+byNationality[k]+'名</span>';
+    });
+    html+='</div>';
+  }
+
+  if(Object.keys(byVisa).length>0){
+    html+='<div style="font-size:12px;font-weight:600;color:#333;margin:.75rem 0 6px">📋 在留資格別内訳</div>';
+    html+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
+    Object.keys(byVisa).forEach(function(k){
+      html+='<span class="tag tag-green">'+escH(k)+' '+byVisa[k]+'名</span>';
+    });
+    html+='</div>';
+  }
+
+  html+='</div>';
+  document.getElementById('summary-content').innerHTML=html;
+}
+
+function renderSupport() {
+  var html='';
+  if(D.workers.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">スタッフ一覧タブからスタッフを登録してください</div></div>';
+  } else {
+    D.workers.forEach(function(w,i){
+      if(!w.name) return;
+      var done=SUPPORT_ITEMS.filter(function(s,j){return w.support['s'+j];}).length;
+      var pct=Math.round(done/SUPPORT_ITEMS.length*100);
+      html+='<div class="sec">';
+      html+='<div class="sec-title">'+escH(w.name)+'　<span style="font-size:11px;font-weight:400;color:#666">支援完了：'+done+'/'+SUPPORT_ITEMS.length+'項目（'+pct+'%）</span></div>';
+      html+='<div style="height:5px;background:#eee;border-radius:3px;margin-bottom:.75rem"><div style="height:100%;width:'+pct+'%;background:#1D9E75;border-radius:3px;transition:width .4s"></div></div>';
+      SUPPORT_ITEMS.forEach(function(item,j){
+        var done=w.support['s'+j];
+        html+='<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f0f0f0">';
+        html+='<div style="width:20px;height:20px;border-radius:5px;border:1.5px solid '+(done?'#1D9E75':'#ddd')+';cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;background:'+(done?'#1D9E75':'transparent')+';flex-shrink:0" onclick="toggleSupport('+i+',\'s'+j+'\')">'+(done?'✓':'')+'</div>';
+        html+='<span style="font-size:12px;color:'+(done?'#1D9E75':'#333')+';text-decoration:'+(done?'line-through':'none')+'">'+item+'</span>';
+        html+='</div>';
+      });
+      html+='</div>';
+    });
+  }
+  document.getElementById('support-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderWorkers();
+</script>
+</body>
+</html>

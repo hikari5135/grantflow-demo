@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>在留資格チェックシステム｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:720px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#185FA5,#378ADD);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#185FA5;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#185FA5;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E6F1FB}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none}
+.f input:focus,.f select:focus{border-color:#185FA5}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.result-card{border-radius:12px;padding:1.25rem;margin-bottom:1rem;text-align:center}
+.result-card.ok{background:#E1F5EE;border:1.5px solid #1D9E75}
+.result-card.warn{background:#FAEEDA;border:1.5px solid #EF9F27}
+.result-card.ng{background:#FCEBEB;border:1.5px solid #E24B4A}
+.result-card.info{background:#E6F1FB;border:1.5px solid #185FA5}
+.result-title{font-size:18px;font-weight:700;margin-bottom:6px}
+.result-sub{font-size:12px;opacity:.85;line-height:1.6}
+.info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee;font-size:13px}
+.info-row:last-child{border-bottom:none}
+.info-label{color:#666}
+.info-value{font-weight:600;color:#333}
+.info-value.ok{color:#0F6E56}
+.info-value.warn{color:#854F0B}
+.info-value.ng{color:#A32D2D}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-gray{background:#f0f0f0;color:#666}
+.visa-card{border:1.5px solid #eee;border-radius:10px;padding:1rem;margin-bottom:.75rem;cursor:pointer;transition:all .15s}
+.visa-card:hover{border-color:#185FA5;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.visa-card.selected{border-color:#185FA5;background:#EEF5FB}
+.visa-name{font-size:14px;font-weight:700;color:#185FA5;margin-bottom:4px}
+.visa-desc{font-size:11px;color:#666;line-height:1.6}
+.visa-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.check-btn{width:100%;padding:12px;border:none;border-radius:10px;background:#185FA5;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:1rem}
+.check-btn:hover{background:#0C447C}
+.industry-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:.5rem}
+.ind-btn{padding:8px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:12px;cursor:pointer;background:#fff;color:#555;font-family:inherit;text-align:left;transition:all .15s}
+.ind-btn.on{border-color:#185FA5;background:#E6F1FB;color:#185FA5;font-weight:500}
+.alert-box{border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:.5rem;line-height:1.6}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.alert-blue{background:#E6F1FB;border:1px solid #185FA5;color:#0C447C}
+.cta-box{background:linear-gradient(135deg,#185FA5,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 在留資格チェックシステム｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>🔍 在留資格チェックシステム</h1>
+  <p>在留資格の就労可否・制限・期限をすぐに確認できます</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('check',this)">🔍 就労可否チェック</button>
+  <button class="tab" onclick="switchTab('list',this)">📋 在留資格一覧</button>
+  <button class="tab" onclick="switchTab('expiry',this)">⏰ 期限管理</button>
+</div>
+
+<div id="tab-check">
+<div class="sec">
+<div class="sec-title">🔍 就労可否チェック</div>
+<div class="f">
+  <label>在留資格を選択してください</label>
+  <select id="visa-select" onchange="checkVisa()">
+    <option value="">-- 選択してください --</option>
+    <option value="tokutei1">特定技能1号</option>
+    <option value="tokutei2">特定技能2号</option>
+    <option value="ginou1">技能実習1号</option>
+    <option value="ginou2">技能実習2号</option>
+    <option value="ginou3">技能実習3号</option>
+    <option value="ikusei">育成就労</option>
+    <option value="gijin">技術・人文知識・国際業務</option>
+    <option value="keiei">経営・管理</option>
+    <option value="ryugaku">留学</option>
+    <option value="kazoku">家族滞在</option>
+    <option value="eijuu">永住者</option>
+    <option value="haiguu">日本人の配偶者等</option>
+    <option value="teijuu">定住者</option>
+    <option value="tokubetsu">特別永住者</option>
+  </select>
+</div>
+<div id="visa-result"></div>
+</div>
+
+<div class="sec">
+<div class="sec-title">⏰ 在留期限 残日数計算</div>
+<div class="r2">
+  <div class="f">
+    <label>在留期限</label>
+    <input type="text" id="expiry-input" placeholder="例：令和8年3月31日" oninput="calcExpiry()">
+  </div>
+  <div class="f">
+    <label>氏名（任意）</label>
+    <input type="text" id="name-input" placeholder="例：Nguyen Van A">
+  </div>
+</div>
+<div id="expiry-result"></div>
+</div>
+</div>
+
+<div id="tab-list" style="display:none">
+<div id="visa-list-content"></div>
+</div>
+
+<div id="tab-expiry" style="display:none">
+<div class="sec">
+<div class="sec-title">⏰ 複数人の期限一括管理</div>
+<div id="expiry-list-content"></div>
+<button class="check-btn" style="background:#1D9E75;margin-top:.5rem" onclick="addExpiryItem()">＋ 追加する</button>
+</div>
+</div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版でさらに詳しく管理</h3>
+  <p>本番版では期限アラートメール・複数事業所管理・<br>在留資格更新のワークフロー管理をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var VISAS = {
+  tokutei1:{name:'特定技能1号',work:'就労可（指定業種のみ）',restriction:'指定された特定産業分野のみ就労可。業種変更は原則不可。',hours:'制限なし（フルタイム）',update:'最長1年・通算5年まで',family:'帯同不可',industries:['介護','ビルクリーニング','素形材・産業機械','電気電子情報','建設','造船・舶用','自動車整備','航空','宿泊','農業','漁業','飲食料品製造','外食業'],points:['就労可能業種が限定されている','業種外での就労は不法就労になる','3か月に1回の定期面談が必要','10項目の支援義務あり（登録支援機関または自社）']},
+  tokutei2:{name:'特定技能2号',work:'就労可（指定業種のみ）',restriction:'特定産業分野のみ。1号より技能水準が高い。',hours:'制限なし',update:'更新制限なし（永続的に更新可能）',family:'帯同可',industries:['建設','造船・舶用','自動車整備','航空','宿泊','素形材・産業機械','電気電子情報','農業','漁業','飲食料品製造','外食業'],points:['2号は高度な技能が必要（試験合格が条件）','在留期間の更新に上限なし','家族帯同が可能','支援義務なし']},
+  ginou1:{name:'技能実習1号',work:'就労可（実習計画に従った業務のみ）',restriction:'認定を受けた技能実習計画に基づく業務のみ。',hours:'実習計画に従う',update:'最長1年',family:'帯同不可',industries:['製造業','建設業','農業','漁業','食品製造','繊維・衣服','機械・金属','その他'],points:['技能実習計画に記載のない業務は不法就労','転職・転籍は原則不可','2号移行には技能検定基礎級の合格が必要','監理団体による監理が必要']},
+  ginou2:{name:'技能実習2号',work:'就労可（実習計画に従った業務のみ）',restriction:'認定を受けた技能実習計画に基づく業務のみ。',hours:'実習計画に従う',update:'最長2年',family:'帯同不可',industries:['製造業','建設業','農業','漁業','食品製造','繊維・衣服','機械・金属','その他'],points:['1号から継続する形での在留','3号移行には技能検定3級の合格が必要','転職・転籍は原則不可']},
+  ginou3:{name:'技能実習3号',work:'就労可（実習計画に従った業務のみ）',restriction:'認定を受けた技能実習計画に基づく業務のみ。',hours:'実習計画に従う',update:'最長2年',family:'帯同不可',industries:['製造業','建設業','農業','漁業','食品製造','繊維・衣服','機械・金属','その他'],points:['2号から継続する形での在留','優良な実習実施者・監理団体のみ受け入れ可能','技能実習制度の最高レベル']},
+  ikusei:{name:'育成就労',work:'就労可（指定業種のみ）',restriction:'育成就労計画に基づく業務のみ。一定条件で転籍可能。',hours:'制限なし',update:'最長3年',family:'帯同不可',industries:['特定技能移行対象職種'],points:['2024年技能実習制度廃止により新設','1〜2年後に一定条件で転籍可能','特定技能1号への移行を前提とした制度','支援計画の作成・実施が義務']},
+  gijin:{name:'技術・人文知識・国際業務',work:'就労可（専門的・技術的業務）',restriction:'大学等で習得した専門知識に関連する業務のみ。単純労働は不可。',hours:'制限なし',update:'最長5年',family:'帯同可（家族滞在ビザ）',industries:['IT・システム開発','翻訳・通訳','デザイン','マーケティング','会計・財務','営業（専門知識を要するもの）'],points:['単純労働への従事は不可','業務内容が在留資格と合致している必要がある','転職時は在留資格変更が必要な場合がある']},
+  keiei:{name:'経営・管理',work:'就労可（経営・管理業務）',restriction:'事業の経営または管理に従事する業務のみ。',hours:'制限なし',update:'最長5年',family:'帯同可',industries:['全業種（経営・管理業務に限る）'],points:['事業規模の要件あり（資本金500万円以上等）','代表取締役・役員等の地位が必要','現場作業への従事は不可']},
+  ryugaku:{name:'留学',work:'原則就労不可（資格外活動許可で週28時間以内）',restriction:'資格外活動許可を取得した場合のみ週28時間以内（長期休暇中は週40時間以内）。風俗営業等は不可。',hours:'週28時間以内（資格外活動許可あり）',update:'在学期間',family:'帯同不可',industries:['資格外活動許可が必要'],points:['資格外活動許可なしの就労は不法就労','週28時間超の就労は不法就労','卒業後は在留資格変更が必要','コンビニ・飲食店等のアルバイトは可（資格外活動許可があれば）']},
+  kazoku:{name:'家族滞在',work:'原則就労不可（資格外活動許可で週28時間以内）',restriction:'資格外活動許可を取得した場合のみ週28時間以内。',hours:'週28時間以内（資格外活動許可あり）',update:'扶養者の在留期間に準じる',family:'—',industries:['資格外活動許可が必要'],points:['扶養者の在留資格が取り消されると影響を受ける','資格外活動許可なしの就労は不法就労','週28時間を超えると不法就労になる']},
+  eijuu:{name:'永住者',work:'就労制限なし（全業種・全職種）',restriction:'就労制限なし。日本人と同等の就労が可能。',hours:'制限なし',update:'在留カード更新（7年ごと）',family:'帯同可',industries:['全業種・全職種'],points:['就労内容に制限なし','在留カードは7年ごとの更新が必要','永住許可が取り消される場合がある（犯罪等）']},
+  haiguu:{name:'日本人の配偶者等',work:'就労制限なし（全業種・全職種）',restriction:'就労制限なし。',hours:'制限なし',update:'最長3年',family:'帯同可',industries:['全業種・全職種'],points:['離婚した場合は在留資格変更が必要','就労内容に制限なし']},
+  teijuu:{name:'定住者',work:'就労制限なし（全業種・全職種）',restriction:'就労制限なし。',hours:'制限なし',update:'最長5年',family:'帯同可',industries:['全業種・全職種'],points:['就労内容に制限なし','日系人等に付与されることが多い']},
+  tokubetsu:{name:'特別永住者',work:'就労制限なし（全業種・全職種）',restriction:'就労制限なし。',hours:'制限なし',update:'在留カード更新（7年ごと）',family:'帯同可',industries:['全業種・全職種'],points:['在日韓国・朝鮮人等に付与','就労内容に制限なし']}
+};
+
+var expiryItems = [];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['check','list','expiry'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='list') renderVisaList();
+  if(tab==='expiry') renderExpiryList();
+}
+
+function checkVisa() {
+  var val = document.getElementById('visa-select').value;
+  var el = document.getElementById('visa-result');
+  if(!val){el.innerHTML='';return;}
+  var v = VISAS[val];
+  if(!v){el.innerHTML='';return;}
+
+  var workOk = v.work.indexOf('制限なし')>=0||v.work.indexOf('就労可')>=0;
+  var workRestricted = v.work.indexOf('28時間')>=0;
+  var cls = workRestricted?'warn':workOk&&v.work.indexOf('指定')>=0?'info':workOk?'ok':'ng';
+
+  var html = '<div class="result-card '+cls+'">';
+  html += '<div class="result-title">'+v.name+'</div>';
+  html += '<div class="result-sub">'+v.work+'</div>';
+  html += '</div>';
+
+  html += '<div class="sec">';
+  html += '<div class="info-row"><span class="info-label">就労可否</span><span class="info-value '+(workRestricted?'warn':workOk?'ok':'ng')+'">'+v.work+'</span></div>';
+  html += '<div class="info-row"><span class="info-label">就労制限</span><span class="info-value">'+v.restriction+'</span></div>';
+  html += '<div class="info-row"><span class="info-label">労働時間</span><span class="info-value '+(workRestricted?'warn':'')+'">'+v.hours+'</span></div>';
+  html += '<div class="info-row"><span class="info-label">在留期間</span><span class="info-value">'+v.update+'</span></div>';
+  html += '<div class="info-row"><span class="info-label">家族帯同</span><span class="info-value">'+v.family+'</span></div>';
+  html += '</div>';
+
+  if(v.industries&&v.industries.length>0){
+    html += '<div class="sec"><div style="font-size:12px;font-weight:600;color:#333;margin-bottom:8px">就労可能な業種・分野</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
+    v.industries.forEach(function(ind){
+      html += '<span class="badge badge-blue">'+ind+'</span>';
+    });
+    html += '</div></div>';
+  }
+
+  html += '<div class="sec"><div style="font-size:12px;font-weight:600;color:#333;margin-bottom:8px">⚠ 注意事項</div>';
+  v.points.forEach(function(p){
+    html += '<div class="alert-box alert-warn" style="margin-bottom:4px">・'+p+'</div>';
+  });
+  html += '</div>';
+
+  el.innerHTML = html;
+}
+
+function calcExpiry() {
+  var dateStr = document.getElementById('expiry-input').value;
+  var name = document.getElementById('name-input').value;
+  var el = document.getElementById('expiry-result');
+  if(!dateStr){el.innerHTML='';return;}
+  try {
+    var r = dateStr.match(/令和(\d+)年(\d+)月(\d+)日/);
+    if(!r){el.innerHTML='<div class="alert-box alert-warn">形式：令和X年X月X日で入力してください</div>';return;}
+    var y=2018+parseInt(r[1]),m=parseInt(r[2])-1,d=parseInt(r[3]);
+    var days = Math.ceil((new Date(y,m,d)-new Date())/86400000);
+    var cls = days<0?'ng':days<=30?'ng':days<=90?'warn':'ok';
+    var msg = days<0?'期限切れ（'+Math.abs(days)+'日超過）':days===0?'本日期限！':days<=30?'あと'+days+'日（至急更新手続きを！）':days<=90?'あと'+days+'日（更新手続きを開始してください）':'あと'+days+'日';
+    el.innerHTML = '<div class="result-card '+cls+'">'
+      +'<div class="result-title">'+msg+'</div>'
+      +'<div class="result-sub">'+(name?escH(name)+'さんの在留期限：':'')+escH(dateStr)+'</div>'
+      +'</div>'
+      +(days<=90&&days>=0?'<div class="alert-box alert-warn">⚠ 在留期限の3か月前から更新手続きが可能です。早めに手続きを開始してください。</div>':'')
+      +(days<0?'<div class="alert-box alert-ng">🔴 在留期限が切れています。直ちに入管局に相談してください。期限切れのまま就労させると不法就労助長罪になります。</div>':'');
+  } catch(e){el.innerHTML='';}
+}
+
+function renderVisaList() {
+  var html = '';
+  Object.keys(VISAS).forEach(function(key){
+    var v = VISAS[key];
+    var workOk = v.work.indexOf('制限なし')>=0;
+    var workRestricted = v.work.indexOf('28時間')>=0;
+    var workLimited = v.work.indexOf('指定')>=0||v.work.indexOf('計画')>=0;
+    var badgeCls = workRestricted?'badge-warn':workOk?'badge-ok':workLimited?'badge-blue':'badge-ng';
+    var badgeLbl = workRestricted?'条件付就労':workOk?'就労制限なし':workLimited?'指定業務のみ':'要資格外活動許可';
+    html += '<div class="sec" style="margin-bottom:.75rem">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:.5rem">';
+    html += '<div style="font-size:14px;font-weight:700;color:#185FA5;flex:1">'+v.name+'</div>';
+    html += '<span class="badge '+badgeCls+'">'+badgeLbl+'</span>';
+    html += '</div>';
+    html += '<div class="info-row"><span class="info-label">就労</span><span class="info-value" style="font-size:12px">'+v.work+'</span></div>';
+    html += '<div class="info-row"><span class="info-label">在留期間</span><span class="info-value" style="font-size:12px">'+v.update+'</span></div>';
+    html += '<div class="info-row"><span class="info-label">家族帯同</span><span class="info-value" style="font-size:12px">'+v.family+'</span></div>';
+    html += '</div>';
+  });
+  document.getElementById('visa-list-content').innerHTML = html;
+}
+
+function addExpiryItem() {
+  expiryItems.push({name:'',visa:'',expiry:''});
+  renderExpiryList();
+}
+
+function updateExpiry(i,key,val){ expiryItems[i][key]=val; renderExpiryList(); }
+function delExpiry(i){ expiryItems.splice(i,1); renderExpiryList(); }
+
+function renderExpiryList() {
+  var html = '';
+  if(expiryItems.length===0){
+    html='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">「追加する」ボタンからスタッフを追加してください</div>';
+  } else {
+    expiryItems.forEach(function(item,i){
+      var days = null;
+      if(item.expiry){
+        try{
+          var r=item.expiry.match(/令和(\d+)年(\d+)月(\d+)日/);
+          if(r){var y=2018+parseInt(r[1]),m=parseInt(r[2])-1,d=parseInt(r[3]);days=Math.ceil((new Date(y,m,d)-new Date())/86400000);}
+        }catch(e){}
+      }
+      var st = days===null?'gray':days<0?'ng':days<=30?'ng':days<=90?'warn':'ok';
+      var stLabel = days===null?'—':days<0?Math.abs(days)+'日超過':days===0?'本日期限':'あと'+days+'日';
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #eee;flex-wrap:wrap">';
+      html += '<input type="text" value="'+escH(item.name)+'" placeholder="氏名" style="width:120px;font-size:12px;padding:5px 8px;border:1px solid #ddd;border-radius:6px" oninput="updateExpiry('+i+',\'name\',this.value)">';
+      html += '<input type="text" value="'+escH(item.expiry)+'" placeholder="令和X年X月X日" style="flex:1;min-width:140px;font-size:12px;padding:5px 8px;border:1px solid #ddd;border-radius:6px" oninput="updateExpiry('+i+',\'expiry\',this.value)">';
+      html += '<span class="badge '+(st==='ok'?'badge-ok':st==='warn'?'badge-warn':st==='ng'?'badge-ng':'badge-gray')+'">'+stLabel+'</span>';
+      html += '<button onclick="delExpiry('+i+')" style="padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer">削除</button>';
+      html += '</div>';
+    });
+  }
+  document.getElementById('expiry-list-content').innerHTML = html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>

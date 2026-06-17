@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>インボイス対応 請求管理ツール｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:720px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#0C447C,#185FA5);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#185FA5;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#0C447C;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E6F1FB}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus{border-color:#185FA5}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.invoice-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.invoice-card.paid{border-color:#1D9E75;background:#F0FFF8}
+.invoice-card.unpaid{border-color:#EF9F27;background:#FFFBF0}
+.invoice-card.overdue{border-color:#E24B4A;background:#FFF5F5}
+.invoice-header{display:flex;align-items:center;gap:8px;margin-bottom:.5rem;cursor:pointer}
+.invoice-name{font-size:13px;font-weight:700;flex:1}
+.invoice-amount{font-size:14px;font-weight:700;color:#0C447C}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-gray{background:#f0f0f0;color:#666}
+.invoice-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.invoice-detail.open{display:block}
+.add-btn{width:100%;padding:10px;border:2px dashed #185FA5;border-radius:10px;background:none;color:#185FA5;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.add-btn:hover{background:#E6F1FB}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:20px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.alert-box{border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:.5rem;line-height:1.6}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-blue{background:#E6F1FB;border:1px solid #185FA5;color:#0C447C}
+.calc-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:13px}
+.calc-row:last-child{border-bottom:none}
+.calc-row.total{font-weight:700;font-size:14px;padding-top:8px}
+.cta-box{background:linear-gradient(135deg,#0C447C,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow インボイス対応 請求管理ツール｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>📄 インボイス対応 請求管理ツール</h1>
+  <p>社労士・行政書士事務所向けの請求・入金管理ツールです</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('invoices',this)">📄 請求一覧</button>
+  <button class="tab" onclick="switchTab('new',this)">➕ 新規作成</button>
+  <button class="tab" onclick="switchTab('summary',this)">📊 集計・分析</button>
+</div>
+
+<div id="tab-invoices"><div id="invoices-content"></div></div>
+<div id="tab-new" style="display:none"><div id="new-content"></div></div>
+<div id="tab-summary" style="display:none"><div id="summary-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版でさらに便利に</h3>
+  <p>本番版ではクラウド保存・PDF請求書自動生成・<br>入金アラートメール通知をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="mailto:akira.sakamoto5135@gmail.com" class="cta-btn">📧 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var invoices = [];
+var expanded = {};
+var newForm = {
+  client:'', invoiceNo:'', invoiceDate:'', dueDate:'',
+  items:[{name:'',qty:1,unit:'式',price:0}],
+  taxRate:10, status:'unpaid', memo:'',
+  registrationNo:'', clientRegistrationNo:''
+};
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['invoices','new','summary'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='invoices') renderInvoices();
+  if(tab==='new') renderNew();
+  if(tab==='summary') renderSummary();
+}
+
+function fmt(v){return Math.round(v).toLocaleString('ja-JP');}
+
+function calcInvoiceTotal(inv) {
+  var subtotal = (inv.items||[]).reduce(function(sum,item){return sum+(item.qty||0)*(item.price||0);},0);
+  var tax = Math.floor(subtotal * (inv.taxRate||10) / 100);
+  return {subtotal:subtotal, tax:tax, total:subtotal+tax};
+}
+
+function daysUntilDue(dateStr) {
+  if(!dateStr) return null;
+  try {
+    var parts = dateStr.split('-');
+    if(parts.length!==3) return null;
+    var d = new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+    return Math.ceil((d-new Date())/86400000);
+  } catch(e){return null;}
+}
+
+function getStatus(inv) {
+  if(inv.status==='paid') return {cls:'paid',badge:'badge-ok',label:'入金済'};
+  var days = daysUntilDue(inv.dueDate);
+  if(days!==null&&days<0) return {cls:'overdue',badge:'badge-ng',label:'期限超過'};
+  if(days!==null&&days<=7) return {cls:'unpaid',badge:'badge-warn',label:'期限間近'};
+  return {cls:'unpaid',badge:'badge-warn',label:'未入金'};
+}
+
+function toggleExpand(i){expanded[i]=!expanded[i];renderInvoices();}
+function upInvoice(i,key,val){invoices[i][key]=val;renderInvoices();}
+function delInvoice(i){if(!confirm('削除しますか？'))return;invoices.splice(i,1);renderInvoices();}
+
+function renderInvoices() {
+  var html='';
+  if(invoices.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">請求書がまだ登録されていません。<br>「新規作成」タブから作成してください。</div></div>';
+  } else {
+    invoices.forEach(function(inv,i){
+      var st = getStatus(inv);
+      var tot = calcInvoiceTotal(inv);
+      var days = daysUntilDue(inv.dueDate);
+      var isExp = expanded[i];
+      html+='<div class="invoice-card '+st.cls+'">';
+      html+='<div class="invoice-header" onclick="toggleExpand('+i+')">';
+      html+='<div style="flex:1">';
+      html+='<div class="invoice-name">'+(inv.client||'（顧問先未入力）')+'</div>';
+      html+='<div style="font-size:11px;color:#888">請求No.'+(inv.invoiceNo||'—')+' ／ 請求日：'+(inv.invoiceDate||'—')+'　支払期限：'+(inv.dueDate||'—')+'</div>';
+      html+='</div>';
+      html+='<div style="text-align:right">';
+      html+='<div class="invoice-amount">'+fmt(tot.total)+'円</div>';
+      html+='<span class="badge '+st.badge+'">'+st.label+'</span>';
+      if(days!==null&&days>=0&&days<=7&&inv.status!=='paid') html+='<span class="badge badge-ng" style="margin-left:4px">あと'+days+'日</span>';
+      html+='</div>';
+      html+='<span style="font-size:12px;color:#aaa;margin-left:8px">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+
+      html+='<div class="invoice-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r2" style="margin-bottom:.75rem">';
+      html+='<div class="f"><label>顧問先名</label><input type="text" value="'+escH(inv.client)+'" oninput="upInvoice('+i+',\'client\',this.value)"></div>';
+      html+='<div class="f"><label>請求番号</label><input type="text" value="'+escH(inv.invoiceNo)+'" oninput="upInvoice('+i+',\'invoiceNo\',this.value)"></div>';
+      html+='<div class="f"><label>請求日</label><input type="date" value="'+escH(inv.invoiceDate)+'" oninput="upInvoice('+i+',\'invoiceDate\',this.value)"></div>';
+      html+='<div class="f"><label>支払期限</label><input type="date" value="'+escH(inv.dueDate)+'" oninput="upInvoice('+i+',\'dueDate\',this.value)"></div>';
+      html+='<div class="f"><label>登録番号（自社）</label><input type="text" value="'+escH(inv.registrationNo)+'" placeholder="T1234567890123" oninput="upInvoice('+i+',\'registrationNo\',this.value)"></div>';
+      html+='<div class="f"><label>入金状況</label><select onchange="upInvoice('+i+',\'status\',this.value);renderInvoices()"><option value="unpaid" '+(inv.status==='unpaid'?'selected':'')+'>未入金</option><option value="paid" '+(inv.status==='paid'?'selected':'')+'>入金済</option></select></div>';
+      html+='</div>';
+      html+='<div style="background:#f7f7f7;border-radius:8px;padding:10px 12px;margin-bottom:.75rem">';
+      html+='<div class="calc-row"><span style="color:#666">小計</span><span>'+fmt(tot.subtotal)+'円</span></div>';
+      html+='<div class="calc-row"><span style="color:#666">消費税（'+inv.taxRate+'%）</span><span>'+fmt(tot.tax)+'円</span></div>';
+      html+='<div class="calc-row total"><span>合計</span><span style="color:#0C447C">'+fmt(tot.total)+'円</span></div>';
+      html+='</div>';
+      html+='<div class="f"><label>メモ</label><input type="text" value="'+escH(inv.memo)+'" placeholder="備考など" oninput="upInvoice('+i+',\'memo\',this.value)"></div>';
+      html+='<button class="del-btn" onclick="delInvoice('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  document.getElementById('invoices-content').innerHTML=html;
+}
+
+function renderNew() {
+  var html='<div class="sec"><div class="sec-title">➕ 新規請求書作成</div>';
+  html+='<div class="alert-blue" style="margin-bottom:1rem;padding:8px 12px;font-size:11px;background:#E6F1FB;border:1px solid #185FA5;border-radius:8px;color:#0C447C">📋 インボイス制度（適格請求書等保存方式）対応。登録番号を入力することで適格請求書として発行できます。</div>';
+  html+='<div class="r2">';
+  html+='<div class="f"><label>顧問先名 ★</label><input type="text" id="n-client" placeholder="例：株式会社〇〇" value="'+escH(newForm.client)+'" oninput="newForm.client=this.value"></div>';
+  html+='<div class="f"><label>請求番号</label><input type="text" id="n-no" placeholder="例：2025-001" value="'+escH(newForm.invoiceNo)+'" oninput="newForm.invoiceNo=this.value"></div>';
+  html+='<div class="f"><label>請求日</label><input type="date" id="n-date" value="'+newForm.invoiceDate+'" oninput="newForm.invoiceDate=this.value"></div>';
+  html+='<div class="f"><label>支払期限</label><input type="date" id="n-due" value="'+newForm.dueDate+'" oninput="newForm.dueDate=this.value"></div>';
+  html+='<div class="f"><label>自社登録番号（インボイス）</label><input type="text" id="n-reg" placeholder="T1234567890123" value="'+escH(newForm.registrationNo)+'" oninput="newForm.registrationNo=this.value"></div>';
+  html+='<div class="f"><label>消費税率</label><select id="n-tax" onchange="newForm.taxRate=parseInt(this.value)"><option value="10" '+(newForm.taxRate===10?'selected':'')+'>10%</option><option value="8" '+(newForm.taxRate===8?'selected':'')+'>8%（軽減税率）</option><option value="0" '+(newForm.taxRate===0?'selected':'')+'>0%（非課税）</option></select></div>';
+  html+='</div>';
+
+  html+='<div style="font-size:12px;font-weight:600;color:#0C447C;margin-bottom:6px">📋 請求明細</div>';
+  html+='<div id="items-area">';
+  newForm.items.forEach(function(item,i){
+    html+='<div style="display:grid;grid-template-columns:2fr 1fr 1fr 2fr auto;gap:6px;margin-bottom:6px;align-items:center">';
+    html+='<input type="text" value="'+escH(item.name)+'" placeholder="項目名（例：顧問料）" style="font-size:12px;padding:6px 8px;border:1px solid #ddd;border-radius:6px" oninput="newForm.items['+i+'].name=this.value">';
+    html+='<input type="number" value="'+item.qty+'" placeholder="数量" style="font-size:12px;padding:6px 8px;border:1px solid #ddd;border-radius:6px" oninput="newForm.items['+i+'].qty=parseInt(this.value)||1;updateNewTotal()">';
+    html+='<select style="font-size:12px;padding:6px 8px;border:1px solid #ddd;border-radius:6px" onchange="newForm.items['+i+'].unit=this.value"><option '+(item.unit==='式'?'selected':'')+'>式</option><option '+(item.unit==='件'?'selected':'')+'>件</option><option '+(item.unit==='時間'?'selected':'')+'>時間</option><option '+(item.unit==='月'?'selected':'')+'>月</option></select>';
+    html+='<input type="number" value="'+item.price+'" placeholder="単価（円）" style="font-size:12px;padding:6px 8px;border:1px solid #ddd;border-radius:6px" oninput="newForm.items['+i+'].price=parseInt(this.value)||0;updateNewTotal()">';
+    html+='<button onclick="removeItem('+i+')" style="padding:4px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer">削</button>';
+    html+='</div>';
+  });
+  html+='</div>';
+  html+='<button onclick="addItem()" style="width:100%;padding:7px;border:1.5px dashed #185FA5;border-radius:8px;background:none;color:#185FA5;font-size:12px;cursor:pointer;margin-bottom:.75rem">＋ 明細を追加</button>';
+  html+='<div id="new-total" style="background:#f7f7f7;border-radius:8px;padding:10px 12px;margin-bottom:.75rem"></div>';
+  html+='<div class="f"><label>メモ・備考</label><input type="text" id="n-memo" placeholder="備考など" value="'+escH(newForm.memo)+'" oninput="newForm.memo=this.value"></div>';
+  html+='<button onclick="saveInvoice()" style="width:100%;padding:12px;border:none;border-radius:10px;background:#185FA5;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">📄 請求書を登録する</button>';
+  html+='</div>';
+  document.getElementById('new-content').innerHTML=html;
+  updateNewTotal();
+}
+
+function updateNewTotal() {
+  var subtotal = newForm.items.reduce(function(sum,item){return sum+(item.qty||0)*(item.price||0);},0);
+  var tax = Math.floor(subtotal*(newForm.taxRate||10)/100);
+  var total = subtotal+tax;
+  var el = document.getElementById('new-total');
+  if(el) el.innerHTML='<div class="calc-row"><span style="color:#666">小計</span><span>'+fmt(subtotal)+'円</span></div>'
+    +'<div class="calc-row"><span style="color:#666">消費税（'+(newForm.taxRate||10)+'%）</span><span>'+fmt(tax)+'円</span></div>'
+    +'<div class="calc-row total"><span>合計</span><span style="color:#0C447C;font-size:16px">'+fmt(total)+'円</span></div>';
+}
+
+function addItem(){newForm.items.push({name:'',qty:1,unit:'式',price:0});renderNew();}
+function removeItem(i){if(newForm.items.length>1){newForm.items.splice(i,1);renderNew();}}
+
+function saveInvoice() {
+  if(!newForm.client){alert('顧問先名を入力してください');return;}
+  invoices.push(JSON.parse(JSON.stringify(newForm)));
+  newForm={client:'',invoiceNo:'',invoiceDate:'',dueDate:'',items:[{name:'',qty:1,unit:'式',price:0}],taxRate:10,status:'unpaid',memo:'',registrationNo:'',clientRegistrationNo:''};
+  alert('請求書を登録しました！');
+  switchTab('invoices',document.querySelectorAll('.tab')[0]);
+}
+
+function renderSummary() {
+  var total=invoices.length;
+  var paid=invoices.filter(function(i){return i.status==='paid';}).length;
+  var unpaid=invoices.filter(function(i){return i.status!=='paid';}).length;
+  var totalAmt=invoices.reduce(function(sum,i){return sum+calcInvoiceTotal(i).total;},0);
+  var paidAmt=invoices.filter(function(i){return i.status==='paid';}).reduce(function(sum,i){return sum+calcInvoiceTotal(i).total;},0);
+  var unpaidAmt=totalAmt-paidAmt;
+
+  var html='<div class="sec"><div class="sec-title">📊 請求集計</div>';
+  html+='<div class="summary-grid">';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#185FA5">'+total+'</div><div class="summary-label">請求件数</div></div>';
+  html+='<div class="summary-card" style="background:#E1F5EE;border-color:#1D9E75"><div class="summary-num" style="color:#0F6E56">'+paid+'</div><div class="summary-label">入金済</div></div>';
+  html+='<div class="summary-card" style="background:#FAEEDA;border-color:#EF9F27"><div class="summary-num" style="color:#854F0B">'+unpaid+'</div><div class="summary-label">未入金</div></div>';
+  html+='</div>';
+  html+='<div style="background:#f7f7f7;border-radius:8px;padding:10px 12px;margin-bottom:.75rem">';
+  html+='<div class="calc-row"><span style="color:#666">請求総額</span><span style="font-weight:600">'+fmt(totalAmt)+'円</span></div>';
+  html+='<div class="calc-row"><span style="color:#666">入金済額</span><span style="font-weight:600;color:#0F6E56">'+fmt(paidAmt)+'円</span></div>';
+  html+='<div class="calc-row total"><span>未入金額</span><span style="color:#A32D2D;font-size:16px">'+fmt(unpaidAmt)+'円</span></div>';
+  html+='</div>';
+
+  var overdue=invoices.filter(function(i){
+    var st=getStatus(i);
+    return st.label==='期限超過';
+  });
+  if(overdue.length>0){
+    html+='<div style="font-size:12px;font-weight:600;color:#A32D2D;margin-bottom:6px">🔴 入金期限超過</div>';
+    overdue.forEach(function(i){
+      html+='<div class="alert-ng">'+escH(i.client)+'：'+fmt(calcInvoiceTotal(i).total)+'円　支払期限：'+escH(i.dueDate)+'</div>';
+    });
+  }
+
+  var soon=invoices.filter(function(i){
+    var days=daysUntilDue(i.dueDate);
+    return i.status!=='paid'&&days!==null&&days>=0&&days<=7;
+  });
+  if(soon.length>0){
+    html+='<div style="font-size:12px;font-weight:600;color:#854F0B;margin:8px 0 6px">🟡 期限間近（7日以内）</div>';
+    soon.forEach(function(i){
+      var days=daysUntilDue(i.dueDate);
+      html+='<div class="alert-warn">'+escH(i.client)+'：'+fmt(calcInvoiceTotal(i).total)+'円　あと'+days+'日</div>';
+    });
+  }
+
+  if(total===0) html+='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">請求書を登録すると集計が表示されます</div>';
+  html+='</div>';
+  document.getElementById('summary-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderInvoices();
+</script>
+</body>
+</html>
