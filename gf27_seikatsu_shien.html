@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>外国人スタッフ 生活支援管理システム｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:760px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#1D7A9E,#3FA8CC);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#1D7A9E;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#155A77;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E5F4F9}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select,.f textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#1D7A9E}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-blue{background:#E5F4F9;color:#155A77}
+.badge-gray{background:#f0f0f0;color:#666}
+.alert-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:.75rem;line-height:1.7}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-blue{background:#E5F4F9;border:1px solid #1D7A9E;color:#155A77}
+.support-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.support-header{display:flex;align-items:center;gap:8px;margin-bottom:.5rem;cursor:pointer}
+.support-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.support-detail.open{display:block}
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid #f0f0f0}
+.check-item:last-child{border-bottom:none}
+.chk{width:20px;height:20px;border-radius:5px;border:1.5px solid #ddd;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;margin-top:1px}
+.chk.done{background:#1D7A9E;border-color:#1D7A9E}
+.chk-title{font-size:12px;color:#333;flex:1}
+.chk-title.done{color:#1D7A9E;text-decoration:line-through}
+.add-btn{width:100%;padding:10px;border:2px dashed #1D7A9E;border-radius:10px;background:none;color:#1D7A9E;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.progress-bar-bg{height:8px;background:#eee;border-radius:4px;margin-top:4px}
+.progress-bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px 6px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:20px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.cta-box{background:linear-gradient(135deg,#155A77,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 外国人スタッフ 生活支援管理システム｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>🏘️ 外国人スタッフ 生活支援管理システム</h1>
+  <p>住居・銀行口座・行政手続き等の生活支援を一元管理<br>特定技能・育成就労の支援計画の実施記録にも活用</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('staff',this)">👤 スタッフ別支援状況</button>
+  <button class="tab" onclick="switchTab('checklist',this)">✅ 生活支援チェックリスト</button>
+  <button class="tab" onclick="switchTab('summary',this)">📊 支援状況サマリー</button>
+</div>
+
+<div id="tab-staff"><div id="staff-content"></div></div>
+<div id="tab-checklist" style="display:none"><div id="checklist-content"></div></div>
+<div id="tab-summary" style="display:none"><div id="summary-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版でさらに便利に</h3>
+  <p>本番版ではクラウド保存・支援記録のPDF出力・<br>複数担当者での共有をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="https://forms.gle/xrgH2CtGaCL7LXHE6" target="_blank" class="cta-btn">📝 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var staffList = [];
+var expanded = {};
+
+var SUPPORT_ITEMS = [
+  {id:'s1', cat:'住居', title:'住居の確保（連帯保証・社宅提供等）'},
+  {id:'s2', cat:'住居', title:'住居契約の手続き補助'},
+  {id:'s3', cat:'住居', title:'家具・家電の準備状況確認'},
+  {id:'s4', cat:'金融', title:'銀行口座の開設補助'},
+  {id:'s5', cat:'金融', title:'携帯電話契約の補助'},
+  {id:'s6', cat:'インフラ', title:'電気・ガス・水道の契約補助'},
+  {id:'s7', cat:'インフラ', title:'インターネット回線契約の補助'},
+  {id:'s8', cat:'行政手続き', title:'住民登録・転入届の補助'},
+  {id:'s9', cat:'行政手続き', title:'マイナンバーカード取得の補助'},
+  {id:'s10', cat:'行政手続き', title:'国民健康保険・年金の手続き補助'},
+  {id:'s11', cat:'生活オリエンテーション', title:'ゴミ出しルールの説明'},
+  {id:'s12', cat:'生活オリエンテーション', title:'交通機関の利用方法説明'},
+  {id:'s13', cat:'生活オリエンテーション', title:'緊急時の連絡先・対応説明'},
+  {id:'s14', cat:'生活オリエンテーション', title:'医療機関の利用方法説明'}
+];
+
+var NATIONALITIES = ['ベトナム','中国','フィリピン','インドネシア','ミャンマー','タイ','カンボジア','その他'];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['staff','checklist','summary'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='staff') renderStaff();
+  if(tab==='checklist') renderChecklist();
+  if(tab==='summary') renderSummary();
+}
+
+function addStaffMember(){
+  var s={name:'',nationality:'ベトナム',moveInDate:'',address:'',emergency:'',checks:{}};
+  staffList.push(s);
+  renderStaff();
+}
+function delStaffMember(i){if(!confirm('削除しますか？'))return;staffList.splice(i,1);renderStaff();}
+function upStaffMember(i,key,val){staffList[i][key]=val;}
+function toggleExpand(i){expanded[i]=!expanded[i];renderStaff();}
+function toggleStaffCheck(i,id){
+  if(!staffList[i].checks) staffList[i].checks={};
+  staffList[i].checks[id]=!staffList[i].checks[id];
+  renderStaff();
+}
+
+function getCompletionRate(s){
+  var done=SUPPORT_ITEMS.filter(function(item){return s.checks&&s.checks[item.id];}).length;
+  return Math.round(done/SUPPORT_ITEMS.length*100);
+}
+
+function renderStaff(){
+  var html='';
+  if(staffList.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">スタッフがまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    staffList.forEach(function(s,i){
+      var isExp=expanded[i];
+      var pct=getCompletionRate(s);
+      html+='<div class="support-card">';
+      html+='<div class="support-header" onclick="toggleExpand('+i+')">';
+      html+='<div style="flex:1">';
+      html+='<div style="font-size:13px;font-weight:700">'+(s.name||'（氏名未入力）')+'</div>';
+      html+='<div style="font-size:11px;color:#888">'+escH(s.nationality)+'　支援進捗：'+pct+'%</div>';
+      html+='</div>';
+      html+='<span style="font-size:12px;color:#aaa">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+      html+='<div class="progress-bar-bg"><div class="progress-bar-fill" style="width:'+pct+'%;background:'+(pct===100?'#1D9E75':pct>50?'#1D7A9E':'#EF9F27')+'"></div></div>';
+      html+='<div class="support-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r3">';
+      html+='<div class="f"><label>氏名</label><input type="text" value="'+escH(s.name)+'" placeholder="氏名" oninput="upStaffMember('+i+',\'name\',this.value)"></div>';
+      html+='<div class="f"><label>国籍</label><select onchange="upStaffMember('+i+',\'nationality\',this.value)">'+NATIONALITIES.map(function(n){return'<option '+(s.nationality===n?'selected':'')+'>'+n+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>入国・入社日</label><input type="date" value="'+escH(s.moveInDate)+'" oninput="upStaffMember('+i+',\'moveInDate\',this.value)"></div>';
+      html+='<div class="f" style="grid-column:1/-1"><label>住所</label><input type="text" value="'+escH(s.address)+'" placeholder="住所" oninput="upStaffMember('+i+',\'address\',this.value)"></div>';
+      html+='<div class="f" style="grid-column:1/-1"><label>緊急連絡先</label><input type="text" value="'+escH(s.emergency)+'" placeholder="緊急連絡先" oninput="upStaffMember('+i+',\'emergency\',this.value)"></div>';
+      html+='</div>';
+      html+='<div style="font-size:12px;font-weight:600;color:#155A77;margin:.75rem 0 4px">生活支援チェック</div>';
+      SUPPORT_ITEMS.forEach(function(item){
+        var d=s.checks&&s.checks[item.id];
+        html+='<div class="check-item"><div class="chk'+(d?' done':'')+'" onclick="toggleStaffCheck('+i+',\''+item.id+'\')">'+(d?'✓':'')+'</div><div class="chk-title'+(d?' done':'')+'">['+item.cat+'] '+item.title+'</div></div>';
+      });
+      html+='<button class="del-btn" style="margin-top:.5rem" onclick="delStaffMember('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addStaffMember()">＋ スタッフを追加</button>';
+  document.getElementById('staff-content').innerHTML=html;
+}
+
+function renderChecklist(){
+  var html='<div class="sec"><div class="sec-title">✅ 生活支援チェックリスト（標準項目）</div>';
+  html+='<div class="alert-blue">特定技能・育成就労の支援計画における「生活オリエンテーション」「住居確保」等の実施事項に対応しています。</div>';
+
+  var categories={};
+  SUPPORT_ITEMS.forEach(function(item){
+    if(!categories[item.cat]) categories[item.cat]=[];
+    categories[item.cat].push(item);
+  });
+
+  Object.keys(categories).forEach(function(cat){
+    html+='<div style="font-size:13px;font-weight:700;color:#155A77;margin:.75rem 0 6px">'+cat+'</div>';
+    categories[cat].forEach(function(item){
+      html+='<div style="font-size:12px;color:#555;padding:5px 0;border-bottom:1px solid #f0f0f0">・'+item.title+'</div>';
+    });
+  });
+  html+='</div>';
+  document.getElementById('checklist-content').innerHTML=html;
+}
+
+function renderSummary(){
+  var html='<div class="sec"><div class="sec-title">📊 支援状況サマリー</div>';
+  if(staffList.length===0){
+    html+='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">スタッフ別支援状況タブでスタッフを登録するとサマリーが表示されます</div>';
+  } else {
+    var totalStaff=staffList.length;
+    var avgRate=Math.round(staffList.reduce(function(a,s){return a+getCompletionRate(s);},0)/totalStaff);
+    var completed=staffList.filter(function(s){return getCompletionRate(s)===100;}).length;
+
+    html+='<div class="summary-grid">';
+    html+='<div class="summary-card"><div class="summary-num" style="color:#1D7A9E">'+totalStaff+'</div><div class="summary-label">対象者数</div></div>';
+    html+='<div class="summary-card"><div class="summary-num" style="color:#0F6E56">'+completed+'</div><div class="summary-label">支援完了</div></div>';
+    html+='<div class="summary-card"><div class="summary-num" style="color:#854F0B">'+avgRate+'%</div><div class="summary-label">平均進捗率</div></div>';
+    html+='</div>';
+
+    html+='<div style="font-size:12px;font-weight:600;color:#333;margin-bottom:8px">対象者別進捗</div>';
+    staffList.forEach(function(s){
+      var pct=getCompletionRate(s);
+      html+='<div style="margin-bottom:.5rem">';
+      html+='<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px"><span>'+escH(s.name||'（氏名未入力）')+'</span><span style="font-weight:600">'+pct+'%</span></div>';
+      html+='<div class="progress-bar-bg"><div class="progress-bar-fill" style="width:'+pct+'%;background:'+(pct===100?'#1D9E75':pct>50?'#1D7A9E':'#EF9F27')+'"></div></div>';
+      html+='</div>';
+    });
+  }
+  html+='</div>';
+  document.getElementById('summary-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderStaff();
+</script>
+</body>
+</html>
