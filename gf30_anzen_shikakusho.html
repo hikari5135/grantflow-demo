@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>製造業 安全管理・資格証管理システム｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:760px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#B8860B,#D4A017);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#B8860B;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#7A5A07;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #FBF3E0}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select,.f textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#B8860B}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-gold{background:#FBF3E0;color:#7A5A07}
+.badge-gray{background:#f0f0f0;color:#666}
+.alert-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:.75rem;line-height:1.7}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.alert-gold{background:#FBF3E0;border:1px solid #B8860B;color:#7A5A07}
+.worker-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.worker-card.expired{border-color:#E24B4A;background:#FFF5F5}
+.worker-card.warning{border-color:#EF9F27;background:#FFFBF0}
+.worker-header{display:flex;align-items:center;gap:8px;margin-bottom:.5rem;cursor:pointer}
+.worker-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.worker-detail.open{display:block}
+.qual-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:12px}
+.qual-item:last-child{border-bottom:none}
+.add-btn{width:100%;padding:10px;border:2px dashed #B8860B;border-radius:10px;background:none;color:#B8860B;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px 6px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:20px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.cta-box{background:linear-gradient(135deg,#7A5A07,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 製造業 安全管理・資格証管理システム｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>⚙️ 製造業 安全管理・資格証管理システム</h1>
+  <p>フォークリフト・玉掛け等の資格証の有効期限を一元管理<br>外国人スタッフの安全衛生教育記録も管理</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('workers',this)">👤 作業員別資格管理</button>
+  <button class="tab" onclick="switchTab('qualifications',this)">📋 製造業 主要資格一覧</button>
+  <button class="tab" onclick="switchTab('summary',this)">📊 有効期限サマリー</button>
+</div>
+
+<div id="tab-workers"><div id="workers-content"></div></div>
+<div id="tab-qualifications" style="display:none"><div id="qualifications-content"></div></div>
+<div id="tab-summary" style="display:none"><div id="summary-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版でさらに便利に</h3>
+  <p>本番版ではクラウド保存・更新期限の自動メール通知・<br>資格証画像のアップロード保存をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="https://forms.gle/xrgH2CtGaCL7LXHE6" target="_blank" class="cta-btn">📝 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var workers = [];
+var expanded = {};
+
+var QUALIFICATIONS = ['フォークリフト運転技能講習','玉掛け技能講習','クレーン運転特別教育','プレス機械作業主任者','有機溶剤作業主任者','特定化学物質作業主任者','酸素欠乏危険作業主任者','床上操作式クレーン運転技能講習','アーク溶接特別教育','安全衛生教育（雇入時）'];
+var NATIONALITIES = ['日本','ベトナム','中国','フィリピン','インドネシア','ミャンマー','タイ','その他'];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['workers','qualifications','summary'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='workers') renderWorkers();
+  if(tab==='qualifications') renderQualifications();
+  if(tab==='summary') renderSummary();
+}
+
+function addWorker(){
+  workers.push({name:'',nationality:'日本',dept:'',quals:[]});
+  renderWorkers();
+}
+function delWorker(i){if(!confirm('削除しますか？'))return;workers.splice(i,1);renderWorkers();}
+function upWorker(i,key,val){workers[i][key]=val;renderWorkers();}
+function toggleExpand(i){expanded[i]=!expanded[i];renderWorkers();}
+
+function addQual(wi){
+  workers[wi].quals.push({name:QUALIFICATIONS[0],acquireDate:'',expiryDate:''});
+  renderWorkers();
+}
+function delQual(wi,qi){workers[wi].quals.splice(qi,1);renderWorkers();}
+function upQual(wi,qi,key,val){workers[wi].quals[qi][key]=val;renderWorkers();}
+
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  try{var d=new Date(dateStr);return Math.ceil((d-new Date())/86400000);}catch(e){return null;}
+}
+
+function getWorkerStatus(w){
+  if(!w.quals||w.quals.length===0) return '';
+  var hasExpired=w.quals.some(function(q){var d=daysUntil(q.expiryDate);return d!==null&&d<0;});
+  var hasWarning=w.quals.some(function(q){var d=daysUntil(q.expiryDate);return d!==null&&d>=0&&d<=60;});
+  if(hasExpired) return 'expired';
+  if(hasWarning) return 'warning';
+  return '';
+}
+
+function renderWorkers(){
+  var html='';
+  if(workers.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">作業員がまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    workers.forEach(function(w,i){
+      var isExp=expanded[i];
+      var st=getWorkerStatus(w);
+      html+='<div class="worker-card '+st+'">';
+      html+='<div class="worker-header" onclick="toggleExpand('+i+')">';
+      html+='<div style="flex:1">';
+      html+='<div style="font-size:13px;font-weight:700">'+(w.name||'（氏名未入力）')+'</div>';
+      html+='<div style="font-size:11px;color:#888">'+escH(w.nationality)+'　'+escH(w.dept||'部署未入力')+'　資格'+(w.quals?w.quals.length:0)+'件</div>';
+      html+='</div>';
+      if(st==='expired') html+='<span class="badge badge-ng">期限切れあり</span>';
+      else if(st==='warning') html+='<span class="badge badge-warn">期限間近</span>';
+      html+='<span style="font-size:12px;color:#aaa;margin-left:4px">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+      html+='<div class="worker-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r3">';
+      html+='<div class="f"><label>氏名</label><input type="text" value="'+escH(w.name)+'" placeholder="氏名" oninput="upWorker('+i+',\'name\',this.value)"></div>';
+      html+='<div class="f"><label>国籍</label><select onchange="upWorker('+i+',\'nationality\',this.value)">'+NATIONALITIES.map(function(n){return'<option '+(w.nationality===n?'selected':'')+'>'+n+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>部署・ライン</label><input type="text" value="'+escH(w.dept)+'" placeholder="例：第1製造ライン" oninput="upWorker('+i+',\'dept\',this.value)"></div>';
+      html+='</div>';
+
+      html+='<div style="font-size:12px;font-weight:600;color:#7A5A07;margin:.75rem 0 4px">保有資格</div>';
+      if(w.quals&&w.quals.length>0){
+        w.quals.forEach(function(q,qi){
+          var days=daysUntil(q.expiryDate);
+          var col=days!==null&&days<0?'#A32D2D':days!==null&&days<=60?'#854F0B':'#333';
+          html+='<div style="border:1px solid #eee;border-radius:8px;padding:8px;margin-bottom:6px">';
+          html+='<div class="r3">';
+          html+='<div class="f"><label>資格名</label><select onchange="upQual('+i+','+qi+',\'name\',this.value)">'+QUALIFICATIONS.map(function(q2){return'<option '+(q.name===q2?'selected':'')+'>'+q2+'</option>';}).join('')+'</select></div>';
+          html+='<div class="f"><label>取得日</label><input type="date" value="'+escH(q.acquireDate)+'" oninput="upQual('+i+','+qi+',\'acquireDate\',this.value)"></div>';
+          html+='<div class="f"><label>有効期限</label><input type="date" value="'+escH(q.expiryDate)+'" oninput="upQual('+i+','+qi+',\'expiryDate\',this.value)"></div>';
+          html+='</div>';
+          if(days!==null) html+='<div style="font-size:11px;color:'+col+';font-weight:600">'+(days<0?Math.abs(days)+'日超過':'あと'+days+'日')+'</div>';
+          html+='<button class="del-btn" style="margin-top:4px" onclick="delQual('+i+','+qi+')">削除</button>';
+          html+='</div>';
+        });
+      }
+      html+='<button style="width:100%;padding:8px;border:1.5px dashed #B8860B;border-radius:8px;background:none;color:#B8860B;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit" onclick="addQual('+i+')">＋ 資格を追加</button>';
+
+      html+='<button class="del-btn" style="margin-top:.75rem" onclick="delWorker('+i+')">🗑 作業員を削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addWorker()">＋ 作業員を追加</button>';
+  document.getElementById('workers-content').innerHTML=html;
+}
+
+function renderQualifications(){
+  var html='<div class="sec"><div class="sec-title">📋 製造業 主要資格・特別教育一覧</div>';
+  html+='<div class="alert-gold">製造現場で必要となる代表的な資格・特別教育です。外国人スタッフも母国語での講習が必要な場合があります。</div>';
+  QUALIFICATIONS.forEach(function(q){
+    html+='<div style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px">・'+q+'</div>';
+  });
+  html+='<div class="alert-warn" style="margin-top:.75rem">🟡 無資格者に特定の作業をさせた場合、労働安全衛生法違反となり罰則の対象となります。</div>';
+  html+='</div>';
+  document.getElementById('qualifications-content').innerHTML=html;
+}
+
+function renderSummary(){
+  var html='<div class="sec"><div class="sec-title">📊 有効期限サマリー</div>';
+  var allQuals=[];
+  workers.forEach(function(w){
+    (w.quals||[]).forEach(function(q){allQuals.push({worker:w.name,qual:q});});
+  });
+
+  if(workers.length===0){
+    html+='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">作業員別資格管理タブで登録するとサマリーが表示されます</div>';
+  } else {
+    var expired=allQuals.filter(function(a){var d=daysUntil(a.qual.expiryDate);return d!==null&&d<0;});
+    var warning=allQuals.filter(function(a){var d=daysUntil(a.qual.expiryDate);return d!==null&&d>=0&&d<=60;});
+    var ok=allQuals.filter(function(a){var d=daysUntil(a.qual.expiryDate);return d!==null&&d>60;});
+
+    html+='<div class="summary-grid">';
+    html+='<div class="summary-card"><div class="summary-num" style="color:#7A5A07">'+workers.length+'</div><div class="summary-label">作業員数</div></div>';
+    html+='<div class="summary-card"><div class="summary-num" style="color:#333">'+allQuals.length+'</div><div class="summary-label">保有資格総数</div></div>';
+    html+='<div class="summary-card" style="background:#FAEEDA;border-color:#EF9F27"><div class="summary-num" style="color:#854F0B">'+warning.length+'</div><div class="summary-label">期限60日以内</div></div>';
+    html+='<div class="summary-card" style="background:#FCEBEB;border-color:#E24B4A"><div class="summary-num" style="color:#A32D2D">'+expired.length+'</div><div class="summary-label">期限切れ</div></div>';
+    html+='</div>';
+
+    if(expired.length>0){
+      html+='<div style="font-size:12px;font-weight:600;color:#A32D2D;margin:1rem 0 6px">🔴 期限切れの資格</div>';
+      expired.forEach(function(a){
+        html+='<div class="alert-ng">'+escH(a.worker||'（氏名未入力）')+'：'+escH(a.qual.name)+'</div>';
+      });
+    }
+    if(warning.length>0){
+      html+='<div style="font-size:12px;font-weight:600;color:#854F0B;margin:1rem 0 6px">🟡 期限が近い資格</div>';
+      warning.forEach(function(a){
+        var days=daysUntil(a.qual.expiryDate);
+        html+='<div class="alert-warn">'+escH(a.worker||'（氏名未入力）')+'：'+escH(a.qual.name)+'（あと'+days+'日）</div>';
+      });
+    }
+  }
+  html+='</div>';
+  document.getElementById('summary-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderWorkers();
+</script>
+</body>
+</html>
