@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>介護業 外国人スタッフ管理システム｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:760px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#7B1FA2,#AB47BC);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#7B1FA2;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#6A1B9A;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #F3E5F5}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select,.f textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#7B1FA2}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-purple{background:#F3E5F5;color:#6A1B9A}
+.badge-gray{background:#f0f0f0;color:#666}
+.alert-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:.75rem;line-height:1.7}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-ng{background:#FCEBEB;border:1px solid #E24B4A;color:#A32D2D}
+.alert-purple{background:#F3E5F5;border:1px solid #7B1FA2;color:#6A1B9A}
+.staff-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.staff-card.alert{border-color:#E24B4A;background:#FFF5F5}
+.staff-card.warn{border-color:#EF9F27;background:#FFFBF0}
+.staff-header{display:flex;align-items:center;gap:8px;margin-bottom:.5rem;cursor:pointer}
+.staff-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.staff-detail.open{display:block}
+.check-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:12px}
+.check-item:last-child{border-bottom:none}
+.chk{width:18px;height:18px;border-radius:4px;border:1.5px solid #ddd;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff}
+.chk.done{background:#7B1FA2;border-color:#7B1FA2}
+.add-btn{width:100%;padding:10px;border:2px dashed #7B1FA2;border-radius:10px;background:none;color:#7B1FA2;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px 6px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:20px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.progress-bar-bg{height:8px;background:#eee;border-radius:4px;margin-top:4px}
+.progress-bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.cta-box{background:linear-gradient(135deg,#6A1B9A,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 介護業 外国人スタッフ管理システム｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>🏥 介護業 外国人スタッフ管理システム</h1>
+  <p>在留資格・介護資格・研修記録を一元管理<br>介護業特有の外国人雇用に対応</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('staff',this)">👤 スタッフ管理</button>
+  <button class="tab" onclick="switchTab('training',this)">📚 研修・資格管理</button>
+  <button class="tab" onclick="switchTab('summary',this)">📊 サマリー</button>
+</div>
+
+<div id="tab-staff"><div id="staff-content"></div></div>
+<div id="tab-training" style="display:none"><div id="training-content"></div></div>
+<div id="tab-summary" style="display:none"><div id="summary-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版でさらに便利に</h3>
+  <p>本番版ではクラウド保存・研修記録のレポート出力・<br>在留期限アラートメール通知をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="https://forms.gle/xrgH2CtGaCL7LXHE6" target="_blank" class="cta-btn">📝 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var staffList = [];
+var expanded = {};
+
+var NATIONALITIES = ['ベトナム','中国','フィリピン','インドネシア','ミャンマー','タイ','その他'];
+var VISA_TYPES = ['特定技能1号（介護）','技能実習（介護）','育成就労（介護）','介護（在留資格）','技術・人文知識・国際業務','永住者','その他'];
+var POSITIONS = ['介護士','介護福祉士','ホームヘルパー','看護助手','グループホームスタッフ','デイサービススタッフ','その他'];
+
+var TRAINING_ITEMS = [
+  {id:'t1', title:'雇入れ時安全衛生教育'},
+  {id:'t2', title:'感染症予防研修'},
+  {id:'t3', title:'高齢者虐待防止研修'},
+  {id:'t4', title:'身体拘束廃止研修'},
+  {id:'t5', title:'認知症ケア研修'},
+  {id:'t6', title:'緊急時対応研修'},
+  {id:'t7', title:'プライバシー保護研修'},
+  {id:'t8', title:'介護記録の書き方研修'},
+  {id:'t9', title:'日本語コミュニケーション研修'},
+  {id:'t10', title:'リスクマネジメント研修'}
+];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['staff','training','summary'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='staff') renderStaff();
+  if(tab==='training') renderTraining();
+  if(tab==='summary') renderSummary();
+}
+
+function addStaff(){
+  staffList.push({name:'',nationality:'ベトナム',visa:'特定技能1号（介護）',position:'',visaExpiry:'',jlptLevel:'',checks:{}});
+  renderStaff();
+}
+function delStaff(i){if(!confirm('削除しますか？'))return;staffList.splice(i,1);renderStaff();}
+function upStaff(i,key,val){staffList[i][key]=val;renderStaff();}
+function toggleExpand(i){expanded[i]=!expanded[i];renderStaff();}
+function toggleCheck(i,id){
+  if(!staffList[i].checks) staffList[i].checks={};
+  staffList[i].checks[id]=!staffList[i].checks[id];
+  renderStaff();
+}
+
+function daysUntil(dateStr){
+  if(!dateStr) return null;
+  try{var d=new Date(dateStr);return Math.ceil((d-new Date())/86400000);}catch(e){return null;}
+}
+
+function getStatus(s){
+  var days=daysUntil(s.visaExpiry);
+  if(days!==null&&days<0) return 'alert';
+  if(days!==null&&days<=90) return 'warn';
+  return '';
+}
+
+function getTrainingRate(s){
+  var done=TRAINING_ITEMS.filter(function(t){return s.checks&&s.checks[t.id];}).length;
+  return Math.round(done/TRAINING_ITEMS.length*100);
+}
+
+function renderStaff(){
+  var html='';
+  if(staffList.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">スタッフがまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    staffList.forEach(function(s,i){
+      var isExp=expanded[i];
+      var st=getStatus(s);
+      var days=daysUntil(s.visaExpiry);
+      var pct=getTrainingRate(s);
+      html+='<div class="staff-card '+st+'">';
+      html+='<div class="staff-header" onclick="toggleExpand('+i+')">';
+      html+='<div style="flex:1">';
+      html+='<div style="font-size:13px;font-weight:700">'+(s.name||'（氏名未入力）')+'</div>';
+      html+='<div style="font-size:11px;color:#888">'+escH(s.nationality)+' ／ '+escH(s.visa)+' ／ 研修：'+pct+'%</div>';
+      html+='</div>';
+      if(days!==null){
+        var badgeCls=st==='alert'?'badge-ng':st==='warn'?'badge-warn':'badge-ok';
+        html+='<span class="badge '+badgeCls+'">'+(days<0?Math.abs(days)+'日超過':'あと'+days+'日')+'</span>';
+      }
+      html+='<span style="font-size:12px;color:#aaa;margin-left:4px">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+      html+='<div class="progress-bar-bg"><div class="progress-bar-fill" style="width:'+pct+'%;background:'+(pct===100?'#7B1FA2':pct>50?'#AB47BC':'#eee')+'"></div></div>';
+      html+='<div class="staff-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r3">';
+      html+='<div class="f"><label>氏名</label><input type="text" value="'+escH(s.name)+'" placeholder="氏名" oninput="upStaff('+i+',\'name\',this.value)"></div>';
+      html+='<div class="f"><label>国籍</label><select onchange="upStaff('+i+',\'nationality\',this.value)">'+NATIONALITIES.map(function(n){return'<option '+(s.nationality===n?'selected':'')+'>'+n+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>在留資格</label><select onchange="upStaff('+i+',\'visa\',this.value)">'+VISA_TYPES.map(function(v){return'<option '+(s.visa===v?'selected':'')+'>'+v+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>職種</label><select onchange="upStaff('+i+',\'position\',this.value)"><option value="">選択</option>'+POSITIONS.map(function(p){return'<option '+(s.position===p?'selected':'')+'>'+p+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>在留期限</label><input type="date" value="'+escH(s.visaExpiry)+'" oninput="upStaff('+i+',\'visaExpiry\',this.value)"></div>';
+      html+='<div class="f"><label>日本語レベル（JLPT）</label><select onchange="upStaff('+i+',\'jlptLevel\',this.value)"><option value="">選択</option><option '+(s.jlptLevel==='N1'?'selected':'')+'>N1</option><option '+(s.jlptLevel==='N2'?'selected':'')+'>N2</option><option '+(s.jlptLevel==='N3'?'selected':'')+'>N3</option><option '+(s.jlptLevel==='N4'?'selected':'')+'>N4</option><option '+(s.jlptLevel==='N5'?'selected':'')+'>N5</option></select></div>';
+      html+='</div>';
+      html+='<div style="font-size:12px;font-weight:600;color:#6A1B9A;margin:.75rem 0 4px">研修受講チェック</div>';
+      TRAINING_ITEMS.forEach(function(t){
+        var d=s.checks&&s.checks[t.id];
+        html+='<div class="check-item"><div class="chk'+(d?' done':'')+'" onclick="toggleCheck('+i+',\''+t.id+'\')">'+(d?'✓':'')+'</div><span>'+t.title+'</span></div>';
+      });
+      html+='<button class="del-btn" style="margin-top:.5rem" onclick="delStaff('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addStaff()">＋ スタッフを追加</button>';
+  document.getElementById('staff-content').innerHTML=html;
+}
+
+function renderTraining(){
+  var html='<div class="sec"><div class="sec-title">📚 介護業 必要研修・資格一覧</div>';
+  html+='<div class="alert-purple">介護施設で外国人スタッフが安全・適切にケアを提供するために必要な研修項目です。</div>';
+  TRAINING_ITEMS.forEach(function(t,idx){
+    html+='<div style="padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px"><strong>'+(idx+1)+'.</strong> '+t.title+'</div>';
+  });
+  html+='<div class="alert-warn" style="margin-top:.75rem">🟡 介護業では感染症・虐待防止・身体拘束廃止に関する研修が法令上義務付けられています。未受講者がいる場合は早急に対応してください。</div>';
+  html+='</div>';
+  document.getElementById('training-content').innerHTML=html;
+}
+
+function renderSummary(){
+  var total=staffList.length;
+  var alertCount=staffList.filter(function(s){return getStatus(s)==='alert';}).length;
+  var warnCount=staffList.filter(function(s){return getStatus(s)==='warn';}).length;
+  var avgTraining=total>0?Math.round(staffList.reduce(function(a,s){return a+getTrainingRate(s);},0)/total):0;
+
+  var html='<div class="sec"><div class="sec-title">📊 サマリー</div>';
+  html+='<div class="summary-grid">';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#7B1FA2">'+total+'</div><div class="summary-label">スタッフ数</div></div>';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#854F0B">'+avgTraining+'%</div><div class="summary-label">平均研修受講率</div></div>';
+  html+='<div class="summary-card" style="background:#FAEEDA;border-color:#EF9F27"><div class="summary-num" style="color:#854F0B">'+warnCount+'</div><div class="summary-label">在留期限間近</div></div>';
+  html+='<div class="summary-card" style="background:#FCEBEB;border-color:#E24B4A"><div class="summary-num" style="color:#A32D2D">'+alertCount+'</div><div class="summary-label">在留期限切れ</div></div>';
+  html+='</div>';
+
+  if(total===0){
+    html+='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">スタッフ管理タブで登録するとサマリーが表示されます</div>';
+  } else {
+    var byVisa={};
+    staffList.forEach(function(s){byVisa[s.visa]=(byVisa[s.visa]||0)+1;});
+    html+='<div style="font-size:12px;font-weight:600;color:#333;margin-bottom:8px">在留資格別人数</div>';
+    Object.keys(byVisa).forEach(function(k){
+      html+='<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:13px"><span>'+escH(k)+'</span><span style="font-weight:600">'+byVisa[k]+'名</span></div>';
+    });
+  }
+  html+='</div>';
+  document.getElementById('summary-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderStaff();
+</script>
+</body>
+</html>
