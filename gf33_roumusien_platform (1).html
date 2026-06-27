@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>労務支援 統合プラットフォーム｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:760px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#1A237E,#283593);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05);flex-wrap:wrap}
+.tab{flex:1;padding:8px 4px;font-size:10px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit;min-width:60px}
+.tab.on{background:#1A237E;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#1A237E;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E8EAF6}
+.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem}
+.menu-card{background:#fff;border:1.5px solid #E8EAF6;border-radius:12px;padding:1rem;text-align:center;cursor:pointer;transition:all .15s}
+.menu-card:hover{border-color:#1A237E;background:#E8EAF6}
+.menu-icon{font-size:28px;margin-bottom:6px}
+.menu-label{font-size:11px;font-weight:600;color:#1A237E}
+.menu-desc{font-size:10px;color:#888;margin-top:3px}
+.tool-frame{background:#F5F5F5;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.tool-title{font-size:13px;font-weight:700;color:#1A237E;margin-bottom:.75rem;display:flex;align-items:center;gap:8px}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select,.f textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit;background:#fff}
+.f input:focus,.f select:focus{border-color:#1A237E}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.result-box{background:#fff;border:1.5px solid #1A237E;border-radius:10px;padding:1rem;margin-top:.75rem}
+.result-title{font-size:12px;font-weight:700;color:#1A237E;margin-bottom:.5rem}
+.result-item{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:12px}
+.result-item:last-child{border-bottom:none}
+.result-item.total{font-weight:700;font-size:13px;padding-top:8px;color:#1A237E}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.alert-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:.75rem;line-height:1.7}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-blue{background:#E8EAF6;border:1px solid #1A237E;color:#1A237E}
+.check-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:12px}
+.check-item:last-child{border-bottom:none}
+.chk{width:18px;height:18px;border-radius:4px;border:1.5px solid #ddd;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;margin-top:1px}
+.chk.done{background:#1A237E;border-color:#1A237E}
+.progress-bar-bg{height:8px;background:#eee;border-radius:4px;margin-top:4px}
+.progress-bar-fill{height:100%;border-radius:4px;transition:width .4s;background:#1A237E}
+.cta-box{background:linear-gradient(135deg,#1A237E,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 労務支援 統合プラットフォーム｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>🏛️ 労務支援 統合プラットフォーム</h1>
+  <p>社労士・行政書士の日常業務を一画面で効率化<br>よく使う計算・チェック・診断ツールを統合</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('menu',this)">🏠 メニュー</button>
+  <button class="tab" onclick="switchTab('zangyo',this)">⏰ 残業代計算</button>
+  <button class="tab" onclick="switchTab('shakai',this)">💰 社会保険料</button>
+  <button class="tab" onclick="switchTab('koyo',this)">📋 雇用保険料</button>
+  <button class="tab" onclick="switchTab('check',this)">✅ 法令チェック</button>
+</div>
+
+<div id="tab-menu"><div id="menu-content"></div></div>
+<div id="tab-zangyo" style="display:none"><div id="zangyo-content"></div></div>
+<div id="tab-shakai" style="display:none"><div id="shakai-content"></div></div>
+<div id="tab-koyo" style="display:none"><div id="koyo-content"></div></div>
+<div id="tab-check" style="display:none"><div id="check-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版でさらに効率化</h3>
+  <p>本番版では全30本以上のシステムが使い放題・<br>計算結果の保存・PDF出力をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="https://forms.gle/xrgH2CtGaCL7LXHE6" target="_blank" class="cta-btn">📝 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var checks = {};
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['menu','zangyo','shakai','koyo','check'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='menu') renderMenu();
+  if(tab==='zangyo') renderZangyo();
+  if(tab==='shakai') renderShakai();
+  if(tab==='koyo') renderKoyo();
+  if(tab==='check') renderCheck();
+}
+
+function renderMenu(){
+  var html='<div class="sec"><div class="sec-title">🏠 ツールメニュー</div>';
+  html+='<div class="alert-blue">社労士・行政書士の日常業務でよく使う計算・チェックツールをまとめました。タップで各ツールに移動できます。</div>';
+  html+='<div class="menu-grid">';
+  html+='<div class="menu-card" onclick="switchTab(\'zangyo\',document.querySelectorAll(\'.tab\')[1])"><div class="menu-icon">⏰</div><div class="menu-label">残業代計算</div><div class="menu-desc">割増賃金を自動計算</div></div>';
+  html+='<div class="menu-card" onclick="switchTab(\'shakai\',document.querySelectorAll(\'.tab\')[2])"><div class="menu-icon">💰</div><div class="menu-label">社会保険料計算</div><div class="menu-desc">健保・厚年を試算</div></div>';
+  html+='<div class="menu-card" onclick="switchTab(\'koyo\',document.querySelectorAll(\'.tab\')[3])"><div class="menu-icon">📋</div><div class="menu-label">雇用保険料計算</div><div class="menu-desc">事業主・被保険者分</div></div>';
+  html+='<div class="menu-card" onclick="switchTab(\'check\',document.querySelectorAll(\'.tab\')[4])"><div class="menu-icon">✅</div><div class="menu-label">法令チェック</div><div class="menu-desc">主要労務法令を点検</div></div>';
+  html+='</div></div>';
+  document.getElementById('menu-content').innerHTML=html;
+}
+
+function renderZangyo(){
+  var html='<div class="tool-frame"><div class="tool-title">⏰ 残業代（割増賃金）計算ツール</div>';
+  html+='<div class="r2">';
+  html+='<div class="f"><label>基本給（月額・円）</label><input type="number" id="base_salary" placeholder="例：250000" oninput="calcZangyo()"></div>';
+  html+='<div class="f"><label>1か月の所定労働時間（時間）</label><input type="number" id="monthly_hours" placeholder="例：160" oninput="calcZangyo()"></div>';
+  html+='<div class="f"><label>時間外労働時間数（時間）</label><input type="number" id="ot_hours" placeholder="例：20" oninput="calcZangyo()"></div>';
+  html+='<div class="f"><label>深夜労働時間数（時間）</label><input type="number" id="night_hours" placeholder="例：5" oninput="calcZangyo()"></div>';
+  html+='<div class="f"><label>休日労働時間数（時間）</label><input type="number" id="holiday_hours" placeholder="例：8" oninput="calcZangyo()"></div>';
+  html+='<div class="f"><label>60時間超残業時間数（時間）</label><input type="number" id="over60_hours" placeholder="例：0" oninput="calcZangyo()"></div>';
+  html+='</div>';
+  html+='<div id="zangyo-result"></div>';
+  html+='</div>';
+  document.getElementById('zangyo-content').innerHTML=html;
+}
+
+function calcZangyo(){
+  var base=parseFloat(document.getElementById('base_salary').value)||0;
+  var monthly=parseFloat(document.getElementById('monthly_hours').value)||160;
+  var ot=parseFloat(document.getElementById('ot_hours').value)||0;
+  var night=parseFloat(document.getElementById('night_hours').value)||0;
+  var holiday=parseFloat(document.getElementById('holiday_hours').value)||0;
+  var over60=parseFloat(document.getElementById('over60_hours').value)||0;
+  var resultEl=document.getElementById('zangyo-result');
+  if(!base||!monthly){resultEl.innerHTML='';return;}
+  var hourly=base/monthly;
+  var otPay=hourly*1.25*ot;
+  var nightPay=hourly*0.25*night;
+  var holidayPay=hourly*1.35*holiday;
+  var over60Pay=hourly*0.25*over60;
+  var total=otPay+nightPay+holidayPay+over60Pay;
+  resultEl.innerHTML='<div class="result-box"><div class="result-title">計算結果</div><div class="result-item"><span>時間単価</span><span>'+fmt(hourly)+'円/時</span></div><div class="result-item"><span>時間外割増（×1.25）</span><span>'+fmt(otPay)+'円</span></div><div class="result-item"><span>深夜割増（+×0.25）</span><span>'+fmt(nightPay)+'円</span></div><div class="result-item"><span>休日割増（×1.35）</span><span>'+fmt(holidayPay)+'円</span></div><div class="result-item"><span>60時間超割増（+×0.25）</span><span>'+fmt(over60Pay)+'円</span></div><div class="result-item total"><span>割増賃金合計</span><span>'+fmt(total)+'円</span></div></div>';
+}
+
+function renderShakai(){
+  var html='<div class="tool-frame"><div class="tool-title">💰 社会保険料 概算計算ツール</div>';
+  html+='<div class="alert-warn">※概算計算です。正確な保険料は標準報酬月額表で確認してください。</div>';
+  html+='<div class="r2">';
+  html+='<div class="f"><label>月額報酬（円）</label><input type="number" id="monthly_salary" placeholder="例：300000" oninput="calcShakai()"></div>';
+  html+='<div class="f"><label>都道府県</label><select id="prefecture" onchange="calcShakai()"><option value="osaka">大阪府</option><option value="tokyo">東京都</option><option value="other">その他</option></select></div>';
+  html+='</div>';
+  html+='<div id="shakai-result"></div>';
+  html+='</div>';
+  document.getElementById('shakai-content').innerHTML=html;
+}
+
+function calcShakai(){
+  var salary=parseFloat(document.getElementById('monthly_salary').value)||0;
+  var pref=document.getElementById('prefecture').value;
+  var resultEl=document.getElementById('shakai-result');
+  if(!salary){resultEl.innerHTML='';return;}
+  var healthRate=pref==='tokyo'?0.0998:pref==='osaka'?0.1064:0.1000;
+  var pensionRate=0.183;
+  var healthEmployee=salary*healthRate/2;
+  var pensionEmployee=salary*pensionRate/2;
+  var healthEmployer=healthEmployee;
+  var pensionEmployer=pensionEmployee;
+  resultEl.innerHTML='<div class="result-box"><div class="result-title">概算計算結果</div><div class="result-item"><span>健康保険料（被保険者）</span><span>'+fmt(healthEmployee)+'円</span></div><div class="result-item"><span>厚生年金保険料（被保険者）</span><span>'+fmt(pensionEmployee)+'円</span></div><div class="result-item total"><span>被保険者負担合計</span><span>'+fmt(healthEmployee+pensionEmployee)+'円</span></div><div class="result-item"><span>健康保険料（事業主）</span><span>'+fmt(healthEmployer)+'円</span></div><div class="result-item"><span>厚生年金保険料（事業主）</span><span>'+fmt(pensionEmployer)+'円</span></div><div class="result-item total"><span>事業主負担合計</span><span>'+fmt(healthEmployer+pensionEmployer)+'円</span></div></div>';
+}
+
+function renderKoyo(){
+  var html='<div class="tool-frame"><div class="tool-title">📋 雇用保険料 計算ツール</div>';
+  html+='<div class="r2">';
+  html+='<div class="f"><label>賃金月額（円）</label><input type="number" id="koyo_salary" placeholder="例：250000" oninput="calcKoyo()"></div>';
+  html+='<div class="f"><label>事業の種類</label><select id="koyo_type" onchange="calcKoyo()"><option value="ippan">一般の事業（1.55%）</option><option value="nourin">農林水産・清酒製造（1.75%）</option><option value="kensetsu">建設の事業（1.85%）</option></select></div>';
+  html+='</div>';
+  html+='<div id="koyo-result"></div>';
+  html+='</div>';
+  document.getElementById('koyo-content').innerHTML=html;
+}
+
+function calcKoyo(){
+  var salary=parseFloat(document.getElementById('koyo_salary').value)||0;
+  var type=document.getElementById('koyo_type').value;
+  var resultEl=document.getElementById('koyo-result');
+  if(!salary){resultEl.innerHTML='';return;}
+  var employeeRate=type==='ippan'?0.006:type==='nourin'?0.007:0.007;
+  var employerRate=type==='ippan'?0.0095:type==='nourin'?0.0105:0.0115;
+  var totalRate=employeeRate+employerRate;
+  var employeePay=salary*employeeRate;
+  var employerPay=salary*employerRate;
+  var totalPay=salary*totalRate;
+  resultEl.innerHTML='<div class="result-box"><div class="result-title">計算結果</div><div class="result-item"><span>被保険者負担（'+Math.round(employeeRate*1000)/10+'‰）</span><span>'+fmt(employeePay)+'円</span></div><div class="result-item"><span>事業主負担（'+Math.round(employerRate*1000)/10+'‰）</span><span>'+fmt(employerPay)+'円</span></div><div class="result-item total"><span>合計保険料（'+Math.round(totalRate*1000)/10+'‰）</span><span>'+fmt(totalPay)+'円</span></div></div>';
+}
+
+var CHECK_ITEMS = [
+  {id:'c1', title:'就業規則の作成・届出（10人以上）'},
+  {id:'c2', title:'36協定の締結・届出'},
+  {id:'c3', title:'有給休暇5日取得義務の管理'},
+  {id:'c4', title:'同一労働同一賃金への対応'},
+  {id:'c5', title:'ハラスメント防止措置の実施'},
+  {id:'c6', title:'育児休業 個別周知・意向確認'},
+  {id:'c7', title:'障害者雇用率の達成'},
+  {id:'c8', title:'労働者名簿・賃金台帳の整備'},
+  {id:'c9', title:'定期健康診断の実施'},
+  {id:'c10', title:'ストレスチェックの実施（50人以上）'}
+];
+
+function toggleCheck(id){checks[id]=!checks[id];renderCheck();}
+
+function renderCheck(){
+  var done=CHECK_ITEMS.filter(function(i){return checks[i.id];}).length;
+  var pct=Math.round(done/CHECK_ITEMS.length*100);
+  var html='<div class="tool-frame"><div class="tool-title">✅ 主要労務法令 対応チェック</div>';
+  html+='<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="font-weight:600">対応状況</span><span style="font-weight:700;color:#1A237E">'+done+'/'+CHECK_ITEMS.length+'（'+pct+'%）</span></div>';
+  html+='<div class="progress-bar-bg"><div class="progress-bar-fill" style="width:'+pct+'%"></div></div>';
+  html+='<div style="margin-top:.75rem">';
+  CHECK_ITEMS.forEach(function(item){
+    var d=checks[item.id];
+    html+='<div class="check-item"><div class="chk'+(d?' done':'')+'" onclick="toggleCheck(\''+item.id+'\')">'+(d?'✓':'')+'</div><span style="'+(d?'text-decoration:line-through;color:#888':'')+'">'+item.title+'</span></div>';
+  });
+  html+='</div>';
+  if(pct===100) html+='<div class="alert-ok" style="margin-top:.75rem">✓ 主要な労務法令対応が完了しています。</div>';
+  else if(pct<50) html+='<div class="alert-warn" style="margin-top:.75rem">🟡 未対応項目があります。優先度の高い項目から対応してください。</div>';
+  html+='</div>';
+  document.getElementById('check-content').innerHTML=html;
+}
+
+function fmt(v){return Math.round(v).toLocaleString('ja-JP');}
+renderMenu();
+</script>
+</body>
+</html>
