@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GrantFlow デモ集｜行政書士・社労士の先生方へ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F2E9;
+  --paper2:#EFE8D8;
+  --ink:#1F2E25;
+  --green:#0F6E56;
+  --green2:#1D9E75;
+  --seal:#B6442C;
+  --line:#D8CFBC;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--paper);color:var(--ink);line-height:1.7}
+.wrap{max-width:880px;margin:0 auto;padding:0 1.25rem 4rem}
+.hero{position:relative;padding:3.5rem 1.25rem 3rem;text-align:center;border-bottom:1px solid var(--line);margin-bottom:2.5rem;overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;height:6px;background:repeating-linear-gradient(90deg,var(--green) 0 18px,transparent 18px 28px);opacity:.5}
+.eyebrow{font-size:.72rem;letter-spacing:.25em;color:var(--green);font-weight:700;margin-bottom:.9rem}
+.hero h1{font-family:'Shippori Mincho',serif;font-weight:700;font-size:clamp(2.1rem,6vw,3.2rem);letter-spacing:.06em;color:var(--ink);margin-bottom:.6rem}
+.hero h1 span{color:var(--green)}
+.hero p{font-size:.95rem;color:#5b6a60;max-width:30em;margin:0 auto}
+.seal{position:absolute;top:1.6rem;right:1.4rem;width:74px;height:74px;border:3px solid var(--seal);border-radius:50%;display:flex;align-items:center;justify-content:center;transform:rotate(-8deg);color:var(--seal);font-family:'Shippori Mincho',serif;font-weight:700;font-size:.78rem;letter-spacing:.15em;line-height:1.3;text-align:center;opacity:.85}
+.intro{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-bottom:2.75rem}
+.intro .pill{background:#fff;border:1px solid var(--line);border-radius:999px;padding:.5rem 1.1rem;font-size:.78rem;font-weight:700;color:var(--green);display:flex;align-items:center;gap:.4rem}
+.intro .pill b{color:var(--ink);font-weight:900}
+.toc-label{font-family:'Shippori Mincho',serif;font-size:1.05rem;font-weight:700;letter-spacing:.12em;color:var(--ink);display:flex;align-items:center;gap:.75rem;margin-bottom:1.4rem}
+.toc-label::after{content:'';flex:1;height:1px;background:var(--line)}
+.section-title{font-family:'Shippori Mincho',serif;font-size:.9rem;font-weight:700;color:var(--green);letter-spacing:.1em;margin:1.5rem 0 .75rem;padding:.5rem .75rem;background:#E4F1EC;border-radius:6px}
+.item{display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:1rem;padding:1.1rem .25rem;border-bottom:1px solid var(--line);text-decoration:none;color:inherit;transition:background .15s}
+.item:hover{background:var(--paper2)}
+.item:last-child{border-bottom:none}
+.num{font-family:'Shippori Mincho',serif;font-size:1.9rem;font-weight:700;color:var(--green2);opacity:.55;text-align:center}
+.body h3{font-size:1rem;font-weight:900;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.body p{font-size:.82rem;color:#6b7a70}
+.tag{display:inline-block;font-size:.66rem;font-weight:700;color:var(--green);background:#E4F1EC;border-radius:5px;padding:.15rem .5rem;margin-bottom:.35rem;letter-spacing:.04em}
+.go{font-family:'Shippori Mincho',serif;font-size:.8rem;font-weight:700;color:#fff;background:var(--green);border-radius:999px;padding:.55rem 1rem;white-space:nowrap}
+.coming{font-family:'Shippori Mincho',serif;font-size:.8rem;font-weight:700;color:#999;background:#eee;border-radius:999px;padding:.55rem 1rem;white-space:nowrap}
+@media (max-width:560px){
+  .item{grid-template-columns:40px 1fr;grid-template-rows:auto auto}
+  .num{font-size:1.4rem}
+  .go,.coming{grid-column:2;justify-self:start;margin-top:.5rem}
+}
+.offer{margin-top:3rem;background:var(--ink);color:var(--paper);border-radius:18px;padding:2.2rem 1.6rem;text-align:center}
+.offer h2{font-family:'Shippori Mincho',serif;font-size:1.4rem;margin-bottom:.6rem;letter-spacing:.05em}
+.offer p{font-size:.85rem;color:#cfd9d3;margin-bottom:1.2rem}
+.offer .price{display:flex;justify-content:center;gap:1.2rem;flex-wrap:wrap;margin-bottom:1.4rem}
+.offer .price div{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:.9rem 1.4rem;min-width:150px}
+.offer .price .label{font-size:.7rem;color:#9fb3a8;letter-spacing:.1em;margin-bottom:.25rem}
+.offer .price .val{font-family:'Shippori Mincho',serif;font-size:1.25rem;font-weight:700;color:#fff}
+.offer .price .sub{font-size:.7rem;color:#9fb3a8;margin-top:.25rem}
+.offer .cta{display:inline-block;background:var(--green2);color:#0A3D2B;font-weight:900;font-size:.92rem;padding:.85rem 2.2rem;border-radius:999px;text-decoration:none}
+.offer .contact{margin-top:1rem;font-size:.78rem;color:#9fb3a8}
+.brand{text-align:center;margin-top:1.6rem;font-size:.72rem;color:#9aa79e;letter-spacing:.1em}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="seal">順次<br>公開<br>中</div>
+  <div class="eyebrow">GRANTFLOW DEMO COLLECTION</div>
+  <h1>行政書士・社労士の<br><span>先生方へ</span></h1>
+  <p>外国人雇用・労務管理に関わる実務を、その場で動かして確認できるデモ集です。順次ツールを追加公開しています。</p>
+</div>
+
+<div class="wrap">
+
+<div class="intro">
+  <div class="pill">⏱ <b>14日間</b>無料トライアル</div>
+  <div class="pill">📶 ログイン<b>不要</b></div>
+  <div class="pill">🔒 データは<b>端末内のみ</b></div>
+  <div class="pill">🛠 現在<b>33本</b>公開中</div>
+</div>
+
+<div class="toc-label">公開中デモ一覧</div>
+
+<div class="section-title">🌏 外国人雇用・在留資格</div>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf13_tokutei_ginou.html" target="_blank">
+  <div class="num">01</div>
+  <div class="body"><div class="tag">特定技能</div><h3>特定技能 支援計画書 作成ツール</h3><p>10項目の支援内容を入力するだけで支援計画書の骨子が完成</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf06_zairyu_check.html" target="_blank">
+  <div class="num">02</div>
+  <div class="body"><div class="tag">在留資格</div><h3>在留資格チェックシステム</h3><p>14種類の在留資格の就労可否・制限・在留期限をその場で確認</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf05_shorui_kanri.html" target="_blank">
+  <div class="num">03</div>
+  <div class="body"><div class="tag">書類管理</div><h3>外国人雇用書類管理システム</h3><p>12種類の必要書類を一覧管理し、未提出・期限切れを自動アラート</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf04_gaikokujin_kanri.html" target="_blank">
+  <div class="num">04</div>
+  <div class="body"><div class="tag">一元管理</div><h3>外国人雇用管理システム</h3><p>国籍・在留資格・在留期限・支援記録を一人ひとり詳細に管理</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf10_ikusei_iko.html" target="_blank">
+  <div class="num">05</div>
+  <div class="body"><div class="tag">制度移行</div><h3>育成就労制度 移行チェックシステム</h3><p>2027年までに必要な移行手続きを16項目のチェックリストで管理</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf11_nyukan_shinsei.html" target="_blank">
+  <div class="num">06</div>
+  <div class="body"><div class="tag">入管申請</div><h3>入管申請 手続き進捗管理ツール</h3><p>複数案件の申請ステージを5段階で見える化、期限アラート付き</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf12_multi_visa.html" target="_blank">
+  <div class="num">07</div>
+  <div class="body"><div class="tag">複数名管理</div><h3>マルチビザ タスク連動管理システム</h3><p>複数スタッフの在留資格更新を一覧化し、必要タスクを自動表示</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf07_kyuyo_tagengo.html" target="_blank">
+  <div class="num">08</div>
+  <div class="body"><div class="tag">多言語</div><h3>AI給与明細 多言語自動生成システム</h3><p>7言語対応。給与明細を日本語と現地語の併記で自動生成</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf08_teichaku.html" target="_blank">
+  <div class="num">09</div>
+  <div class="body"><div class="tag">定着支援</div><h3>定着率向上支援ツール</h3><p>8項目の離職リスク診断と定期面談チェックで早期離職を防止</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf09_renraku_kanri.html" target="_blank">
+  <div class="num">10</div>
+  <div class="body"><div class="tag">連絡記録</div><h3>監理団体・登録支援機関 連絡管理ツール</h3><p>定期報告・面談・書類提出の記録と次回対応期限を一元管理</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf23_ryo_kanri.html" target="_blank">
+  <div class="num">11</div>
+  <div class="body"><div class="tag">寮管理</div><h3>寮宿舎管理システム</h3><p>部屋割り・入居者・稼働率・月間家賃収入を一元管理</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<div class="section-title">💼 助成金・労務管理</div>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf01_career_up.html" target="_blank">
+  <div class="num">12</div>
+  <div class="body"><div class="tag">助成金</div><h3>キャリアアップ助成金 管理システム</h3><p>申請から受給までの進捗・必要書類を一元管理</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf02_shindan.html" target="_blank">
+  <div class="num">13</div>
+  <div class="body"><div class="tag">助成金</div><h3>助成金自動診断ツール</h3><p>8つの質問に答えるだけで利用できる助成金を自動診断</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf03_jinzai_kakuho.html" target="_blank">
+  <div class="num">14</div>
+  <div class="body"><div class="tag">助成金</div><h3>人材確保等支援助成金 管理システム</h3><p>5コースの要件チェック・申請管理を一元化</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf14_36kyotei.html" target="_blank">
+  <div class="num">15</div>
+  <div class="body"><div class="tag">労務管理</div><h3>36協定 自動チェックツール</h3><p>業種・特別条項に応じた残業上限を自動判定、従業員ごとに管理</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf15_yukyu_kyuka.html" target="_blank">
+  <div class="num">16</div>
+  <div class="body"><div class="tag">労務管理</div><h3>有給休暇 管理システム</h3><p>年5日取得義務の達成状況を自動チェック、期限アラート付き</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf16_doitsu_roudou.html" target="_blank">
+  <div class="num">17</div>
+  <div class="body"><div class="tag">労務管理</div><h3>同一労働同一賃金 チェックツール</h3><p>正社員とパート・契約社員の待遇差を9項目で点検</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf17_chingin_daicho.html" target="_blank">
+  <div class="num">18</div>
+  <div class="body"><div class="tag">労務管理</div><h3>賃金台帳 自動生成ツール</h3><p>法定記載事項8項目に対応した賃金台帳を自動生成・印刷</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf18_shogaisha.html" target="_blank">
+  <div class="num">19</div>
+  <div class="body"><div class="tag">労務管理</div><h3>障害者雇用管理システム</h3><p>法定雇用率の自動計算・不足人数・助成金情報を表示</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf19_ikuji_kyugyo.html" target="_blank">
+  <div class="num">20</div>
+  <div class="body"><div class="tag">労務管理</div><h3>育児休業 取得管理システム</h3><p>男女別取得率を自動計算、個別周知・意向確認の管理も</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf20_shugyo_kisoku.html" target="_blank">
+  <div class="num">21</div>
+  <div class="body"><div class="tag">労務管理</div><h3>就業規則 整備チェックツール</h3><p>4カテゴリ19項目で整備状況を点検、法改正対応も確認</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<div class="section-title">🏢 業務効率化</div>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf21_mensetsu.html" target="_blank">
+  <div class="num">22</div>
+  <div class="body"><div class="tag">採用</div><h3>AI面接・採用管理ツール</h3><p>面接評価を数値化・候補者ランキングを自動生成</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf22_invoice.html" target="_blank">
+  <div class="num">23</div>
+  <div class="body"><div class="tag">請求管理</div><h3>インボイス対応 請求管理ツール</h3><p>インボイス登録番号対応・入金状況・未入金額を自動集計</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf09_renraku_kanri.html" target="_blank">
+  <div class="num">24</div>
+  <div class="body"><div class="tag">連絡管理</div><h3>監理団体・登録支援機関 連絡管理ツール</h3><p>定期報告・面談・書類提出の記録と次回対応期限を管理</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf24_kokyaku_dash.html" target="_blank">
+  <div class="num">25</div>
+  <div class="body"><div class="tag">顧客管理</div><h3>顧客別従業員管理ダッシュボード</h3><p>複数顧問先の外国人従業員を一画面で管理、在留期限アラート付き</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf26_tagengo_staff.html" target="_blank">
+  <div class="num">26</div>
+  <div class="body"><div class="tag">多言語</div><h3>多言語スタッフ管理システム</h3><p>7言語対応。スタッフへの連絡メッセージを母国語で自動生成</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<div class="section-title">🌏 外国人スタッフ支援</div>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf27_seikatsu_shien.html" target="_blank">
+  <div class="num">27</div>
+  <div class="body"><div class="tag">生活支援</div><h3>外国人スタッフ 生活支援管理システム</h3><p>住居・銀行口座・行政手続きなど14項目の生活支援を一元管理</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf28_mental_health%20(1).html" target="_blank">
+  <div class="num">28</div>
+  <div class="body"><div class="tag">メンタルケア</div><h3>外国人スタッフ メンタル健康管理システム</h3><p>定期面談の記録とストレス状況を可視化、リスクレベルを自動判定</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf29_torokushien_kanri.html" target="_blank">
+  <div class="num">29</div>
+  <div class="body"><div class="tag">登録支援機関</div><h3>登録支援機関 支援業務管理システム</h3><p>受入れ機関ごとに支援10項目の実施状況を一元管理</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<div class="section-title">🏭 業種別管理</div>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf30_anzen_shikakusho.html" target="_blank">
+  <div class="num">30</div>
+  <div class="body"><div class="tag">製造業</div><h3>製造業 安全管理・資格証管理システム</h3><p>フォークリフト・玉掛け等の資格証有効期限を一元管理</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf31_kensetsu_gaikokujin.html" target="_blank">
+  <div class="num">31</div>
+  <div class="body"><div class="tag">建設業</div><h3>建設業 外国人作業員管理システム</h3><p>在留資格・資格証・現場配置を一元管理</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf32_kaigo_gaikokujin%20(2).html" target="_blank">
+  <div class="num">32</div>
+  <div class="body"><div class="tag">介護業</div><h3>介護業 外国人スタッフ管理システム</h3><p>在留資格・研修記録を一元管理、10項目の研修受講状況をチェック</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<a class="item" href="https://hikari5135.github.io/grantflow-demo/gf33_roumusien_platform%20(1).html" target="_blank">
+  <div class="num">33</div>
+  <div class="body"><div class="tag">統合ツール</div><h3>労務支援 統合プラットフォーム</h3><p>残業代・社会保険料・雇用保険料の計算と法令チェックを一画面で</p></div>
+  <div class="go">デモを開く</div>
+</a>
+
+<div class="offer">
+  <h2>すべて使い放題のプランです</h2>
+  <p>33本以上のシステムを、希望するだけご利用いただけます。<br>現在モニター先3社様を募集中です。</p>
+  <div class="price">
+    <div>
+      <div class="label">MONTHLY</div>
+      <div class="val">¥22,000 / 月（税込）</div>
+    </div>
+    <div>
+      <div class="label">YEARLY</div>
+      <div class="val">¥198,000（税込）</div>
+      <div class="sub">3か月分無料・66,000円お得</div>
+    </div>
+  </div>
+  <a class="cta" href="https://forms.gle/xrgH2CtGaCL7LXHE6" target="_blank">📝 14日間無料トライアルを申し込む</a>
+  <div class="contact">akira.sakamoto5135@gmail.com　｜　GrantFlow 阪本光</div>
+</div>
+
+<div class="brand">GRANTFLOW — 社労士・行政書士・登録支援機関向け業務支援システム</div>
+
+</div>
+</body>
+</html>
