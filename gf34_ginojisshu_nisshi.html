@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>技能実習日誌 管理システム｜GrantFlow デモ版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;background:#f0f2f5;min-height:100vh;padding:1.5rem 1rem;display:flex;justify-content:center}
+.app{max-width:760px;width:100%}
+.demo-banner{background:linear-gradient(135deg,#533AB7,#7C5DE0);border-radius:12px;padding:10px 16px;margin-bottom:1rem;color:#fff;text-align:center;font-size:11px}
+.topbar{background:linear-gradient(135deg,#006064,#00838F);border-radius:12px;padding:14px 16px;margin-bottom:1rem;color:#fff;text-align:center}
+.topbar h1{font-size:15px;font-weight:700;margin-bottom:4px}
+.topbar p{font-size:11px;opacity:.85;line-height:1.6}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;background:#fff;border-radius:10px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tab{flex:1;padding:8px 4px;font-size:11px;font-weight:500;text-align:center;cursor:pointer;border-radius:7px;color:#666;border:none;background:none;font-family:inherit}
+.tab.on{background:#006064;color:#fff;font-weight:600}
+.sec{background:#fff;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.sec-title{font-size:14px;font-weight:700;color:#006064;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #E0F7FA}
+.f{margin-bottom:.65rem}
+.f label{font-size:11px;color:#666;display:block;margin-bottom:3px}
+.f input,.f select,.f textarea{width:100%;font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;outline:none;font-family:inherit}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:#006064}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.badge-ok{background:#E1F5EE;color:#0F6E56}
+.badge-warn{background:#FAEEDA;color:#854F0B}
+.badge-ng{background:#FCEBEB;color:#A32D2D}
+.badge-teal{background:#E0F7FA;color:#006064}
+.badge-gray{background:#f0f0f0;color:#666}
+.alert-box{border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:.75rem;line-height:1.7}
+.alert-ok{background:#E1F5EE;border:1px solid #1D9E75;color:#0F6E56}
+.alert-warn{background:#FAEEDA;border:1px solid #EF9F27;color:#854F0B}
+.alert-teal{background:#E0F7FA;border:1px solid #006064;color:#006064}
+.diary-card{border:1.5px solid #eee;border-radius:12px;padding:1rem;margin-bottom:.75rem}
+.diary-header{display:flex;align-items:center;gap:8px;margin-bottom:.5rem;cursor:pointer}
+.diary-detail{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #eee}
+.diary-detail.open{display:block}
+.add-btn{width:100%;padding:10px;border:2px dashed #006064;border-radius:10px;background:none;color:#006064;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:1rem;font-family:inherit}
+.del-btn{padding:3px 8px;border:1px solid #E24B4A;border-radius:5px;background:#fff;color:#A32D2D;font-size:11px;cursor:pointer;font-family:inherit}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+.summary-card{text-align:center;padding:10px 6px;border-radius:10px;border:1px solid #eee}
+.summary-num{font-size:20px;font-weight:700}
+.summary-label{font-size:10px;color:#666;margin-top:2px}
+.progress-bar-bg{height:8px;background:#eee;border-radius:4px;margin-top:4px}
+.progress-bar-fill{height:100%;border-radius:4px;transition:width .4s;background:#006064}
+.cta-box{background:linear-gradient(135deg,#006064,#0A3D2B);border-radius:12px;padding:1.25rem;text-align:center;color:#fff;margin-top:1rem}
+.cta-box h3{font-size:14px;font-weight:700;margin-bottom:6px}
+.cta-box p{font-size:11px;opacity:.9;margin-bottom:10px;line-height:1.7}
+.cta-btn{display:inline-block;background:#ffd700;color:#0A3D2B;font-weight:700;font-size:13px;padding:10px 24px;border-radius:8px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="demo-banner">
+  🎯 GrantFlow 技能実習日誌 管理システム｜無料デモ版　ログイン不要
+</div>
+<div class="topbar">
+  <h1>📔 技能実習日誌 管理システム</h1>
+  <p>技能実習生の日誌記録・指導員確認を効率化<br>育成就労移行後も継続して使える記録管理</p>
+</div>
+
+<div class="tabs">
+  <button class="tab on" onclick="switchTab('diary',this)">📔 日誌記録</button>
+  <button class="tab" onclick="switchTab('trainee',this)">👤 実習生管理</button>
+  <button class="tab" onclick="switchTab('summary',this)">📊 記録サマリー</button>
+</div>
+
+<div id="tab-diary"><div id="diary-content"></div></div>
+<div id="tab-trainee" style="display:none"><div id="trainee-content"></div></div>
+<div id="tab-summary" style="display:none"><div id="summary-content"></div></div>
+
+<div class="cta-box">
+  <h3>🌿 GrantFlow 本番版でさらに便利に</h3>
+  <p>本番版ではクラウド保存・日誌のPDF出力・<br>監理団体への報告書自動生成をご利用いただけます。<br>14日間無料トライアル実施中！</p>
+  <a href="https://forms.gle/xrgH2CtGaCL7LXHE6" target="_blank" class="cta-btn">📝 無料トライアルを申し込む</a>
+  <div style="font-size:11px;opacity:.75;margin-top:6px">akira.sakamoto5135@gmail.com</div>
+</div>
+</div>
+
+<script>
+var diaries = [];
+var trainees = [];
+var diaryExpanded = {};
+var traineeExpanded = {};
+
+var WORK_TYPES = ['鋳造','鍛造','切削加工','プレス加工','電気機器組立て','溶接','塗装','プラスチック成形','縫製','農業','漁業','食品製造','建設','介護','その他'];
+var NATIONALITIES = ['ベトナム','中国','フィリピン','インドネシア','ミャンマー','タイ','カンボジア','その他'];
+var VISA_TYPES = ['技能実習1号','技能実習2号','技能実習3号','育成就労'];
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  ['diary','trainee','summary'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===tab?'':'none';
+  });
+  if(tab==='diary') renderDiary();
+  if(tab==='trainee') renderTrainee();
+  if(tab==='summary') renderSummary();
+}
+
+function addDiary(){
+  diaries.push({
+    date:new Date().toISOString().substr(0,10),
+    trainee:'',
+    workType:'',
+    workContent:'',
+    workHours:8,
+    supervisorCheck:false,
+    memo:''
+  });
+  renderDiary();
+}
+function delDiary(i){if(!confirm('削除しますか？'))return;diaries.splice(i,1);renderDiary();}
+function upDiary(i,key,val){diaries[i][key]=val;renderDiary();}
+function toggleDiary(i){diaryExpanded[i]=!diaryExpanded[i];renderDiary();}
+
+function addTrainee(){
+  trainees.push({name:'',nationality:'ベトナム',visa:'技能実習1号',workType:'',startDate:'',endDate:'',supervisor:''});
+  renderTrainee();
+}
+function delTrainee(i){if(!confirm('削除しますか？'))return;trainees.splice(i,1);renderTrainee();}
+function upTrainee(i,key,val){trainees[i][key]=val;}
+function toggleTrainee(i){traineeExpanded[i]=!traineeExpanded[i];renderTrainee();}
+
+function renderDiary(){
+  var html='<div class="sec"><div class="sec-title">📔 日誌記録一覧</div>';
+  html+='<div class="alert-teal">技能実習日誌は実習実施者が毎日作成し、技能実習終了後1年間保存する義務があります。</div>';
+
+  if(diaries.length===0){
+    html+='<div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">日誌がまだ記録されていません。<br>下の「追加」ボタンから記録してください。</div>';
+  } else {
+    diaries.forEach(function(d,i){
+      var isExp=diaryExpanded[i];
+      html+='<div class="diary-card">';
+      html+='<div class="diary-header" onclick="toggleDiary('+i+')">';
+      html+='<div style="flex:1">';
+      html+='<div style="font-size:13px;font-weight:700">'+escH(d.date)+'　'+escH(d.trainee||'（実習生未選択）')+'</div>';
+      html+='<div style="font-size:11px;color:#888">'+escH(d.workType||'作業種別未選択')+'　'+d.workHours+'時間</div>';
+      html+='</div>';
+      html+='<span class="badge '+(d.supervisorCheck?'badge-ok':'badge-warn')+'">'+(d.supervisorCheck?'確認済':'未確認')+'</span>';
+      html+='<span style="font-size:12px;color:#aaa;margin-left:4px">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+      html+='<div class="diary-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r2">';
+      html+='<div class="f"><label>実習日</label><input type="date" value="'+escH(d.date)+'" oninput="upDiary('+i+',\'date\',this.value)"></div>';
+      html+='<div class="f"><label>実習生名</label><select onchange="upDiary('+i+',\'trainee\',this.value)"><option value="">選択</option>'+trainees.map(function(t){return'<option '+(d.trainee===t.name?'selected':'')+'>'+escH(t.name)+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>作業種別</label><select onchange="upDiary('+i+',\'workType\',this.value)"><option value="">選択</option>'+WORK_TYPES.map(function(w){return'<option '+(d.workType===w?'selected':'')+'>'+w+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>実習時間数</label><input type="number" value="'+d.workHours+'" min="1" max="24" oninput="upDiary('+i+',\'workHours\',this.value)"></div>';
+      html+='</div>';
+      html+='<div class="f"><label>実習内容</label><textarea rows="3" oninput="upDiary('+i+',\'workContent\',this.value)">'+escH(d.workContent)+'</textarea></div>';
+      html+='<div class="f"><label>メモ・特記事項</label><input type="text" value="'+escH(d.memo)+'" placeholder="特記事項など" oninput="upDiary('+i+',\'memo\',this.value)"></div>';
+      html+='<div style="display:flex;align-items:center;gap:8px;margin-top:.5rem">';
+      html+='<input type="checkbox" id="check_'+i+'" '+(d.supervisorCheck?'checked':'')+' onchange="upDiary('+i+',\'supervisorCheck\',this.checked)">';
+      html+='<label for="check_'+i+'" style="font-size:12px;font-weight:600;color:#006064">指導員確認済</label>';
+      html+='</div>';
+      html+='<button class="del-btn" style="margin-top:.5rem" onclick="delDiary('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='</div>';
+  html+='<button class="add-btn" onclick="addDiary()">＋ 日誌を追加</button>';
+  document.getElementById('diary-content').innerHTML=html;
+}
+
+function renderTrainee(){
+  var html='';
+  if(trainees.length===0){
+    html='<div class="sec"><div style="text-align:center;padding:2rem;color:#aaa;font-size:13px">実習生がまだ登録されていません。<br>下の「追加」ボタンから登録してください。</div></div>';
+  } else {
+    trainees.forEach(function(t,i){
+      var isExp=traineeExpanded[i];
+      var count=diaries.filter(function(d){return d.trainee===t.name;}).length;
+      var checked=diaries.filter(function(d){return d.trainee===t.name&&d.supervisorCheck;}).length;
+      html+='<div class="diary-card">';
+      html+='<div class="diary-header" onclick="toggleTrainee('+i+')">';
+      html+='<div style="flex:1">';
+      html+='<div style="font-size:13px;font-weight:700">'+(t.name||'（氏名未入力）')+'</div>';
+      html+='<div style="font-size:11px;color:#888">'+escH(t.nationality)+' ／ '+escH(t.visa)+'　日誌：'+count+'件（確認済：'+checked+'件）</div>';
+      html+='</div>';
+      html+='<span style="font-size:12px;color:#aaa">'+(isExp?'▲':'▼')+'</span>';
+      html+='</div>';
+      html+='<div class="diary-detail'+(isExp?' open':'')+'">';
+      html+='<div class="r3">';
+      html+='<div class="f"><label>氏名</label><input type="text" value="'+escH(t.name)+'" placeholder="氏名" oninput="upTrainee('+i+',\'name\',this.value)"></div>';
+      html+='<div class="f"><label>国籍</label><select onchange="upTrainee('+i+',\'nationality\',this.value)">'+NATIONALITIES.map(function(n){return'<option '+(t.nationality===n?'selected':'')+'>'+n+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>在留資格</label><select onchange="upTrainee('+i+',\'visa\',this.value)">'+VISA_TYPES.map(function(v){return'<option '+(t.visa===v?'selected':'')+'>'+v+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>実習作業</label><select onchange="upTrainee('+i+',\'workType\',this.value)"><option value="">選択</option>'+WORK_TYPES.map(function(w){return'<option '+(t.workType===w?'selected':'')+'>'+w+'</option>';}).join('')+'</select></div>';
+      html+='<div class="f"><label>実習開始日</label><input type="date" value="'+escH(t.startDate)+'" oninput="upTrainee('+i+',\'startDate\',this.value)"></div>';
+      html+='<div class="f"><label>実習終了日（予定）</label><input type="date" value="'+escH(t.endDate)+'" oninput="upTrainee('+i+',\'endDate\',this.value)"></div>';
+      html+='<div class="f" style="grid-column:1/-1"><label>担当指導員</label><input type="text" value="'+escH(t.supervisor)+'" placeholder="指導員名" oninput="upTrainee('+i+',\'supervisor\',this.value)"></div>';
+      html+='</div>';
+      html+='<button class="del-btn" onclick="delTrainee('+i+')">🗑 削除</button>';
+      html+='</div></div>';
+    });
+  }
+  html+='<button class="add-btn" onclick="addTrainee()">＋ 実習生を追加</button>';
+  document.getElementById('trainee-content').innerHTML=html;
+}
+
+function renderSummary(){
+  var totalDiaries=diaries.length;
+  var checkedDiaries=diaries.filter(function(d){return d.supervisorCheck;}).length;
+  var uncheckedDiaries=totalDiaries-checkedDiaries;
+  var totalHours=diaries.reduce(function(a,d){return a+(parseFloat(d.workHours)||0);},0);
+
+  var html='<div class="sec"><div class="sec-title">📊 記録サマリー</div>';
+  html+='<div class="summary-grid">';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#006064">'+trainees.length+'</div><div class="summary-label">実習生数</div></div>';
+  html+='<div class="summary-card"><div class="summary-num" style="color:#333">'+totalDiaries+'</div><div class="summary-label">日誌記録数</div></div>';
+  html+='<div class="summary-card" style="background:#E1F5EE;border-color:#1D9E75"><div class="summary-num" style="color:#0F6E56">'+checkedDiaries+'</div><div class="summary-label">指導員確認済</div></div>';
+  html+='<div class="summary-card" style="background:#FAEEDA;border-color:#EF9F27"><div class="summary-num" style="color:#854F0B">'+uncheckedDiaries+'</div><div class="summary-label">未確認</div></div>';
+  html+='</div>';
+
+  if(totalHours>0){
+    html+='<div style="background:#E0F7FA;border-radius:8px;padding:10px 14px;margin-bottom:.75rem;display:flex;justify-content:space-between;align-items:center">';
+    html+='<span style="font-size:12px;font-weight:600;color:#006064">総実習時間</span>';
+    html+='<span style="font-size:18px;font-weight:700;color:#006064">'+totalHours+'時間</span>';
+    html+='</div>';
+  }
+
+  if(totalDiaries===0){
+    html+='<div style="text-align:center;color:#aaa;font-size:12px;padding:1rem">日誌記録タブで記録するとサマリーが表示されます</div>';
+  }
+
+  if(uncheckedDiaries>0){
+    html+='<div class="alert-warn">🟡 指導員未確認の日誌が'+uncheckedDiaries+'件あります。確認してください。</div>';
+  }
+  html+='</div>';
+  document.getElementById('summary-content').innerHTML=html;
+}
+
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+renderDiary();
+</script>
+</body>
+</html>
